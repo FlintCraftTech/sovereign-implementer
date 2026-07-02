@@ -1,0 +1,9 @@
+{
+  "name": "si-plugin",
+  "version": "2.0.0",
+  "description": "Sovereign Implementer hooks for OpenCode — session start detection, scope-lock enforcement, git safety, and QUEUE.md structure lint",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "node --check src/session-start.js && node --check src/pre-tool-use.js && node --check src/post-tool-use.js"
+  }
+}
