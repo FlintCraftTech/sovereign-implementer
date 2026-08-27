@@ -1,4 +1,4 @@
-# [HASH] — The test-rezips entry posts at a close once the build has been exercised, and the archive folder is renamed to say what it holds
+# beac9d2 — The test-rezips entry posts at a close once the build has been exercised, and the archive folder is renamed to say what it holds
 
 A rezip had gone unposted, and the capture proposed fixing it by posting at the rezip. The user redesigned it at processing, and the redesign is the substance: **an entry describes a build that has been exercised, not a fresh one.** So it posts at a **close**, and the readiness test is **sessions, not time** — at least one full /plan and one full /next run on the installed build since its rezip, read from `LOG/` records dated after the install date the session opening reports. Her words settling it: *"There's no timing to this."*
 

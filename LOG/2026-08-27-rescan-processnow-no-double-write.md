@@ -1,4 +1,4 @@
-# [HASH] — rescan.md stops writing a capture for an item the user chose to process now
+# beac9d2 — rescan.md stops writing a capture for an item the user chose to process now
 
 Two shipped docs disagreed and a live session followed the wrong one. `rescan.md`'s Step 2 said unconditionally that after the user answers the numbered set "the writes then land", while `plan.md`'s process-now rule says an item taken now is never written as a capture — it is written once, as a work item, after the interview. A /rescan set was answered "process now" and the captures were written first anyway.
 

@@ -1,4 +1,4 @@
-# [HASH] — setup.md's Step 3 heading stops promising two settings the step no longer asks about
+# beac9d2 — setup.md's Step 3 heading stops promising two settings the step no longer asks about
 
 The heading read "Step 3: Interview (adaptive discovery + two settings)" while the step's own body states there is no settings question anywhere — the last one was dropped in favour of ignoring `INBOX/` on both paths.
 

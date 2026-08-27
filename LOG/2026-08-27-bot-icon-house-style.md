@@ -1,4 +1,4 @@
-# [HASH] — The bot gets a house-style icon: white line art with cord striations on the Chagora badge, and sets it as its own avatar
+# beac9d2 — The bot gets a house-style icon: white line art with cord striations on the Chagora badge, and sets it as its own avatar
 
 The user confirmed `throughlinerprojectboticon.svg` as the intended line art, which turned the job from a redraw into a recolour-and-composite. Her addition at processing: the spinal cord at the bottom gains a couple of striations — **up-and-down lines running along the cord, not cross-lines**, her correction — to make it more recognisable for what it is meant to be.
 

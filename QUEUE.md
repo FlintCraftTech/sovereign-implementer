@@ -6,6 +6,24 @@ Two sections. **Processed** — agreed work, ordered top-to-bottom; /next builds
 
 ## Processed
 
+#### The beta channel: each Wednesday's pick offered via Discord and a GitHub pre-release [beta-tester-pathway]
+**Your idea, 2026-08-22, designed in the same session into a three-channel model — the standard release-channel shape (Chrome/Firefox), adopted on your terminology question.** Your day-to-day rezips are dev builds, yours alone and unchanged by this. Each Wednesday's pick becomes the **beta**: announced on the Throughliner Discord, hosted as a GitHub pre-release (Discord cannot host an install; the release ritual already builds and attaches zips), and offered to willing testers while it soaks for a week — you as the only tester at first, which is better than nothing and still a beta channel. After its week it promotes to **stable** and goes to the community listing ([marketplace-submission]). This superseded the earlier two-route question (repo-at-HEAD versus per-rezip artifacts): the weekly-pick artifact route won because it gives testers your chosen moments rather than every commit, and it reuses release machinery rather than adding a publish step to every rezip.
+**Your sequencing, 2026-08-22, revised the same day: the channels launch together rather than beta-then-listing** — the community listing is itself part of how testers arrive, so the chain is beta channel + community listing (honestly framed as early), then YouTube videos pointing at them. Written on both items per the known-ordering rule.
+
+**Kept 2026-08-22, held behind [weekly-release-cycle].** The three things the capture left open are settled. **Install route: a ref-pinned marketplace add** — research done at processing (`resources/research/claude-marketplace-listing-paths.md`, beta-channel section): a marketplace-add pins to a branch via `#ref`, so a `beta` branch fast-forwarded to each Wednesday's pick serves testers through the README's existing ask-Claude install shape, and no tester touches a zip; the pre-release zip stays as the release artifact. The research caveat travels: some ref-handling behaviour is covered by open feature requests, so the walkthrough is smoke-tested on a real second machine before any tester gets it. **Naming, your decision at processing: one cycle, called the release cycle** — beta is a step inside the Wednesday turn, not a sibling cycle; this build amends the one definition rather than adding another. **Offer wording:** drafted in the build, honestly-early testing framing; the launch announcement is the `[user]` line [beta-launch-announcement], filed with this keep.
+
+--- Build block ---
+Changes: amend the release-cycle definition in the cycles doc so one Wednesday turn carries both events — fast-forward the `beta` branch to the newest week-old rezip's commit, and promote last week's beta to the stable release; create the `beta` branch. `README.md` — add a beta-channel section: what beta means (honestly early), the tester install walkthrough (ask Claude to add the marketplace `FlintcraftTech/throughliner#beta` and install), and how updates arrive. Draft the Discord beta-offer announcement text into [beta-launch-announcement]'s walkthrough.
+Acceptance: the cycles doc still parses under the shipped check with the two-event turn; the `beta` branch exists; README's beta section reads for a non-coder and matches the walkthrough smoke-test caveat (not offered to testers until smoke-tested); the announcement draft is under 2,000 characters.
+Refused: a separate beta cycle with its own cadence — one cycle, beta as a step (the user's call); zip-download installs for testers — the ref-pinned marketplace add replaces it; a separate beta repo — a branch suffices.
+--- End build block ---
+**Understudy ordering, your decision 2026-08-22: the beta launch does not wait for it** — Understudy debuts as the standard companion app with the YouTube videos, after this channel and the listing; until then the beta materials carry the one-line caution against editing project docs while a run writes. Written on both this item and the marketplace item per the known-ordering rule.
+**Read [expedite-first-beta-release] before building this, 2026-08-26.** Alex's labelled test-rezip list would give the Wednesday pick a defined candidate set, which this item never had. It does not collide with the ref-pinned install decided here — the list is zips for people who want raw dev builds, testers still install from the `beta` branch — but it changes what the pick selects from, so the two are designed together or not at all.
+**Selector settled 2026-08-26, your decision, recorded in full on [weekly-release-cycle]:** the Wednesday beta pick is the most recent stable-labelled rezip from the nerds list; the stable release is last week's beta promoted after its soak. This item's two-event turn is unchanged in shape — only what the pick selects from changed.
+**Install half advanced 2026-08-26:** [beta-branch-install-pin] creates the `beta` branch at today's expedited release and points README/INSTALL at `#beta`, with the second-machine smoke test as [beta-install-smoke-and-post-edit]. What remains here is the cycle wiring — the two-event Wednesday turn — and the announcement draft; this item's build reconciles its block against what those two already shipped.
+**Lifted 2026-08-27.** [weekly-release-cycle] shipped and was verified in the same run — `CYCLES.md` now exists with the weekly Wednesday definition, checked by running the installed parser against it rather than by reading the file. So the definition this item amends is there to amend, and the hold is dropped.
+**Files:** the cycles doc, `README.md`, QUEUE.md (the announcement item's walkthrough). The dependency is real, not just conceptual: the definition this amends is created by [weekly-release-cycle]'s build.
+
 --- Cleared to run above this line ---
 
 #### [user] Write the article comparing Throughliner to memory-system approaches, finishing with what shipped [competition-comparison-article]
@@ -85,24 +103,6 @@ Not before: 2026-09-21
 
 **Files:** none in this project except the research file step 2 creates under `resources/research/`. The artifact is an article for flintcraft.tech. Relates to [competition-comparison-article] — a separate piece, no dependency either way.
 
-#### The beta channel: each Wednesday's pick offered via Discord and a GitHub pre-release [beta-tester-pathway]
-**Your idea, 2026-08-22, designed in the same session into a three-channel model — the standard release-channel shape (Chrome/Firefox), adopted on your terminology question.** Your day-to-day rezips are dev builds, yours alone and unchanged by this. Each Wednesday's pick becomes the **beta**: announced on the Throughliner Discord, hosted as a GitHub pre-release (Discord cannot host an install; the release ritual already builds and attaches zips), and offered to willing testers while it soaks for a week — you as the only tester at first, which is better than nothing and still a beta channel. After its week it promotes to **stable** and goes to the community listing ([marketplace-submission]). This superseded the earlier two-route question (repo-at-HEAD versus per-rezip artifacts): the weekly-pick artifact route won because it gives testers your chosen moments rather than every commit, and it reuses release machinery rather than adding a publish step to every rezip.
-**Your sequencing, 2026-08-22, revised the same day: the channels launch together rather than beta-then-listing** — the community listing is itself part of how testers arrive, so the chain is beta channel + community listing (honestly framed as early), then YouTube videos pointing at them. Written on both items per the known-ordering rule.
-
-**Kept 2026-08-22, held behind [weekly-release-cycle].** The three things the capture left open are settled. **Install route: a ref-pinned marketplace add** — research done at processing (`resources/research/claude-marketplace-listing-paths.md`, beta-channel section): a marketplace-add pins to a branch via `#ref`, so a `beta` branch fast-forwarded to each Wednesday's pick serves testers through the README's existing ask-Claude install shape, and no tester touches a zip; the pre-release zip stays as the release artifact. The research caveat travels: some ref-handling behaviour is covered by open feature requests, so the walkthrough is smoke-tested on a real second machine before any tester gets it. **Naming, your decision at processing: one cycle, called the release cycle** — beta is a step inside the Wednesday turn, not a sibling cycle; this build amends the one definition rather than adding another. **Offer wording:** drafted in the build, honestly-early testing framing; the launch announcement is the `[user]` line [beta-launch-announcement], filed with this keep.
-
---- Build block ---
-Changes: amend the release-cycle definition in the cycles doc so one Wednesday turn carries both events — fast-forward the `beta` branch to the newest week-old rezip's commit, and promote last week's beta to the stable release; create the `beta` branch. `README.md` — add a beta-channel section: what beta means (honestly early), the tester install walkthrough (ask Claude to add the marketplace `FlintcraftTech/throughliner#beta` and install), and how updates arrive. Draft the Discord beta-offer announcement text into [beta-launch-announcement]'s walkthrough.
-Acceptance: the cycles doc still parses under the shipped check with the two-event turn; the `beta` branch exists; README's beta section reads for a non-coder and matches the walkthrough smoke-test caveat (not offered to testers until smoke-tested); the announcement draft is under 2,000 characters.
-Refused: a separate beta cycle with its own cadence — one cycle, beta as a step (the user's call); zip-download installs for testers — the ref-pinned marketplace add replaces it; a separate beta repo — a branch suffices.
---- End build block ---
-**Understudy ordering, your decision 2026-08-22: the beta launch does not wait for it** — Understudy debuts as the standard companion app with the YouTube videos, after this channel and the listing; until then the beta materials carry the one-line caution against editing project docs while a run writes. Written on both this item and the marketplace item per the known-ordering rule.
-**Read [expedite-first-beta-release] before building this, 2026-08-26.** Alex's labelled test-rezip list would give the Wednesday pick a defined candidate set, which this item never had. It does not collide with the ref-pinned install decided here — the list is zips for people who want raw dev builds, testers still install from the `beta` branch — but it changes what the pick selects from, so the two are designed together or not at all.
-**Selector settled 2026-08-26, your decision, recorded in full on [weekly-release-cycle]:** the Wednesday beta pick is the most recent stable-labelled rezip from the nerds list; the stable release is last week's beta promoted after its soak. This item's two-event turn is unchanged in shape — only what the pick selects from changed.
-**Install half advanced 2026-08-26:** [beta-branch-install-pin] creates the `beta` branch at today's expedited release and points README/INSTALL at `#beta`, with the second-machine smoke test as [beta-install-smoke-and-post-edit]. What remains here is the cycle wiring — the two-event Wednesday turn — and the announcement draft; this item's build reconciles its block against what those two already shipped.
-Blocked by: [weekly-release-cycle]
-**Files:** the cycles doc, `README.md`, QUEUE.md (the announcement item's walkthrough). The dependency is real, not just conceptual: the definition this amends is created by [weekly-release-cycle]'s build.
-
 #### [user] Post the beta-channel launch announcement on the Throughliner Discord [beta-launch-announcement]
 Filed 2026-08-22 with the keep of [beta-tester-pathway], which drafts the announcement text into this walkthrough as part of its build. The offer is framed honestly early — a testing invitation, not a product launch — and yields to the one-a-day posting chain like every other post. Launches alongside the community listing per your sequencing recorded on [beta-tester-pathway] and [marketplace-submission].
 **Walkthrough.**
@@ -135,20 +135,17 @@ Filed 2026-08-27 with [posting-rule-two-kinds-and-tip-pipeline], from your instr
 2. On your yes per post, the bot posts the replacement in the same topic. Look for: the new post appearing under the bot's name.
 3. You delete your original post of each (only you can — the bot cannot delete or edit your messages in a forum topic it doesn't manage, and your authorship is the thing being replaced). Look for: the topic showing only the bot's copy.
 4. The register line for each how-to post is updated to point at the bot's copy, with the channel named; this item closes when every how-to topic's live text is bot-authored.
-Blocked by: [discord-posting-bot]
+**Blocker re-pointed 2026-08-27, not lifted.** [discord-posting-bot] shipped and was verified live — the bot posted to #tips and read the message back byte-identical — so the thing this waited on exists. But the same run measured the bot's per-channel permissions and found it **cannot post in the how-to forum**, which is where step 1 of this walkthrough goes. Lifting it now would clear work that stops at its first step. The hold moves to [bot-needs-howto-send-permission], which is the grant that has to happen first.
+Blocked by: [bot-needs-howto-send-permission]
 
 ## Unprocessed
 
-#### Last session advises processing tip-candidates-need-visibility-screen next [forward-advisory]
-Advice from the 2026-08-27 build close, not work. The next planning session reads this and deletes it in the same breath.
+#### Last session advises processing release-validation-chain-findings next [forward-advisory]
+Advice from the third 2026-08-27 session's close, not work. The next planning session reads this and deletes it in the same breath. It replaces the spent advisory that session cleared at its opening.
 
-**Why this one first.** The tip-coverage audit filed twelve tip candidates in that same run, and they were written against criteria that do not contain the test the user applied hours later when she rejected a drafted post outright: is the thing being described visible from where the user stands? Screening the twelve against that question costs one pass and decides whether the other twelve items are worth designing at all. Designing them first and screening after is the same work in the expensive order.
+**Why this one first.** That capture points at `resources/research/release-validation-chain-broken.md`, whose root finding — validation always runs on a build the working tree has already moved past — cost this session its planning time: the close had to re-derive by hand which commit the tested build was before the user's off-cycle release could run. Until the chain is fixed, every release request repeats that derivation. Overlap check: nothing in the 38 waiting captures contradicts it, and two ([beta-tester-pathway-files-line-names-queue], the tip screen) are independent of it.
 
-**Two other things that will be waiting, mentioned so they are not mistaken for competing recommendations.** The below-line revisit at the planning opening will find two held items whose blockers shipped this session — [beta-tester-pathway] and [howto-posts-bot-authorship] — and both look liftable without anything else happening first. And [live-rules-name-retired-terms] is a live defect in two hook files rather than a rule question, so it wants a build rather than a discussion.
-
-**Condition, stated as a condition rather than a count:** this stops being the right first item once the twelve have been screened, whether or not any of them survives.
-
-The cleared region is empty, so a build run would stop immediately — planning is the only useful next move regardless of which item goes first.
+**Condition:** this stops being the right first item once the four findings in that file have dispositions, whatever they are.
 
 #### Show-first approval moments produce their text twice [approval-flow-token-doubling-simplification]
 Captured by you (2026-08-01) while reviewing your Claude Code feature request anthropics/claude-code#77134. Rescoped at your direction 2026-08-13 from a larger item about approval-time doubling generally.
@@ -482,20 +479,6 @@ Earlier in that same run, [posting-rule-two-kinds-and-tip-pipeline] wrote into `
 
 Worth weighing against the project's ban on speculative rules: this is one recorded instance, and the admission gate asks for a failure you can point to. This is that pointer, filed so a second instance has something to join.
 
-#### [user] Check the second machine for a flintcraft marketplace the beta install may have overwritten [second-machine-marketplace-overwrite-check]
-Filed by /rescan, 2026-08-27, from the beta install smoke test earlier in the same chat.
-
-The install on the second machine registered the marketplace under the name `flintcraft` — its transcript reads "Successfully added marketplace: flintcraft (declared in user settings)". Earlier in that same run this project shipped a guard against exactly this: `claude plugin marketplace add` **silently overwrites** an existing registration of the same name, with no warning and no error (anthropics/claude-code#44042, `resources/research/marketplace-name-collision.md`).
-
-The guard as written says only this project's own machines are exposed, because testers have no local directory marketplace to collide with. The second machine is one of your own machines, so it is not covered by that reassurance — and nothing checked whether it already had a `flintcraft` registration pointing somewhere else. If it did, that registration is now gone and whatever depended on it points at the GitHub beta branch instead.
-
-Recorded as flagged-not-checked in `LOG/2026-08-27-beta-install-smoke-and-post-edit.md`; this is the line that makes it get checked.
-
-**Walkthrough.**
-1. On the second machine, in a Claude Code chat, ask Claude to list the configured plugin marketplaces and say where `flintcraft` points. Look for: a single entry named `flintcraft`, and the source it names.
-2. If it points at `FlintcraftTech/throughliner#beta`, that is this install and nothing was lost — say so and this closes.
-3. If you expected a local folder there instead, tell this project what it should have been. Look for: whether anything on that machine was relying on the old registration.
-
 #### Screen the twelve tip candidates against the is-this-visible-to-a-user test [tip-candidates-need-visibility-screen]
 Filed by /rescan, 2026-08-27, joining two things that happened in the same chat and were never connected.
 
@@ -579,4 +562,37 @@ The sentence SPEC owes, as the build would put it — to be re-authored by whoev
 > Where the method names the close as the next step, it recommends running /rescan first, so anything decided but never written down is caught before the session ends.
 
 The second half of that item — the close's scan standing down when a rescan just ran, with a required line saying so — needs no SPEC sentence: SPEC already says a chat that invokes /rescan pays a line at the close, which is exactly that outcome.
+
+#### Rezip's tip-candidate step writes to a file the scope-lock refuses at rezip time [tip-pooling-step-blocked-by-scope-lock]
+Found live 2026-08-27, at the first rezip after the step was built in the same run. Filed by Claude.
+
+[posting-rule-two-kinds-and-tip-pipeline] added a step to the rezip ritual: notice tip candidates as features land in the installed build, and pool them in `ANNOUNCEMENT-IDEAS.md`. The step cannot run.
+
+**Why.** A rezip happens after a close, when the build working file has been deleted, so the scope-lock treats the session as a planning session. Its standing writable list is QUEUE.md, SPEC.md, CYCLES.md, TOOLS.md, `LOG/`, research notes and scratch files. `ANNOUNCEMENT-IDEAS.md` is on none of them, and the write was refused outright — correctly, by the rule as it stands.
+
+**The design fault is the siting, not the lock.** The pooling step was written into the ritual without checking what the session running that ritual is permitted to write. The rezip is the one moment the step is meant to fire, and it is exactly the moment the file is unwritable.
+
+Three candidate fixes, none chosen here:
+- add `ANNOUNCEMENT-IDEAS.md` to the planning session's standing list, which is the smallest change but widens a list deliberately kept narrow;
+- move the pool into a file already on the list — the queue itself, as captures, which is where cleared candidates end up anyway;
+- move the pooling to a moment that has a build working file, though the rezip is where the information is freshest, which is why it was sited there.
+
+**Worth weighing at processing: whether pooling is needed at all**, given the audit that just filed twelve tip candidates straight into Unprocessed with no pool involved. That path was not blocked by anything.
+
+**What this session did instead**, so the work is not lost: the two candidates it would have pooled are recorded in the rezip's own account in this session's tail — the rescan-before-close recommendation, and /rescan's process-now arm no longer writing a throwaway capture. Both were screened against the user's visibility test and the other three of the build's rule changes were deliberately not pooled, being internal.
+
+#### Process the release-chain findings in resources/research/release-validation-chain-broken.md [release-validation-chain-findings]
+Filed at the third 2026-08-27 session's planning close. The file was written as the build session's post-close tail — a defect report addressed to the next planning session — and that session (this one) never saw it, because a tail file is invisible until the close stages it. This line is what puts it in front of a planning run.
+
+Four findings, per its own index line: validation always runs on a build the tree has already moved past, so the ritual packages the least-tested state; the test-rezips entry lifecycle attaches a zip with the same flaw; `content_stamp()` hashes raw bytes under `core.autocrlf=true` with no `.gitattributes`, so a commit can never be compared to an installed build; and the weekly cycle's stable-label selector has no label-to-commit mechanism behind it. Fix directions are listed in the file, none chosen.
+
+Live evidence from this session: this close had to re-derive by hand that test2 = d31b553 before the off-cycle release of the tested build could be planned — the exact lookup the broken chain fails to provide.
+
+#### Beta-channel item's file list names QUEUE.md, which a build run cannot write [beta-tester-pathway-files-line-names-queue]
+Filed at the third 2026-08-27 session's planning close; the queue lint flagged it when [beta-tester-pathway] was lifted, and the user approved capturing it. The item's Files line includes "QUEUE.md (the announcement item's walkthrough)" — its build is meant to draft the Discord beta-offer text into [beta-launch-announcement]'s walkthrough, which lives in the queue. A run cannot reach the queue: queue content is planning work, and the scope-lock refused exactly this shape once already ([queue-walkthroughs-say-claude-cannot-post]).
+
+The collision was named at the close: [beta-tester-pathway] is cleared and runs before the next planning session unless amended first. The likely fix is small — the announcement draft is authored at a planning session instead, or the build writes it somewhere a run may write and a planning session carries it across — but choosing is processing, not filing.
+
+#### "Contest by number or say go" close ask never says what go does [contest-by-number-ask-unexplained]
+Captured by you, 2026-08-27, at this close's own candidate-set ask: the phrasing is confusing because it does not explain what happens on "go". A reader is asked to choose between two words with only one of them defined — contesting is explained by the numbering, while "go" silently means "write all of these as captures". The fix is wording at the ask's site(s): the candidate-set specimen should state the effect in the sentence, e.g. "say go to file them all, or contest by number." Sites to grep at processing: the wind-down re-scan in done.md, and the /rescan candidate-set ask if it shares the phrasing.
 

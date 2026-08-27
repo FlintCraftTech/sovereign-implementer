@@ -1,4 +1,4 @@
-# [HASH] — This project gets a cycles doc and a weekly Wednesday release, and the release model is amended to run on it
+# beac9d2 — This project gets a cycles doc and a weekly Wednesday release, and the release model is amended to run on it
 
 Releases had been on request and at no other time — the user's decision of 2026-08-09, made after she stopped an automatic release twice. This narrows that clause rather than overturning it: a release runs when she asks, **or** when the weekly release cycle falls due.
 

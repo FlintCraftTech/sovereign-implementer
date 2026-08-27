@@ -5,6 +5,8 @@ and enough of the finding to decide whether to open it, ending in the filename â
 the same contract `LOG/index.md` states for itself, and for the same reason: a
 session should be able to tell what a file answers without opening it.
 
+- **The release chain cannot deliver a validated build (2026-08-27).** Four findings: validation always runs on a build the tree has already moved past, so the ritual packages the least-tested state; the test-rezips entry lifecycle shipped the same day attaches a zip with the same flaw; `content_stamp()` hashes raw bytes under `core.autocrlf=true` with no `.gitattributes`, so a commit can never be compared to an installed build (measured: identical code, different stamps, every diff line-endings only); and the weekly cycle's stable-label selector has no label-to-commit or commit-to-release mechanism behind it. Includes the day's facts (d31b553 = the validated -test2 build) and four undecided fix directions â†’ release-validation-chain-broken.md
+
 **No length cap of any kind.** A line too short to support the open-or-skip
 decision fails at any length; a line that reproduces its file fails too.
 

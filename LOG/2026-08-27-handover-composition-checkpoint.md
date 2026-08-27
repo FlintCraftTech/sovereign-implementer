@@ -1,4 +1,4 @@
-# [HASH] — Three scattered rules become one named checkpoint at the moment a message hands work over
+# beac9d2 — Three scattered rules become one named checkpoint at the moment a message hands work over
 
 Three shipped, clearly written rules each failed to fire at the moment they applied, in a single build run: the tool-check, when a Discord message's text was handed to the user to supply by hand twenty minutes after the same session provisioned a bot with Read Message History for exactly that; the jargon rule, broken within the hour by the session that authored it; and the view-in-doc link rule, months shipped and correctly applied elsewhere in the same run, yet a file was named in prose with no link until the user asked. A fourth instance, added at processing, was the shared-vocabulary rule broken in the planning session itself.
 

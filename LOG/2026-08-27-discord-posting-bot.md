@@ -1,4 +1,4 @@
-# [HASH] — Claude gains a route to Discord: a standard-library bot client, and CLAUDE.md's no-route sentences replaced by the route plus its approval gate
+# beac9d2 — Claude gains a route to Discord: a standard-library bot client, and CLAUDE.md's no-route sentences replaced by the route plus its approval gate
 
 Every Discord post this project has made was copied across by hand. This builds the route: `resources/discord_post.py`, a standard-library client that sends, edits, deletes, lists, attaches files and sets the bot's own avatar against Discord API v10, reading its token from `INBOX/.discord-bot-token.txt`.
 

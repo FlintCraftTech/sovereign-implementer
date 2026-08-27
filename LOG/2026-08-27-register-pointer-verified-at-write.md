@@ -1,4 +1,4 @@
-# [HASH] — A register line claiming text is on file verbatim is written only after the target is confirmed to hold it
+# beac9d2 — A register line claiming text is on file verbatim is written only after the target is confirmed to hold it
 
 Two lines in `INBOX/sent.md` claimed post text sat "verbatim" in a record that held no quoted text. One repair had even pointed back at the register in a circle. The fault was findable only because a session happened to need the text — nothing would have surfaced it otherwise, and a pointer that resolves to nothing reads exactly like one that resolves.
 

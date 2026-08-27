@@ -1,4 +1,4 @@
-# [HASH] — The posting bot prunes its own old test-rezips entries, under four bounds that make the pin and other members' posts unreachable
+# beac9d2 — The posting bot prunes its own old test-rezips entries, under four bounds that make the pin and other members' posts unreachable
 
 Pruning the nerds list was a by-hand job. It now runs in the same pass as each new entry. The route and its reasoning are in this session's entry for [discord-posting-bot]; this records only what the prune adds.
 

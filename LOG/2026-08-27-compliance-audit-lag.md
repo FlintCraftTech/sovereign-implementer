@@ -1,4 +1,4 @@
-# [HASH] — Compliance sweep over the rule-bearing commits since the last audit: seven findings
+# beac9d2 — Compliance sweep over the rule-bearing commits since the last audit: seven findings
 
 Filed by the rule checks at the previous close under the slug they print. The item carried a written file list and also told the audit to recompute it, since the check reads it from git — so the recomputation was run and used. It returned **eight** files under delta scope: `CLAUDE.md`, `done-build.md`, `done-plan.md`, `done.md`, `feedback-and-inbox.md`, `migrate-checklist.md`, `next-audit.md`, `next-build.md`. The item's own list named five more from its own session; the recomputed list is what the audit ran on, exactly as instructed.
 

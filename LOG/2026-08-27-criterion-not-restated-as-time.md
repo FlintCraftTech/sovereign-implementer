@@ -1,4 +1,4 @@
-# [HASH] — A readiness criterion may not be restated as a calendar claim
+# beac9d2 — A readiness criterion may not be restated as a calendar claim
 
 Twice in one planning session a criterion was announced as a time. A readiness test of "one plan run and one next run" was reported as "nothing goes up today" — when both sessions could perfectly well run the same day. The user caught both, and settled it in four words: *"There's no timing to this."*
 

@@ -1,4 +1,4 @@
-# [HASH] — Twelve longstanding features have never had a post: the tip-coverage sweep
+# beac9d2 — Twelve longstanding features have never had a post: the tip-coverage sweep
 
 Filed at the decision step from the user's instruction on the tips restructure: a load of longstanding features have never been posted about, and those are fed in by date rather than by release. This audit is what finds them.
 

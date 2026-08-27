@@ -1,4 +1,4 @@
-# [HASH] — A rezip guard against the marketplace name collision, resting on a confirmed CLI bug rather than a suspicion
+# beac9d2 — A rezip guard against the marketplace name collision, resting on a confirmed CLI bug rather than a suspicion
 
 The local `flintcraft` directory marketplace is what every rezip on this machine depends on, and this repository's committed `marketplace.json` declares the same name. The worry was that adding the GitHub marketplace would collide. It was deliberately never tested, because the test was the risk.
 

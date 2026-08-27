@@ -1,4 +1,4 @@
-# [HASH] — Posting gains a second kind: tips, with their own test, their own channel and a pipeline from rezip to post
+# beac9d2 — Posting gains a second kind: tips, with their own test, their own channel and a pipeline from rezip to post
 
 The posting rule said the purpose was to announce new features, changes and improvements to Throughliner "and nothing else". The user's channel restructure splits that: some of what went to announcements is from now on a **tip**, announcements narrows to **news**, and old posts may be recycled.
 

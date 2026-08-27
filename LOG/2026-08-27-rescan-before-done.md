@@ -1,4 +1,4 @@
-# [HASH] — The rescan is recommended wherever the close is named, and the close's own scan stands down when one just ran
+# beac9d2 — The rescan is recommended wherever the close is named, and the close's own scan stands down when one just ran
 
 Two halves of one idea, captured by the user at the session's rest and processed in the same exchange.
 
