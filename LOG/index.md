@@ -2,7 +2,7 @@
 
 One-line summaries of each session. Newest first.
 
-- [HASH] — plan — release plan settled: tested test2 identified byte-for-byte as d31b553, to release as v1.21.1 from that commit with beta pointed there; [beta-tester-pathway] lifted, [howto-posts-bot-authorship] re-pointed at the send-permission grant; overwrite-check deleted (premise gone); 3 captures + advisory filed on the broken release chain → 2026-08-27-chat-plan-3.md
+- b97573d — plan — release plan settled: tested test2 identified byte-for-byte as d31b553, to release as v1.21.1 from that commit with beta pointed there; [beta-tester-pathway] lifted, [howto-posts-bot-authorship] re-pointed at the send-permission grant; overwrite-check deleted (premise gone); 3 captures + advisory filed on the broken release chain → 2026-08-27-chat-plan-3.md
 - beac9d2 — chat-level record for the 2026-08-27 build run: 13 built, 2 audits filed (19 findings), 4 walk-throughs all done, the bot's first Discord post, and five of this session's own rules broken by the session that wrote them → 2026-08-27-chat-build-2.md
 - beac9d2 — build — `resources/discord_post.py` created: standard-library Discord client (send/edit/delete/list/attach/set-avatar, emoji-tolerant channel resolution); CLAUDE.md's "no route to Discord" replaced by the route with the approval gate restated; `edit` left unconfirmed → 2026-08-27-discord-posting-bot.md
 - beac9d2 — build — prune added to the posting script under four bounds (keep 15, bot-authored only, pins excluded, stop-on-error); bulk-delete refused on its two-week limit; dry-run verified the author bound → 2026-08-27-bot-prunes-test-rezips.md
