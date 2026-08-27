@@ -1,4 +1,4 @@
-# [HASH] — TOOLS.md created; the Discord environment recorded, channel IDs left out
+# d31b553 — TOOLS.md created; the Discord environment recorded, channel IDs left out
 
 The overdue write done in-session: `TOOLS.md` created at the project root carrying the Discord facts learned live on 2026-08-27 — token path and header shape, readable channels, the per-channel 403 gotcha, the Message Content Intent trap, edit-own-only semantics — plus the `py`-not-`python` interpreter fact. The user's decision: channel IDs stay out of the committed file (the repository is public); a session looks them up through the bot in one call. The capture deleted with everything relocated; its two queue citations repointed at TOOLS.md.
 

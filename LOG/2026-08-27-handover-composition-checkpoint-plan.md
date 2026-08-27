@@ -1,4 +1,4 @@
-# [HASH] — Three rule-failure captures merged into one hand-over checkpoint
+# d31b553 — Three rule-failure captures merged into one hand-over checkpoint
 
 The advisory's three same-shape captures — [capability-just-granted-not-considered], [walkthrough-jargon-broken-by-its-own-author], [file-link-not-offered-at-hand-over] — weighed together as one finding: three shipped, clearly written rules each failed to fire while composing a hand-over message, and none while editing a file. Not recency, not wording; hand-over composition had no checkpoint.
 

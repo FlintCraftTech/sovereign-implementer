@@ -659,7 +659,7 @@ were named and accepted: a user who never asks for a public repository never
 considers licensing, and a user who publishes may never think about whether their
 logs belong in it.
 
-## Step 3: Interview (adaptive discovery + two settings)  [SEQUENCE, PROMPT]
+## Step 3: Interview (adaptive discovery)  [SEQUENCE, PROMPT]
 
 The interview is an **adaptive discovery, not a fixed script.** Its job is to reach
 a shared, buildable understanding — enough to fill SPEC's What / Who / How /

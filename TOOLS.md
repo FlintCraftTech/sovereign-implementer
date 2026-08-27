@@ -18,6 +18,14 @@ capability is absent.
   setup; **test-rezips-for-nerds** returned HTTP 403 "Missing Access" until the
   bot was added to that channel's own permissions (a channel overwrite, not a
   missing scope); **main** returns 403 and stays that way deliberately — it is a Chagora testing channel, not a Throughliner posting target (the user's correction, 2026-08-27).
+- **Reading a channel and posting to it are separate grants**, and the bot has
+  them unevenly (measured 2026-08-27 by computing effective permissions from
+  the guild roles plus each channel's overwrites — not by test-posting, which
+  would send real messages). It **can** post to test-rezips-for-nerds,
+  general-chat and give-and-get-support; it **cannot** post to tips,
+  announcements or the how-to forum, each returning HTTP 403 "Missing
+  Permissions" (code 50013). Reading tips and announcements works, which is why
+  the gap is invisible until a send is attempted.
 - Channel IDs are deliberately not recorded here (this file is committed to a
   public repository — the user's decision, 2026-08-27). A session needing one
   looks it up through the bot's API in one call.
@@ -27,6 +35,17 @@ capability is absent.
   deleting others' messages and pinning — never rewriting them.
 - Posting is gated by the standing approval rule: nothing leaves the machine
   without the user seeing the exact text and saying yes.
+
+## Inkscape on this machine (learned live 2026-08-27)
+
+- The CLI is at `C:\Program Files\Inkscape\bin\inkscape.exe`. It exports PNG
+  (`--export-type=png`, `--export-area-drawing|page|<x0:y0:x1:y1>`) and fits a
+  page to its art with
+  `--actions="select-all;fit-canvas-to-selection;export-filename:<same file>;export-overwrite;export-do"`.
+- **`--query-all` and `--export-area` report and take PIXELS, while path data in
+  a mm-based document is in MILLIMETRES** — factor 3.7795 for a 96dpi document.
+  Coordinates read from a query and pasted into a `d` attribute land off-canvas
+  with no error; divide by 3.7795 first. This cost one wasted render.
 
 ## Python on this machine
 

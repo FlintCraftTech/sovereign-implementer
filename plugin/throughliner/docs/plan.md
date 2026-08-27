@@ -1362,8 +1362,9 @@ Unprocessed again.
 
 Skipping the last item leaves Unprocessed non-empty, which is fine. On the last
 item there's no next verbatim, so the message is just the off-ramps — worded
-**neutrally** — "we can close the session and record it, or is there anything
-else to capture or discuss?" — balanced between the two, with the command named
+**neutrally** — "we can run the rescan first to catch anything decided
+but never written down, then close the session and record it — or is there
+anything else to capture or discuss?" — balanced between the two, with the command named
 in words inside the sentence rather than at its end. An empty Unprocessed is a
 resting state. That is the end-of-queue gate's first firing, subject to the
 once-per-rest bound stated at the gate.
@@ -1516,8 +1517,9 @@ to do.
 
 When the queue empties, do **not** presume the session is over. An empty
 Unprocessed is a resting state, not a stop signal. Ask one neutral question
-— "we can close the session and record it, or is there anything else to capture
-or discuss?" — and wait. The command is named in words and does not end the
+— "we can run the rescan first to catch anything decided but never written
+down, then close the session and record it — or is there anything else to
+capture or discuss?" — and wait. The command is named in words and does not end the
 sentence: the app lifts a trailing slash command into the composer, so an ask
 ending on one is a keystroke from being answered by accident.
 

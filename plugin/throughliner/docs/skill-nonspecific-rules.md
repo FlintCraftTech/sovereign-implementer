@@ -131,6 +131,31 @@ The work cycle. Every piece of work travels the same loop.
                                                   # nothing waits for approval
   ```
 
+- **Before a message hands something over for the user to do, read it back
+  against three questions in one pass.** The trigger is composition, not a
+  skill: any message giving the user steps to perform, wherever it is written.
+
+```
+1. WORDS      does any step use a term naming nothing on the user's own
+              screen or in their own files? Is any part of this method
+              called by anything other than its own name? Does each step
+              name the thing to click or type AND the thing to look for?
+2. TOOL       is there a tool that could do this instead of the user —
+              including one this session itself set up? Read TOOLS.md,
+              not your memory of what the project can do.
+3. LINKS      is every file the message points at given as a link, per
+              View-in-doc rendering below?
+```
+
+  Question 2's rule is the CLI-tool rule under Research and evidence filing;
+  question 3's is View-in-doc rendering. Both stay canonical there and are
+  cross-referenced rather than restated.
+
+  **The honest limit, and it must be stated wherever this is described:** one
+  named checklist at one named moment makes the three checks more likely to
+  fire than three rules scattered across the corpus. Nothing verifies that the
+  read-back ran. Do not describe it as enforcing anything.
+
 - **Where the user directly asks for something now and a rule of this method
   would hold it back, warn once and then do it.** One standalone turn naming
   what the request crosses, what the risk is, and — briefly — what could be done
@@ -440,7 +465,10 @@ about your own certainty.
 
 **Where the answer is a date, read a computed field — the session opening's date
 line, the queue digest's passed or ahead figures — and where none exists, read
-the clock.** Never derive today's date by assumption. Same trigger as the rule
+the clock.** Never derive today's date by assumption, nor restate a non-date
+criterion as a time claim: when saying when something can happen, state the
+criterion and check the world against it, and reach for "today", "tomorrow" or
+"later" only where the criterion itself is a date. Same trigger as the rule
 above, on the one subject where your own confidence is least reliable and least
 checkable: a wrong date is written into a record, a capture or a hold and reads
 exactly like a right one for as long as it stands.

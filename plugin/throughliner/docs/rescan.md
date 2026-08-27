@@ -85,8 +85,18 @@ files.
 
 **Work still to do → Unprocessed** [PROMPT]. Show the candidate set as ONE
 numbered message before anything is written, and wait. The user contests by
-number or says go; the
-writes then land, and a contested item is dropped or reworked one at a time.
+number or says go, and a contested item is dropped or reworked one at a time.
+**What happens then depends on the answer:**
+
+```
+answered FILE          ->  the capture is written, exactly as now
+answered PROCESS NOW   ->  NOTHING is written. The item enters the planning
+                           loop and is written once, as a work item, after
+                           the interview — plan.md's process-now rule
+```
+
+  Writing a capture first and then processing it spends a write that is thrown
+  away, and process-now is the common answer. The offer below is what asks.
 
 Placement is the standing one — appended to the bottom of Unprocessed, no
 judgment, no narration of the mechanics.

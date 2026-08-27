@@ -1,4 +1,4 @@
-# [HASH] — Rezip entry redesigned by the user: posts at the close, sessions not time, zips attached
+# d31b553 — Rezip entry redesigned by the user: posts at the close, sessions not time, zips attached
 
 The capture's rezip-sited posting step was superseded by the user's own redesign at processing: an entry describes a build that has been exercised, so it posts at **/done**, ready when at least one full /plan and one full /next have run on the installed build since its rezip — sessions, not time; her correction on the point is recorded in [criterion-not-restated-as-time]. A fresh entry carries no usability rating; posting the new entry unlocks editing the previous one with a testing-outcomes summary and a rating out of 5 (her 3/5 for the current channel entry recorded; that first backfill is hers to paste, every later one a bot edit of its own message).
 

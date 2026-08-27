@@ -204,6 +204,25 @@ loading procedure docs from a docset that had already been retired. Bumping to
    **Known false positive, not a finding:** the returned block currently
    reports `INBOX/sent.md` as waiting mail. Already known — do not file it.
 
+### No entry is posted here
+
+**The test-rezips entry does not post at the rezip.** It posts at a later close,
+once at least one full /plan and one full /next have run on the build this rezip
+just installed — an entry describes a build that has been exercised. The check
+and the entry's two-step lifecycle are in `CLAUDE.md`'s Discord posts section.
+
+### Tip-candidate check
+
+The rezip is the moment a feature lands in the installed build, which makes it
+the moment a tip about that feature becomes noticeable. Read what this rezip
+carries — the commits since the last one — and add a line to
+`ANNOUNCEMENT-IDEAS.md` at the project root for each feature a tip could
+explain, in whatever format that file already uses. Pooling only: a candidate
+is not postable until a release clears it, which is the release step below.
+
+Nothing is posted here, and a rezip carrying no user-facing feature adds
+nothing. Say in one line what was pooled, or that nothing was.
+
 ## Release (on request)
 
 Run this when Alex asks for a release, and only then. Once she has asked, run the
@@ -287,8 +306,8 @@ outright here.
      by someone eventually. This one doesn't, so the release sweep is where it gets
      read.
 5. Archive current zip:
-   `mv plugin/throughliner.zip plugin/zip-archive/throughliner-v<OLD_VERSION>.zip`
-6. Prune `plugin/zip-archive/` to the three most recent zips (delete oldest).
+   `mv plugin/throughliner.zip plugin/release-zip-archive/throughliner-v<OLD_VERSION>.zip`
+6. Prune `plugin/release-zip-archive/` to the three most recent zips (delete oldest).
 7. Delete all `__pycache__` folders under `plugin/throughliner/` so compiled Python
    bytecode never ships in the zip (disposable — Python regenerates them as needed):
    `Get-ChildItem "plugin\throughliner" -Recurse -Directory -Filter __pycache__ | Remove-Item -Recurse -Force`
@@ -334,7 +353,7 @@ outright here.
 11. Stage every dirty path in `plugin/throughliner/` (run
    `git status --porcelain plugin/throughliner/` and stage each listed path — catches
    any sweep edits from the consistency sweep), plus the zip in `plugin/`, archive changes in
-   `plugin/zip-archive/`, plugin.json, and the LOG/ changes (including the
+   `plugin/release-zip-archive/`, plugin.json, and the LOG/ changes (including the
    hash-backfill edits). Commit: "Bump to v<VERSION> and repackage".
 12. `git push`.
 13. Publish a GitHub Release for the new version, so users who subscribed via Watch
@@ -393,9 +412,21 @@ outright here.
     anything that had to be decided along the way. It rides the next session's
     commit like any other post-close work.
 
+### Clear the tip candidates this release ships
+
+The release is what makes a pooled tip candidate postable, so this is where the
+pool is marked. Read `ANNOUNCEMENT-IDEAS.md` against the features this release
+shipped, mark each candidate those features clear, and leave a note in that file
+saying which are cleared and by which version.
+
+Nothing is posted here either. The note is read by the next /plan, which files
+the cleared candidates as dated post items on the one-a-day rhythm — new or
+updated features first, historical tips on slow news days. Say in one line which
+candidates were cleared, or that none were.
+
 **Archive accuracy.** Only the Release ritual ever builds the zip — neither Rezip
 nor Push touches it — so the zip sitting in the working tree is always the last
-released one, and the copy archived into `plugin/zip-archive/` at the archive step of the next
+released one, and the copy archived into `plugin/release-zip-archive/` at the archive step of the next
 release faithfully reflects the prior release. Git history remains the authoritative
 record either way, since each release commits `throughliner.zip`.
 

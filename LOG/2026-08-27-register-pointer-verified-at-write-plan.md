@@ -1,4 +1,4 @@
-# [HASH] — Register audit: two false pointers found and repaired, verify-at-write rule queued
+# d31b553 — Register audit: two false pointers found and repaired, verify-at-write rule queued
 
 The capture [sent-register-pointer-resolves-to-nothing] was processed by doing the checkable half in-session. Every "verbatim in X" pointer in `INBOX/sent.md` was tested against its record: eight of ten resolved to real quoted text; two pointed at `LOG/2026-08-26-beta-day-one-posts-2.md`, which holds none. Worse, the one prior repair was circular — the pin-edited record said the full text was "reproduced in the register line's pointer", which points back at the record.
 

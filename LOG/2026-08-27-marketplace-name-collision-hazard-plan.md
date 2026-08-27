@@ -1,4 +1,4 @@
-# [HASH] — Marketplace collision confirmed by research; flag cleared by a standing rule
+# d31b553 — Marketplace collision confirmed by research; flag cleared by a standing rule
 
 The feared behaviour is the real one: web research at the decision step confirmed `marketplace add` silently overwrites a same-name registration — open Claude Code bug #44042 — so the beta install command on the rezip machine would silently repoint `flintcraft` to GitHub. Finding filed at `resources/research/marketplace-name-collision.md` with its index line.
 

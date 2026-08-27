@@ -394,6 +394,13 @@ close picks up whatever came after the last one. Invoke it shortly before
 closing and this costs a line. With no /rescan run, the close does the full job,
 scanning the whole chat.
 
+**Where nothing has happened since that rescan — no work, no decisions, only the
+close being invoked — perform no second pass, and write one line into the record:
+"covered by the rescan just run."** The required line is what keeps a
+stood-down scan distinguishable from one that never happened. Conversation
+between the rescan and the close is still scanned under the window rule above,
+so this arm reaches only the case where the window is genuinely empty.
+
 **Cycles due-ness check first** [SILENT] when no cycles doc exists; [BRIEF]
 whenever one does. The session opening emits a cycles line naming each
 definition and what its observable reads, and that line is the trigger — but

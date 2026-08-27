@@ -1,4 +1,4 @@
-# [HASH] — Tips split designed: two post kinds, the tip pipeline, and how-to posts under the bot
+# d31b553 — Tips split designed: two post kinds, the tip pipeline, and how-to posts under the bot
 
 From the user's channel restructure ([discord-channel-purposes-split], deleted into this): some announcements posts are henceforth tips, announcements narrows to news, and old posts can recycle. Her pipeline design, carried into one build item: tip candidates noticed at the rezip and pooled in `ANNOUNCEMENT-IDEAS.md`; the release marks which candidates its shipped features clear; the next /plan files them as dated post items — new features first, historical tips on slow days. Tip staleness rides the existing repeal-grep once the register records each post's channel.
 

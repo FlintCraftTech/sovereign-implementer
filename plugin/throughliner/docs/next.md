@@ -642,10 +642,10 @@ more. No experiment, no search, no stopping. (The heavy version, where the
 command is actually run, belongs at /plan's decision step, where the walkthrough is
 authored and the user is in the room.)
 
-**Read a step back for developer and testing vocabulary before handing it
-over.** Same check the halt text already gets, applied to hand-over steps: a
-term naming nothing in the user's own files is translated or dropped before the
-step goes out. The user is about to act on these words with nobody to ask.
+**Run the hand-over checkpoint before a step goes out** — the three-question
+read-back in skill-nonspecific-rules.md: the words, whether a tool could do it
+instead, and whether every file named is linked. The user is about to act on
+these words with nobody to ask.
 
 **Verify any command before handing it over to be pasted.** Run it where doing
 so is safe — a scratch fixture — or read the tool's `--help`. The scope is
@@ -669,6 +669,7 @@ raise it at the next /plan  ->  if the user would rather mention it there
 
 When every `[user]` item has been walked through or deferred, tell the user the
 whole run is complete — Claude-work built, user steps addressed — and recommend
+running the rescan first, to catch anything decided but never written down, then
 /done.
 
 **Copy discipline when the run is all `[user]` items.** Open with the item

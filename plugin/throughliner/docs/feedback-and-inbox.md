@@ -213,6 +213,14 @@ to another project — anything that leaves this machine.
 nothing later reconstructs it.** No second copy of the content: the line points at
 the text, exactly as `LOG/index.md` points at entries.
 
+**A pointer claiming the text is on file verbatim is written only after the
+place it names is confirmed to hold that text** — the write-verify-point rule in
+skill-nonspecific-rules.md, applied at this one further site. Re-read the target
+in the same turn, because that is the only moment the wording is guaranteed to be
+on hand. **Where the text is not stored anywhere, the line says so plainly
+instead of pointing** — "text not on file" rather than a pointer to a record
+holding no quoted text.
+
 **Read the claim off the approved text as it stands on screen, never from what
 the session settled.** What was decided in conversation and what the message
 actually says come apart, and the line is what a later repeal is checked against
