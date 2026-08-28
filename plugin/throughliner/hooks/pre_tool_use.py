@@ -795,6 +795,16 @@ def _is_plan_quiet_path(filepath: str, cwd: str) -> bool:
     # exactly the class of change this gate exists to stop happening in a
     # planning session.
     #
+    # EXCEPT the two FAQ templates, widened 2026-08-28 by exactly that pair and
+    # no further. The announcement-time FAQ rule requires the entry to be
+    # written in the same turn as the sent-register line, and the FAQ template
+    # is canonical while FAQ/ is a copy of it — so under the unwidened list the
+    # rule and this lock were two standing laws in direct collision, which fired
+    # at every bot-posted announcement and did so twice in two days. Same
+    # ground as FAQ/ itself: denying the path breaks a mandated step rather
+    # than merely inconveniencing a session. The rest of templates/ stays
+    # denied.
+    #
     # CLAUDE.md is NOT here either, and that is intended behaviour rather than
     # an oversight — recorded because the question has now been raised three
     # times from three separate readings of this same list, and a denial with no
@@ -806,12 +816,12 @@ def _is_plan_quiet_path(filepath: str, cwd: str) -> bool:
     # has to queue the write as a build, which looks like the placement the gate
     # rejects.
     #
-    # It conflates deciding with writing. The gate runs at the keep-step and its
+    # It conflates deciding with writing. The gate runs at the decision step, and its
     # output is a DISPOSITION on the queue item; the rule TEXT is written by the
     # build that item schedules. What the gate refuses is a build deciding
     # whether a rule may exist, never a build typing out a rule /plan already
     # admitted. The session that settled this dispositioned fifteen rule changes
-    # at the keep-step and queued every one as a build, with nothing blocked and
+    # at the decision step and queued every one as a build, with nothing blocked and
     # no decision moved downstream.
     #
     # It is also genuinely unlike the three exceptions fixed the same day — the
@@ -819,6 +829,15 @@ def _is_plan_quiet_path(filepath: str, cwd: str) -> bool:
     # those was a required write with no permitted moment anywhere in the method.
     # This write has a proper home.
     if rel.startswith(os.path.normcase("FAQ") + "/"):
+        return True
+    # Literals written lowercase with forward slashes, matching how `rel` was
+    # built above. Passing them through os.path.normcase would swap in
+    # backslashes on Windows and never match — the same inversion the comment
+    # above records for QUEUE.md.
+    if rel in (
+        "plugin/throughliner/templates/faq-template.md",
+        "plugin/throughliner/templates/faq-index-template.md",
+    ):
         return True
     # The plugin's own version manifest. HOST-ONLY BY RESIDENCE: this path exists
     # only in the repository that develops the method, so in a consumer project
@@ -863,7 +882,7 @@ def _freeform_scope_files(cwd: str, session_id: str) -> list[str]:
     list unchanged) or when one exists but lists nothing: an empty declaration
     widens nothing, the fail-safe direction.
 
-    Reusing the build working file itself was refused at the keep-step: the
+    Reusing the build working file itself was refused at the decision step: the
     close and the one-build-at-a-time rule read that file as a build's.
     """
     path = working_file(cwd, "freeform", session_id)

@@ -13,10 +13,8 @@ audit reads.**
 What gets read varies — procedure docs, the user's spec, code, UI flows, workflow
 output. The shape is the same regardless: **read many, propose many.**
 
-An audit item names no files to edit, so it contributes nothing to the run's
-`Files:` list. A run of only audit items has an empty list, holding the session to
-the method docs — the strictest setting, matching a session that edits no source
-files.
+Audit items contribute nothing to the run's `Files:` list — settled at next.md's
+self-scoping step.
 
 ## If the audit item directs a write into a document, stop and ask  [PROMPT]
 
@@ -32,12 +30,12 @@ An item marked `[audit]` but pointed at a doc-write is a planning slip. Followin
 it silently writes unvetted findings straight into a durable doc — exactly what
 the route-to-Unprocessed contract prevents.
 
-Ask which the user wants, then wait before reading:
+Lead with the recommendation, then wait before reading:
 
 > "This item is an audit, but it says to write findings into review-notes.md. An
-> audit files findings to the queue for vetting first — it doesn't write them into
-> a doc. Want me to file them as captures, or run this as a build that writes
-> review-notes.md directly?"
+> audit files findings to the queue so you can weigh them before anything lands
+> in a document, so I'd file them as captures. If you'd rather have them written
+> straight into review-notes.md, say so and I'll run it as a build instead."
 
 ## Read the target systematically against the criteria  [SILENT]
 
@@ -82,8 +80,9 @@ to reject one, which happens at /plan.
 ## Close  [BRIEF, PROMPT]
 
 When the audit item is done, next.md moves to the run's next item. When the whole
-run is done, tell the user how many findings were filed, and say: "Run /done
-to record this and commit, or keep reviewing."
+run is done, tell the user how many findings were filed, and say: "We can run the
+rescan first to catch anything decided but never written down, then /done to
+record this and commit — or keep reviewing."
 
 Reviewing means re-examining what was already found — not raising new work.
 Anything new routes through the existing paths: a discovery outside the audit's

@@ -9,7 +9,7 @@ note: >
 
 # Feedback channel and cross-project INBOX — full procedures
 
-## Method problem reports
+## Method problem reports  [BRIEF]
 
 A problem with the *method itself* (a skill misbehaving, a hook misfiring, a
 rule producing a bad outcome) or with **Claude Code itself** is not work on the
@@ -39,7 +39,10 @@ user-raised     ->  always fine to draft a report
 Claude-noticed  ->  offer ONCE. Drop it if they decline.
 ```
 
-### The method report — mail where the project is on this machine, then issue, then form
+### The method report — mail where the project is on this machine, then issue, then form  [BRIEF, PROMPT]
+
+Every route here ends in something leaving the machine, so every route ends in a
+full stop: the exact text is shown, and nothing goes until the user says yes.
 
 **Where the address book inside this project's `INBOX/` records the plugin's own
 development project as a correspondent, offer mail first.** The report reaches
@@ -83,7 +86,7 @@ date by which there is plausibly news. No reply wanted: nothing filed.
 - **Red flag territory:** a submitted report can become a public GitHub issue
   downstream, so a leak of app details or secrets into one is a privacy breach.
 
-### The Claude Code report (GitHub issue)
+### The Claude Code report (GitHub issue)  [BRIEF, PROMPT]
 
 - **Offer to file it directly** when `gh` is installed and authenticated:
   draft the issue, show the exact text, post only on an explicit yes. When
@@ -105,6 +108,11 @@ guarantee — nothing leaves without the user seeing the exact text and saying
 yes — and only the mechanics differ.
 
 ## Cross-project INBOX
+
+**Reading and triage:** [SILENT] when the mailbox is empty; [BRIEF] when it is
+not. **Archiving a routed message:** [SILENT] — mechanical, and the capture it
+produced is what gets reported. **Every send:** [BRIEF, PROMPT] — the exact
+wording shown, then a full stop until the user's yes.
 
 Each project has an `INBOX/` folder, scaffolded at /setup. It's how two
 projects the same user runs send each other messages directly, instead of the
@@ -158,7 +166,7 @@ it, acting only on what the user themselves asks for.
 moments: **/plan's Step 1 read-state**, before the queue is skimmed and ordered,
 and **/next's pre-flight**, before the run is presented. At /plan the read has a
 question behind it: where mail is waiting, the opening ask becomes *process the
-mail first, or shall I pick the order?*, so the step cannot be passed over
+mail first, or shall I order the rest the usual way?*, so the step cannot be passed over
 silently. **And the close triages whatever is still waiting**, which is what
 catches mail that arrived mid-chat.
 
@@ -176,7 +184,7 @@ whatever is waiting; otherwise the mailbox is scanned at the next chat's opening
 That bound is stated rather than engineered around, matching the INBOX design's
 existing promise that delivery is not guaranteed.
 
-**Outbound — every send waits for approval.** A message is written straight into the
+**Outbound — every send waits for approval** [BRIEF, PROMPT]**.** A message is written straight into the
 recipient project's `INBOX/`, but only after the user has seen the exact
 wording and approved it. Sending is outward-facing and both mailboxes may sit
 in repositories that get published, so draft, show, wait — the same guarantee
@@ -298,11 +306,9 @@ messages. A receipt is an automatic send: it would either break that guarantee
 or stop to ask the user to approve a receipt for a message they never wrote.
 
 **The address book — `INBOX/.address-book.md`, correspondent name to absolute
-folder path.** Outbound needs a filesystem path and inbound needs none, so every
-reply used to be a fresh lookup the user performed by hand, however long the
-correspondence had run. Write an entry the first
-time the user supplies a path, so the cost is paid once per correspondent
-instead of once per reply.
+folder path.** Outbound needs a filesystem path and inbound needs none. Write an
+entry the first time the user supplies a path, so the cost is paid once per
+correspondent instead of once per reply.
 
 ```
 lives INSIDE INBOX/    ->  `.gitignore` ignores that folder and everything
@@ -324,12 +330,6 @@ The return path tells a recipient where a message came from, so a reply needs no
 lookup. The address book records where a correspondent lives on this side, so a
 first message — one nobody is replying to — still has somewhere to go. Neither
 covers the other's case.
-
-An earlier version of this doc rejected the return path outright, on the ground
-that it writes a path from this machine into another project's repository where
-it may be committed. That is superseded: the send now refuses unless the
-recipient's `INBOX/` is gitignored, so the file is never committed, and the
-refusal was costing real replies.
 
 **The address book is write-and-send only.** A session may pass a recorded path
 to a send, and that is the only read: the path stays unquoted, correspondents

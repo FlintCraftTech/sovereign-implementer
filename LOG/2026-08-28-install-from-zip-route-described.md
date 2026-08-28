@@ -1,4 +1,4 @@
-# [HASH] — [user] done — the install-from-zip route now in the nerds pin, and the whole pin compressed
+# 2e9cb18 — [user] done — the install-from-zip route now in the nerds pin, and the whole pin compressed
 
 Placement settled at processing: the pin, not a new how-to topic — the how-to set stays small by design and three sentences fit the pin's register. The install paragraph was drafted (unzip → add the extracted folder as a local plugin marketplace → install → full restart), then the user judged the whole pin too long, so Claude compressed the entire welcome text — every claim kept, the duplicated safe-route sentence merged — and she pasted it over the pin (only she can edit her own message). Register line written with the full claim set; the reader's steps are untouched by the archive rework, so the text won't stale when it ships. The compressed pin text verbatim:
 

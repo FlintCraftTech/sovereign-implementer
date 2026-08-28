@@ -260,26 +260,41 @@ def send(token, channel, body_path, attach=None):
     return message
 
 
-def build_plugin_zip(project_root, out_dir):
-    """Zip plugin/throughliner/ as it stands, for a test-rezips entry.
+def archived_plugin_zip(project_root, version=None):
+    """The zip of a build from plugin/rezip-archive/, for a test-rezips entry.
 
-    Built at posting time and never kept locally: the release archive stays
-    release-only, Discord holds the download, and the entry's Commit: line is
-    what lets any build be rebuilt byte-for-byte from git.
+    Nothing is built here. The rezip archives each build's zip at the moment
+    that build is installed and its stamps are proved equal to the source, so
+    the archived bytes are the bytes that were tested; a zip built now would be
+    of whatever the working tree has since become.
+
+    With no version given, the newest entry is used. The readme beside each zip
+    carries that build's label, version and Commit: line, and is what the
+    channel post says.
     """
-    import zipfile
+    archive_dir = os.path.join(project_root, "plugin", "rezip-archive")
+    if not os.path.isdir(archive_dir):
+        raise DiscordError(
+            "No rezip archive at %s. It is written by the rezip ritual's "
+            "archive step — run a rezip before posting an entry." % archive_dir)
 
-    source = os.path.join(project_root, "plugin", "throughliner")
-    if not os.path.isdir(source):
-        raise DiscordError("No plugin folder at %s to zip." % source)
+    zips = sorted(name for name in os.listdir(archive_dir)
+                  if name.endswith(".zip"))
+    if not zips:
+        raise DiscordError("No zips in %s to attach." % archive_dir)
 
-    target = os.path.join(out_dir, "throughliner.zip")
-    with zipfile.ZipFile(target, "w", zipfile.ZIP_DEFLATED) as archive:
-        for folder, _, names in os.walk(source):
-            for name in names:
-                full = os.path.join(folder, name)
-                archive.write(full, os.path.relpath(full, os.path.dirname(source)))
-    return target
+    if version is None:
+        chosen = max(zips, key=lambda name: os.path.getmtime(
+            os.path.join(archive_dir, name)))
+    else:
+        wanted = "throughliner-v%s.zip" % version.lstrip("v")
+        if wanted not in zips:
+            raise DiscordError(
+                "No archived build %s in %s. Available: %s"
+                % (wanted, archive_dir, ", ".join(zips)))
+        chosen = wanted
+
+    return os.path.join(archive_dir, chosen)
 
 
 def edit(token, channel, message_id, body_path):
@@ -324,6 +339,76 @@ def fetch_all(token, channel_id, cap=300):
         if len(batch) < 100:
             break
     return collected
+
+
+def _readable_channels(token):
+    """Every text channel the bot can see, across every guild it is in.
+
+    Read access is what the grant gives; posting is a separate grant. This is a
+    read only, so it reaches everything the bot has been let into.
+    """
+    found = []
+    for guild in request(token, "GET", "/users/@me/guilds") or []:
+        channels = request(token, "GET", "/guilds/%s/channels" % guild["id"])
+        for channel in channels or []:
+            # 0 = text, 5 = announcement. Voice and category entries hold no
+            # messages, and asking for their messages errors.
+            if channel.get("type") in (0, 5):
+                found.append((channel.get("name", channel["id"]),
+                              channel["id"]))
+    return found
+
+
+def replies(token, since, cap=300):
+    """Replies to the bot's own messages, and messages @mentioning it.
+
+    A read only — there is no send path here. What comes back is data for a
+    session to weigh: an owed reply is drafted and goes out on the user's
+    explicit yes to the exact text, under the standing send gate, which this
+    script does not and cannot enforce.
+
+    `since` is an ISO date (YYYY-MM-DD). Messages are compared on their own
+    timestamps rather than against anything stored, so nothing here keeps a
+    position and a forgotten run costs nothing — the same posture as the
+    correspondence check that reads GitHub issues.
+    """
+    me = whoami(token)
+    my_id = str(me["id"])
+
+    out = []
+    for name, channel_id in _readable_channels(token):
+        try:
+            messages = fetch_all(token, channel_id, cap=cap)
+        except DiscordError:
+            # A channel the bot can list but not read its history. Skipped
+            # rather than fatal: one closed door must not hide every other
+            # channel's replies.
+            continue
+        for message in messages:
+            stamp = message.get("timestamp", "")
+            if stamp[:10] < since:
+                continue
+            author = message.get("author", {})
+            if str(author.get("id")) == my_id:
+                continue
+            referenced = message.get("referenced_message") or {}
+            replies_to_bot = str(
+                (referenced.get("author") or {}).get("id")) == my_id
+            mentions_bot = any(str(u.get("id")) == my_id
+                               for u in message.get("mentions", []))
+            if not (replies_to_bot or mentions_bot):
+                continue
+            out.append({
+                "channel": name,
+                "author": author.get("global_name")
+                          or author.get("username", "unknown"),
+                "timestamp": stamp,
+                "kind": "reply" if replies_to_bot else "mention",
+                "content": message.get("content", ""),
+                "id": message["id"],
+            })
+    out.sort(key=lambda row: row["timestamp"])
+    return out
 
 
 def prune(token, channel, keep=15, dry_run=False):
@@ -401,10 +486,12 @@ def main(argv=None):
     p_send.add_argument("--body", required=True,
                         help="path to the approved text (sent verbatim)")
     p_send.add_argument("--attach", help="optional file to attach")
-    p_send.add_argument("--attach-plugin-zip", metavar="DIR",
-                        help="zip plugin/throughliner/ into DIR (use the "
-                             "session scratchpad) and attach it — the "
-                             "test-rezips entry's download")
+    p_send.add_argument("--attach-archived-zip", metavar="VERSION", nargs="?",
+                        const="", default=None,
+                        help="attach a build's zip from plugin/rezip-archive/ "
+                             "— the test-rezips entry's download. Give a "
+                             "version, or omit it for the newest archived "
+                             "build. Nothing is built here.")
     p_send.add_argument("--prune-to", type=int, metavar="N",
                         help="after posting, keep only the newest N of the "
                              "bot's own unpinned messages in this channel")
@@ -428,6 +515,16 @@ def main(argv=None):
     p_prune.add_argument("--dry-run", action="store_true",
                          help="report what would go, delete nothing")
 
+    p_replies = sub.add_parser(
+        "replies",
+        help="read replies to the bot and @mentions of it, across every "
+             "channel it can see. A read only — no send path.")
+    p_replies.add_argument("--since", required=True, metavar="YYYY-MM-DD",
+                           help="ignore anything older than this date")
+    p_replies.add_argument("--cap", type=int, default=300,
+                           help="how far back to page per channel "
+                                "(default: 300 messages)")
+
     sub.add_parser("whoami", help="report the bot's own account")
 
     args = parser.parse_args(argv)
@@ -437,10 +534,10 @@ def main(argv=None):
 
         if args.command == "send":
             attachment = args.attach
-            if args.attach_plugin_zip:
-                attachment = build_plugin_zip(args.project_root,
-                                              args.attach_plugin_zip)
-                print("Built %s (%d KB)"
+            if args.attach_archived_zip is not None:
+                attachment = archived_plugin_zip(
+                    args.project_root, args.attach_archived_zip or None)
+                print("Attaching archived build %s (%d KB)"
                       % (attachment, os.path.getsize(attachment) // 1024))
             message = send(token, args.channel, args.body, attachment)
             print("Posted to #%s — message id %s" % (args.channel, message["id"]))
@@ -474,6 +571,19 @@ def main(argv=None):
         elif args.command == "set-avatar":
             set_avatar(token, args.image)
             print("Avatar updated.")
+
+        elif args.command == "replies":
+            found = replies(token, args.since, cap=args.cap)
+            if not found:
+                print("No replies or mentions since %s." % args.since)
+            for row in found:
+                print("--- #%s — %s — %s (%s)"
+                      % (row["channel"], row["author"],
+                         row["timestamp"][:10], row["kind"]))
+                print(row["content"])
+                print()
+            if found:
+                print("%d item(s) since %s." % (len(found), args.since))
 
         elif args.command == "whoami":
             me = whoami(token)

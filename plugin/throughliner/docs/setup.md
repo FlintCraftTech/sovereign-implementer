@@ -769,3 +769,50 @@ the LOG entry /done writes at close.
   then **/clear** to start fresh. The habit that matters: **always /done before
   /clear**, so each session is saved before the context resets.
 
+## The self-hosting seed  [BRIEF, PROMPT]
+
+For a user building something whose output is instructions — a method, a plugin,
+a port, a house style — the discipline for authoring rules their own sessions
+will follow can be seeded into the project.
+
+**Two entry points, one seed.**
+
+```
+at a fresh setup    ->  one question during the interview: are you building
+                        something that will carry its own rules — a method,
+                        a plugin, a port?
+on an adopted       ->  the user says so at any time ("I want to self-host").
+  project               Run the same seed against the project as it stands.
+```
+
+**The seed is add-only, in the top-up's never-overwrite discipline.** Nothing the
+user wrote is rewritten, and where a file it would create already exists, say so
+and leave it alone.
+
+**What it places.**
+
+```
+the project's CLAUDE.md   ->  a self-hosting block, appended between its own
+                              start and end markers, from
+                              ${CLAUDE_PLUGIN_ROOT}/templates/self-hosting-claude-block.md
+a retired-terms register  ->  from templates/retired-terms-template.md
+a compliance-audit
+  checklist               ->  from templates/compliance-audit-checklist-template.md
+```
+
+The block carries the rule gate (admission, eviction, distribution, wording), the
+disposition-on-the-queue-item pattern with its session-record line, and the
+host-versus-target framing. Put the two files where the project keeps its own
+notes rather than at a fixed path, and say where they went.
+
+**What is deliberately not seeded, and it is worth saying to the user:** this
+project's own release and packaging rituals, and its rule-checking scripts. They
+are shaped around one repository's layout, and shipping them would mean
+maintaining a tool before anyone has proven they need it. The discipline
+generalises; the machinery does not.
+
+**Say what the block is for in one sentence, in the user's own terms** — that
+their rule text is a thing they now maintain, and these are the checks that keep
+it from growing past what a model will follow. Then get an explicit yes before
+writing anything.
+

@@ -43,9 +43,11 @@ The docset serves the **5-series — Fable 5 and Opus 5** — which converge on 
 
 ## Host and target
 
-**Host** = the plugin as installed in the desktop app. Its hooks fire, its skills are available, its procedures govern sessions. Nothing in this repo changes host behaviour — only a `claude` CLI install/update against the committed marketplace plus a full app restart does (the desktop app's in-app plugin upload is gone; the exact commands are in the Push section below and in `resources/release-ritual.md`). A bare working-tree or zip edit changes nothing the host sees, because the host runs a frozen snapshot the CLI copied into `~/.claude/plugins/cache/...` at install time, not the live files. **Two packaging paths, and conflating them has already caused one wrong deletion:** the **rezip** itself builds no zip — the local marketplace sources the folder and the CLI snapshots it directly — while a **release** runs `Compress-Archive` into `plugin/throughliner.zip`, archives the previous one under `plugin/release-zip-archive/`, and attaches the zip to the GitHub Release. So those two paths are live release artifacts, not leftovers of the retired rezip packaging.
+**Host** = the plugin as installed in the desktop app. Its hooks fire, its skills are available, its procedures govern sessions. Nothing in this repo changes host behaviour — only a `claude` CLI install/update against the committed marketplace plus a full app restart does (the desktop app's in-app plugin upload is gone; the exact commands are in the Push section below and in `resources/release-ritual.md`). A bare working-tree or zip edit changes nothing the host sees, because the host runs a frozen snapshot the CLI copied into `~/.claude/plugins/cache/...` at install time, not the live files. **The rezip builds every zip and the release only copies one.** The install itself uses no zip — the local marketplace sources the folder and the CLI snapshots it directly — but immediately after the install, once the stamps are proved equal, the **rezip** zips `plugin/throughliner/` into `plugin/rezip-archive/` with a readme carrying that build's label, `Commit:` line and version. A **release** then copies the picked build's archived zip to `plugin/throughliner.zip` and attaches it to the GitHub Release; it runs no `Compress-Archive` of its own.
 
-**The word "rezip" nonetheless still involves a zip, and this is the full truth so the word stops misleading:** a rezip refreshes the install from the folder and builds nothing, but the **test-rezips entry posted about that build attaches a zip of it**, built at posting time from `plugin/throughliner/` as it stands (~270KB, well under Discord's file limit) and never kept locally. So the channel's name is literally true, the release archive stays release-only and pruned to three, Discord holds the download, and the entry's `Commit:` line lets any build be rebuilt byte-for-byte from git. **Renaming the word was refused:** the channel name keeps it public, and docs saying "refresh" against a channel saying "rezips" would mislead more, not less.
+**That ordering is the point rather than a detail.** A zip built at release time is a zip of whatever the working tree has become since the build was tested, so the release could ship bytes nobody had run. Building it at the one moment the folder is provably the installed build closes that, and it makes the label-to-commit lookup a local file read instead of a person reading Discord.
+
+**So the word "rezip" is literally true, and this is the full truth so it stops misleading:** the archive is a 15-entry local mirror of the test-rezips-for-nerds channel — one zip and one readme per build, the readme being the channel post's own text — pruned to 15 as the channel is. The folder is gitignored: every archived build is rebuildable byte-for-byte from its `Commit:` line, so committing the zips would store what git already holds. `plugin/release-zip-archive/` is retired and deleted, GitHub Releases keeping every release's zip. **Renaming the word was refused:** the channel name keeps it public, and docs saying "refresh" against a channel saying "rezips" would mislead more, not less.
 **Target** = the editable source at `plugin/throughliner/`. This is what sessions build and edit. Target changes have no effect until packaged and installed as the new host.
 
 Host and target are the same plugin at different stages. Ambiguous references to "the plugin," "the hooks," "the procedures," etc. must specify host or target. **Default assumption: discussion is about the target unless the user says otherwise.** Most target changes become host changes automatically on reinstall. Changes that live outside the plugin package (e.g. project doc structure, this CLAUDE.md) won't propagate through reinstall and need manual updates.
@@ -78,7 +80,7 @@ No code method/
   .gitignore
   plugin/                — plugin packaging
     throughliner.zip     — the zip a RELEASE builds and attaches (not the rezip)
-    release-zip-archive/ — previous releases' zips, pruned to three
+    rezip-archive/       — each rezip's zip + readme, newest 15, gitignored
     throughliner/        — target source
       .claude-plugin/    — plugin manifest
       hooks/             — session_start, pre_tool_use, stop, post_tool_use
@@ -199,7 +201,7 @@ Then four questions:
   **A check that finds something files one capture in Unprocessed under the slug it prints, and then gets out of the way.** It does not escalate over time — that would need a bare number, which the gate now bans — and it does not go quiet on a standing finding, which would recreate the silent inaction the whole design exists to prevent. The work goes where all work goes, ordered by the ladder and counting toward the throughput floor, where ignoring it is visible in the queue. **A check counts as satisfied while an open capture with its slug already exists**, which is the guard against filing the same capture every session.
 
   **Independent checks rather than a positional cycle**, because a cycle put compression permanently downstream of machinery that never ran. Independent triggers can each fire whether or not any other ran, and can be built one at a time. **That argument is weaker than it looked, and the instruction never to re-propose the cycle is repealed** — these checks then had no trigger either, for their entire life, so nothing ran them and the reasoning that defeated the alternative applies to the winner with equal force. A later session may re-propose a cycle on its merits.
-- **FAQ entries are authored at the announcement, not with the work item.** When a posted announcement's line is written into `INBOX/sent.md`, the FAQ entry answering what that announcement teaches is authored in the same turn — into `plugin/throughliner/templates/faq-template.md` with its `faq-index-template.md` index line, then both files re-copied into `FAQ/` (`FAQ/faq.md` and `FAQ/index.md` are a straight copy of the shipped template, and the template is canonical; `FAQ/` is kept because `session_start` points every session at `FAQ/index.md` exactly as it does for consumers). This supersedes and repeals the FAQ-sync close gate and the FAQ-entries-ride-work-items decision step rule, replacing their judgment trigger ("does this alter what a user does?") with an unmissable one — the sent-register line is already required to be written in the approval turn, so the entry rides a write that cannot be skipped silently. Post source material lives in `ANNOUNCEMENT-IDEAS.md` at the project root, seeded from the retired FAQ's entries. **Fetch rule:** open the FAQ when working out how the plugin behaves on the user's side — neither always nor never; it is the record of what has been announced. Host-project rule — consumers never author FAQ entries.
+- **FAQ entries are authored at the announcement, not with the work item.** When a posted announcement's line is written into `INBOX/sent.md`, the FAQ entry answering what that announcement teaches is authored in the same turn — into `plugin/throughliner/templates/faq-template.md` with its `faq-index-template.md` index line, then both files re-copied into `FAQ/` (`FAQ/faq.md` and `FAQ/index.md` are a straight copy of the shipped template, and the template is canonical; `FAQ/` is kept because `session_start` points every session at `FAQ/index.md` exactly as it does for consumers). This supersedes and repeals the FAQ-sync close gate and the FAQ-entries-ride-work-items decision step rule, replacing their judgment trigger ("does this alter what a user does?") with an unmissable one — the sent-register line is already required to be written in the approval turn, so the entry rides a write that cannot be skipped silently. Post source material lives in `ANNOUNCEMENT-IDEAS.md` at the project root, a static seed archive holding the retired FAQ's entries — read for material, not written to. **Fetch rule:** open the FAQ when working out how the plugin behaves on the user's side — neither always nor never; it is the record of what has been announced. Host-project rule — consumers never author FAQ entries.
 - **README feature-list sync rides the SPEC-sync trigger.** A change that adds or removes a user-facing feature — a skill, a mode, a command, or user-visible hook behaviour — already must update SPEC.md. That same moment also syncs README.md's "What it does" feature list, which is the plain-English mirror of SPEC's feature list. One more clause on the existing trigger, not a new detection point. Host-only concern: consumers don't maintain the method's README.
 - **A close whose staged paths include `plugin/throughliner/hooks/` runs the suites under `resources/testing/` before committing, and halts on any failure.** Read the trigger from `git status`, so it needs no judgment and fires only on the sessions that could have broken a hook. Where a suite fails, say in plain words which assertion failed and what it expected, and do not commit until it passes or the user decides otherwise.
 
@@ -256,7 +258,7 @@ One thing the old marker's note said is worth keeping, because it was misread re
 
 **Three separate actions, and the words mean what they say.** "Push" once meant the full release ritual, so a push and a release were one event; they were decoupled on 2026-08-04 and stay decoupled.
 
-- **Rezip** refreshes the installed host from the local `plugin/throughliner` folder so Alex can dogfood the plugin privately. Never publishes, never releases, touches no remote. It builds no zip — the local marketplace sources the folder and the CLI snapshots it directly. **A rezip runs before the push, not after it.**
+- **Rezip** refreshes the installed host from the local `plugin/throughliner` folder so Alex can dogfood the plugin privately. Never publishes, never releases, touches no remote. The install uses no zip — the local marketplace sources the folder and the CLI snapshots it directly — but the rezip does archive one afterwards, into the gitignored `plugin/rezip-archive/`, which is where a release later gets its bytes. **A rezip runs before the push, not after it.**
 
   **Never run `claude plugin marketplace add` against the GitHub repository on a machine using the local `flintcraft` directory marketplace.** The CLI silently overwrites a same-name registration — no warning, no error — so the local `flintcraft` would be repointed at the remote, and every later rezip would install the published plugin while reporting success. The derivation is a verified external bug, anthropics/claude-code#44042, open and tracked; the evidence is in `resources/research/marketplace-name-collision.md`. Only this project's own machines are exposed, because testers have no local directory marketplace to collide with.
 - **Push** is `git push`, and nothing else. Routine and cheap — it runs after every /next and at any /done, with no consistency sweep, no zip and no GitHub Release. `plugin.json` is committed carrying whatever `-testN` suffix the rezip left; the release bump strips it. It needs no confirmation, so don't ask for one.
@@ -310,19 +312,24 @@ TIP   ->  #tips            one Throughliner feature explained. Maybe newish,
 
 **For news, the test is not "did we learn it" but "did Throughliner change".** A session that has just learned something useful feels like it has something to announce, and that feeling is not the criterion. The exclusion of general Claude Code tips stands for both kinds: a tip is about *this* plugin's features.
 
+**Where a post passes both tests — it reports a change AND explains how to do something — the tip test wins and it goes to #tips.** News is reserved for the change itself: a release, or a big happening. Without the tie-break both tests pass and the post lands wherever it was drafted, which is how a how-to went to #announcements on 2026-08-27 and had to be deleted and reposted the same hour.
+
+**And a tip walks the reader through the how-to rather than reporting that a capability exists.** A post saying the plugin can now do X is a change report wearing a tip's clothes; a tip says what to type, where to look, and what tells you it worked.
+
 **Old posts may be recycled into future ones**, so a subject already covered is not spent.
 
-**The tip pipeline, and the rhythm is one post a day.**
+**The tip pipeline.**
 
 ```
 1. REZIP      tip candidates are noticed as features land in the installed
-              build, and pooled in ANNOUNCEMENT-IDEAS.md at the project root.
+              build, and filed as ordinary captures in Unprocessed — the one
+              file every session may write, whatever it is doing.
 2. RELEASE    the release is what makes a candidate postable. The ritual marks
-              which pooled candidates its shipped features clear, and leaves a
-              note for the next /plan.
-3. /PLAN      reads that note and files the cleared candidates as dated post
-              items — new or updated features first, historical tips on slow
-              news days.
+              which open candidates its shipped features clear, by appending a
+              line to each of those captures naming the version.
+3. /PLAN      reads those lines and processes the cleared candidates into dated
+              post items — new or updated features first, historical tips on
+              slow news days.
 ```
 
 Tip staleness is covered by the existing repeal-grep over `INBOX/sent.md`, which is why the register records the channel per post.
@@ -337,11 +344,15 @@ Tip staleness is covered by the existing repeal-grep over `INBOX/sent.md`, which
 
 > Throughliner now checks your GitHub issues when you plan. If you filed a problem report and someone answered it, that answer shows up as work in your queue instead of sitting on a page you'd have to remember to open.
 
+**A post describes something the user can see in a session they are sitting in, or answers a question they actually ask.** Internal arrangement is not postable however well it is worded — where the method's own text moved, what was merged, which rule now lives where. The recorded failure: a draft about splitting rationale out of operative rules passed both existing tests and was rejected on five separate visibility grounds (`LOG/2026-08-27-announcement-rationale-split-correction.md`).
+
 **Verify against the shipped plugin at post time, not at draft time.** Before the draft goes out, re-read what it claims against the installed build; where the claim has drifted, rewrite it or hold the post.
 
 The limit is **2,000 characters**, which is Discord's.
 
 **Claude has a route to Discord: the bot, driven by `resources/discord_post.py`.** It reads the channels it has been granted, and it sends, edits and deletes its own messages. Reading and posting are separate: reading needs nothing beyond the grant, while **every send is gated by the approval rule — the exact text is shown and needs an explicit yes before anything leaves the machine, and an automated edit is still a send.** That is the existing rule on anything leaving the machine, restated here because the sentence it replaces was carrying it: the old text said Claude had no route, which was a fact doing double duty as a safeguard. Only the fact changed.
+
+**The planning opening's correspondence check also runs the replies read** — `py resources/discord_post.py replies --since <date>`, anchored to the most recent planning session's record, the same anchor the issues check uses and with no state file. One capture per reply carrying something new, satisfied while an open capture with its slug exists; an owed reply is drafted and sent only on an explicit yes to the exact text, under the send gate above. Replies arriving mid-session wait for the next opening, as INBOX mail does. Recomputing the anchor from the record rather than storing it means a forgotten check costs nothing and no file can go stale.
 
 **The draft-edit flow.** A draft is written to a `.txt` file and opened in Notepad — the side panel opens `.md` read-only and `.txt` not at all, both tested. Alex edits, saves and says done; the script then posts that file's exact bytes on her explicit yes. Editing the file directly beats negotiating wording change-by-change in chat. A post-post correction is the bot editing its own message, since nobody can edit anyone else's Discord message.
 
@@ -366,7 +377,9 @@ PREVIOUS entry posting the new one unlocks the edit of the one before it: a
                usability rating out of 5, given by Alex at that moment.
 ```
 
-The posting step builds the zip into the temp scratchpad and attaches it, so every entry carries the build it describes. Drafting, approval and posting run the ordinary way — Notepad draft file, explicit yes to the exact text, the bot posts, a register line with a pointer confirmed to resolve. The prune runs in the same pass.
+The posting step attaches the build's zip from `plugin/rezip-archive/` — `--attach-archived-zip` on the posting script — so every entry carries the bytes that were actually installed and tested rather than a zip built at posting time from a tree that has moved on. Drafting, approval and posting run the ordinary way — Notepad draft file, explicit yes to the exact text, the bot posts, a register line with a pointer confirmed to resolve. The prune runs in the same pass, keeping the channel and the archive at the same 15.
+
+**An edit to an entry updates that build's readme in the same turn, under the same approval as the edit.** The archive readme and the channel post are the same text by design — that equality is what lets a release read a label from a local file — so changing a label or backfilling outcomes in one and not the other silently breaks the lookup the whole model rests on.
 
 **First iteration, stated because it differs:** the entry currently in the channel is Alex's own post, so its backfill — outcomes plus her rating of 3/5, given 2026-08-27 — is hers to paste once. Every entry after that is bot-authored and bot-editable.
 

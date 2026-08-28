@@ -1,4 +1,4 @@
-# [HASH] — Law-prose article kept and cleared, with the full source map and the giveaway
+# 2e9cb18 — Law-prose article kept and cleared, with the full source map and the giveaway
 
 Filed thin as a blocker mid-session, then enriched and kept the same day. What exists: no draft anywhere — the survey mapped the source material (the restyle records from 2026-08-10 on, the honest blind-spot record, the rejection guardrail) into the item. The user's narrative arc opens the story: massive prose rule sets with no system, then pseudocode, then law prose. Her giveaway idea rides it: the self-authoring rules as a free, platform-agnostic prompt anyone can implement — generalised from [setup-self-hosting-seed]'s templates, which build first. Cleared with no hold, unlike the two held articles: its material is the record itself, and the article is publicly promised ("a website article coming", the 2026-08-26 beta announcement — the ground that also anchored filing it). At the keep the user named the walkthrough the first clear representation of co-writing, which became [co-writing-shape-question], held for a lived instance.
 

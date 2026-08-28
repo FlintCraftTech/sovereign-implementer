@@ -1,4 +1,4 @@
-# [HASH] — [user] done — the red-flags tip posted, with the user's strengthened caveat
+# 2e9cb18 — [user] done — the red-flags tip posted, with the user's strengthened caveat
 
 First tip drawn from the screened pool. The user required the caveat at posting strength before any send — Claude cannot anticipate every exposure or breach; an instruction to look proactively does not give it a comprehensive picture of the world to infer from — and rewrote the closing paragraph herself (her text posted verbatim). She also struck "without you knowing what you accepted": a coherent reply in a plan session is no guarantee of understanding, so the ending now claims only what the record shows — an explicit, recorded choice, never a default. Posted to #tips through the bot on her yes (message 1542770068172177470), read back in place, registered; the FAQ entry joined [faq-writes-at-announcement-unblocked] as its third entry. Posted text:
 

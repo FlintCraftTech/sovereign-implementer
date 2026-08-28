@@ -81,7 +81,9 @@ passed yet.
 A `/plan` run opens by checking the queue for problems — work marked ready that
 contradicts its own notes, items that name no files to change, work waiting on
 itself in a loop — and reports what it finds. Then it asks one question: is
-there anything you want to prioritise, or should Claude pick the order?
+there anything you want to prioritise, or shall Claude order them the usual way?
+"The usual way" means the standard order the method applies when nothing is
+prioritised — you get told in one line which order was used.
 
 You don't have to process everything in one sitting. `/plan`, `/done`, fresh
 chat, `/plan` again is a normal rhythm.
@@ -176,3 +178,79 @@ The window comes from your own records rather than a fixed number of sessions,
 so it stretches to cover however long it has been. It matters most if you plan
 every week or two and build in between: all that building lands in the record,
 and the next planning session walks in having read it.
+
+## How do I update Throughliner, and which build should I be on?
+
+Be on the newest release listed on the plugin's Releases page on GitHub. Each
+one has been used for real work before it was published, and its notes say what
+changed. They are all marked "pre-release" — that describes the stage the plugin
+is at, not a warning against installing it. The newest is the one to have.
+
+Updating is one ask away. In a chat in Claude Code, ask Claude to update the
+plugin — it runs the command for you. Then **fully quit** Claude Code and reopen
+it, because plugins load when the app launches; a new chat is not enough. On
+Windows, check the process has actually exited, since a normal close can leave
+it running.
+
+A new version existing will never nag you. Your project hears about the plugin
+only when something actually needs your attention: a document your project is
+missing, a newer setting it hasn't been offered, or a change to the document
+format that needs migrating. Each of those says so plainly at the start of a
+session and tells you what to run. Silence means there is nothing to do.
+
+If you want to know when a new version lands, the plugin's GitHub page has a
+**Watch** button: choose Custom, tick Releases, and you get an email each time.
+
+## How do I report a problem, and how does the answer get back to me?
+
+Start by saying which thing is misbehaving — Claude asks if it can't tell.
+
+**Your own app** is ordinary work: it becomes an item in your queue like
+anything else.
+
+**Throughliner itself** — a command doing something odd, a step that confused
+you, a rule with a bad result — goes to the plugin's author. Claude offers to
+file it as an issue on the Throughliner repository, drafts it, and shows you the
+exact words. Nothing is sent until you say yes, and the offer tells you plainly
+that an issue is public and sits under your own GitHub account. If you would
+rather keep it private, there is a web form instead, and it is a proper route
+rather than a lesser one.
+
+**Claude Code itself** — the app, its viewer, its links — is Anthropic's, and
+goes to an issue on their own repository the same way.
+
+Answers find you rather than the other way round. Every planning session opens
+by checking your correspondence — mail from your other projects, replies on
+issues you filed, new issues on your own repository — and files anything new
+into your queue. So you don't have to remember to go and look.
+
+If you want a reply to something you sent, say so when it goes: Claude files a
+dated reminder in your queue, and it surfaces in a planning session once that
+date passes.
+
+One optional thing worth having: `gh`, GitHub's command-line tool. Everything
+works without it — Claude writes the report out and you post it yourself. What
+you'd miss is the two-way channel, where Claude both files the report and reads
+the answer back.
+
+## What does a red flag mean in my queue?
+
+Claude watches every chat for anything that could expose your data or your
+users' data, and when it spots something, it says so in plain English and marks
+the piece of work that carries it. That mark is the red flag.
+
+The flag rides the work rather than sitting in a list of its own, because the
+item *is* what gets done about the risk.
+
+A flag clears one of two ways, and both leave a record. Either the risk is
+designed out, and your session log says how. Or you are told plainly what the
+risk is and you choose to go ahead anyway, and the log records that you were
+told and what you decided.
+
+Flagged work cannot reach the ready-to-build region while its flag is
+uncleared, so a build never quietly ships past a security concern.
+
+The honest limit, which matters more than the feature: Claude cannot anticipate
+every exposure or breach. It catches what is in view, and there is no way to
+know what it missed. So Throughliner will never tell you a project is secure —
+it shows you what it sees and hands you the decision.

@@ -310,7 +310,7 @@ without acting on the advisory.
 > Seventeen items ready to build and four waiting to be processed; nothing is
 > held below the line.
 >
-> **Anything you want to prioritise, or shall I pick the order?**
+> **Anything you want to prioritise, or shall I order them the usual way?**
 
 **Position carries this, not a message of its own** — a separate advisory message
 was tried and dropped, because it left the first message with nothing to answer.
@@ -564,11 +564,14 @@ balanced choice where the pass has in fact reached a view. Say the view.
 > targeted was cut. My recommendation is to drop it — keep it instead?"
 
 **Beat 2 — the ordering ask** [PROMPT]. One question: **"Anything you want to
-prioritise, or shall I pick the order?"** One question, not a menu — the only
-alternative offered is the user's own priorities. A user with something on their
-mind answers it here. The question names no order, because the order used is
-often the fallback rather than any nameable default; the one-line narration that
-follows the reorder names, in plain words, the order picked.
+prioritise, or shall I order them the usual way?"** One question, not a menu —
+the only alternative offered is the user's own priorities. A user with something
+on their mind answers it here. **"The usual way" signals that a standard is being
+applied without naming which rung it falls to**, because the order used is often
+the fallback ladder rather than any nameable default; the one-line narration that
+follows the reorder names, in plain words, the order picked. Without that signal
+the ask reads as Claude improvising, and the user cannot tell that following the
+standard procedure is one of the options.
 
 **Where an uncleared red flag tops the order, the ask is asymmetric instead:
 lead with the flag as what comes first unless the user names something
@@ -582,7 +585,7 @@ does after any other item. Naming three things to start with is not a statement
 that the run ends after three.
 
 **Where mail is waiting, that question carries it instead: "There's mail waiting
-— process that first, or shall I pick the order?"** Still one question, and
+— process that first, or shall I order the rest the usual way?"** Still one question, and
 it is what gives the mail step its teeth: a question the user answers, rather
 than a step that can be passed over.
 
@@ -847,11 +850,32 @@ deleted                          not worth doing. If already decided (check
                                    and commit.
 ```
 
-**The recommendation states in plain words what would actually change and what
-happens to the entry, and the ask requests agreement in those words.** The words
-are the method's own — the ones the queue itself shows — so the ask reads
-"move it into Processed, cleared to run?", explained on first use and then used
-(skill-nonspecific-rules.md's Vocabulary section).
+**The recommendation states in plain words what would actually change, and the
+ask requests agreement to that — with the move stated as what follows on the
+yes.** Two parts, one turn:
+
+```
+"<what would actually change, in plain words>.
+ Would you agree with that? If so I'll move it into Processed, cleared to run."
+```
+
+**The question asks about the recommendation, never about the mechanics.** An ask
+that reads "move it into Processed, cleared to run?" asks about the filing, so a
+natural answer — "agreed", "as you recommend" — answers a question nobody put,
+and what the record then holds is consent to a write rather than a readable
+verdict on the substance.
+
+**The recommendation is never the move itself.** It is the substance stated
+immediately before it; the move to the cleared section is what happens on the
+user's agreeing response. Where agreement does not land, processing simply
+continues.
+
+The words are the method's own — the ones the queue itself shows — explained on
+first use and then used (skill-nonspecific-rules.md's Vocabulary section). **The
+delete ask is unchanged**: it already asks the fate question directly.
+
+A separate consent turn was weighed and refused as over-asking — the two-part
+form keeps the turn.
 
 **A recommendation to process an entry into Processed must describe what would
 actually get built**, in terms
@@ -1044,9 +1068,35 @@ says which — and **the observable that marks a completed turn**. The openings
 and closes then compute due-ness from that observable and file a capture when a
 turn is due; nothing stores a position.
 
-**And where an item is recurring-shaped — the same artifact worked repeatedly —
-offer a cycle once, in the message already discussing that item, never as a turn
-of its own.** Creating one stays the user's call.
+**And where the user asks for a named step list with no schedule, author it here
+as a ritual** — into the same cycles doc, carrying the artifact, the steps, and
+**the word that fires it**, in place of a cadence and an observable. A ritual is
+run when the user says its word and at no other time, so nothing computes
+due-ness for one and nothing files a capture for one.
+
+**And where work is either shape, offer once, in the message already discussing
+that item, never as a turn of its own:**
+
+```
+recurring-shaped   the same artifact worked repeatedly, a cadence visible
+                   in the record            ->  offer a cycle
+procedure-shaped   the same multi-step sequence done on request more than
+                   once, no cadence         ->  offer a ritual
+```
+
+Creating either stays the user's call.
+
+**And where a ritual turns out to have a cadence, re-author it as a cycle** —
+the same steps gain the cadence and the observable that marks a completed turn.
+The promotion is the user's call like the creation, and it is a rewrite of the
+one definition rather than a second entry beside it.
+
+**And before recommending a disposition, read the cycles doc for a definition
+whose artifact this item touches; where one covers it, the recommendation names
+that cycle and shapes the work as part of its turn** — a template, a step, a
+material the turn reads — rather than as one-off work. An artifact that already
+has a cycle has a home, and work written as a one-off lands outside it and is
+done again next turn.
 
 **Where an entry's prose says it came from an audit and has not been reviewed,
 say so when you introduce it.** One clause: this came out of the such-and-such
@@ -1457,8 +1507,10 @@ have finished the thought.
 
 **When *Claude* raises something mid-/plan that may be work, ask once, at the
 moment it is raised, before any write and before any analysis, design, or other
-work on it: file it for later, or work it now — and
-recommend working it now.** An applied correction that may be method work still
+work on it: file it for later, or work it with you now — and
+recommend working it now.** **The offer says "with you"** — processing is done
+together, and an offer that reads as something Claude goes away and does primes
+the user for the wrong interaction. An applied correction that may be method work still
 gets the offer. The reason is identical on both branches: the capture
 exists because this session's context produced it. **Recommend the route and
 nothing else** — no clause inviting anything further, since this branch is barred
@@ -1480,7 +1532,7 @@ that introduced it.
 put and still has to wait:
 
 ```
-Claude   Want me to process that now, or carry on and file it for later?
+Claude   Want me to process that with you now, or carry on and file it for later?
          I'd take it now — it's fresh. Anything else to add first?
 
 user     yes, now
@@ -1490,8 +1542,9 @@ Claude   [interview turn: what the item is, what it would change, what is
 
 user     [answers]
 
-Claude   [recommendation turn: what would be written, in plain words, and
-         where it would sit — then STOP and wait]
+Claude   [recommendation turn: what would be written, in plain words, then
+         "Would you agree with that? If so I'll move it into Processed,
+         cleared to run." — then STOP and wait]
 
 user     [agrees, or doesn't]
 ```

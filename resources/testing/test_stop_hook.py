@@ -102,6 +102,30 @@ def test_filing_claim_with_no_heading_and_no_log_entry_still_blocks():
     shutil.rmtree(root, ignore_errors=True)
 
 
+def test_placeholder_slugs_from_a_specimen_do_not_block():
+    """[stop-hook-placeholder-slugs]: discussing a specimen is ordinary work.
+
+    The live instance: a reorder specimen carrying [slug-a] and [beta-slug] was
+    read as two claims of filed captures, and the turn was blocked. Correct by
+    the hook's own rules, and wrong for the session.
+    """
+    root = project()
+    code, out = run(root, "The specimen should read: moved [slug-a] above "
+                          "[some-slug] so it builds first.")
+    check("placeholder slugs in a specimen do not block",
+          not blocked(out, code), out)
+    shutil.rmtree(root, ignore_errors=True)
+
+
+def test_a_genuinely_absent_slug_still_blocks_alongside_placeholders():
+    """The suppression must be the specimen vocabulary and nothing wider."""
+    root = project()
+    code, out = run(root, "I've filed [genuinely-absent] to Unprocessed.")
+    check("a real absent slug still blocks after the placeholder carve-out",
+          blocked(out, code), out)
+    shutil.rmtree(root, ignore_errors=True)
+
+
 def test_a_queued_slug_does_not_block():
     root = project()
     code, out = run(root, "I've filed [still-queued] to the queue.")
@@ -173,6 +197,8 @@ if __name__ == "__main__":
     print("test_stop_hook")
     test_cited_shipped_slug_does_not_block()
     test_filing_claim_with_no_heading_and_no_log_entry_still_blocks()
+    test_placeholder_slugs_from_a_specimen_do_not_block()
+    test_a_genuinely_absent_slug_still_blocks_alongside_placeholders()
     test_a_queued_slug_does_not_block()
     test_block_still_downgrades_after_one_fire()
     test_ticked_slug_in_working_file_does_not_block()

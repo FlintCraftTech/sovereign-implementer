@@ -71,6 +71,17 @@ CLAIM_PATTERNS = [
     ),
 ]
 
+# A placeholder slug from a specimen, not a real one. The boundary is derived
+# rather than invented: it is the shipped docs' own specimen vocabulary —
+# [slug-a], [some-slug], [work-slug], [old-slug] — while no real slug in this
+# project's history contains the word "slug", because a real slug names its
+# work. Discussing specimens is ordinary planning work, and the check was
+# firing on it.
+#
+# The residual, stated: an item deliberately named `something-slug` slips the
+# check. That is now also a reason not to name one that way.
+PLACEHOLDER_SLUG = re.compile(r"(^|-)slug($|-)", re.IGNORECASE)
+
 # Words that mean the sentence is talking ABOUT a slug rather than claiming it
 # was just written. Cheap false-positive suppression.
 NEGATION_NEAR = re.compile(
@@ -92,6 +103,8 @@ def _claimed_slugs(message):
                 if re.fullmatch(r"[a-z0-9][a-z0-9-]*", group) and "-" in group:
                     slug = group
             if not slug:
+                continue
+            if PLACEHOLDER_SLUG.search(slug):
                 continue
             # Look at the sentence around the match for hedging language.
             start = max(0, match.start() - 60)

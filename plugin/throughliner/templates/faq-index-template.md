@@ -21,3 +21,11 @@ announced yet, not that questions aren't welcome: just ask in chat.
 - **Does `/plan` know what happened in my other sessions?** — the history it
   reads at the opening, the overlap it checks for, and why it reports either
   way. [faq.md](faq.md)
+- **How do I update Throughliner, and which build should I be on?** — why the
+  newest release is the one to have, the one ask that updates it, and why you
+  are never nagged. [faq.md](faq.md)
+- **How do I report a problem, and how does the answer get back to me?** — the
+  three destinations, what goes public and what doesn't, and how replies find
+  their way into your queue. [faq.md](faq.md)
+- **What does a red flag mean in my queue?** — how a risk gets marked, the two
+  ways it clears, and the limit on what Claude can promise. [faq.md](faq.md)

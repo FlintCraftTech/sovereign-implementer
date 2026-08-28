@@ -88,6 +88,17 @@ But some sentences genuinely must travel with a rule for the rule to be applied 
 
 **Moving a why out is a subtraction-pass move, and its hazard — taking an operative statement with it — is covered in [`rule-maintenance.md`](rule-maintenance.md).**
 
+## Repeals recorded elsewhere
+
+**The planning close's reorders — do not reinstate.** Build-order re-derivation
+across Processed and the Unprocessed reorder by unblock-potential were both
+repealed on 2026-08-11. The reasoning, and the two further reorders retired in
+the same run, are in `LOG/2026-08-11-processed-reorder-mostly-unnecessary.md`
+(commit `7c9922a`) — read it before proposing any of the four again.
+
+This note lives here rather than in `done-plan.md` because its audience is a
+future method author, which a consumer never is, and that doc ships.
+
 ## This document's own limits
 
 It is subject to its own admission test. Per-rule worked examples are deliberately excluded: they are the growth engine, and they are how its predecessor justified its own length.

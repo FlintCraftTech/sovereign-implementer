@@ -435,8 +435,10 @@ be built as it stands.
 
 **Show the candidate set as ONE numbered message before anything is written**
 [PROMPT].
-The user contests by number or says go; the writes then land, and a contested
-item is dropped or reworked one at a time.
+**End the message with what each answer does: "Say go to file them all, or
+contest by number."** Numbering explains contesting on its own; "go" explains
+nothing unless the sentence says it files the whole set. The writes then land,
+and a contested item is dropped or reworked one at a time.
 
 Add them to this session's LOG entry's "Routed to Captures:" line as a
 working-tree edit riding this commit.

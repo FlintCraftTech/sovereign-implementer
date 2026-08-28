@@ -22,6 +22,16 @@ Open a chat in Claude Code and ask it to install Throughliner — Claude runs th
 
 **Why `#beta`?** That's the tested weekly pick — the version we're happy for people to run. The plugin's main line carries day-to-day development and can change under you mid-week, so `#beta` is the one to install unless you specifically want the newest unfinished work.
 
+### What the beta channel is
+
+Once a week — on a Wednesday — one build gets picked and put on the beta channel. That build has already been used for a week's real work before it reaches you, and the week after that it becomes the stable release. So the version you install has been lived in, not just compiled.
+
+It is honestly early, and that's the plain description rather than a disclaimer. The plugin is in active testing, the number of people running it is small, and things will still be rough in places. What you get for that is a version someone has actually used rather than the newest unfinished commit.
+
+Updates arrive when you ask for them. Nothing updates itself: ask Claude to update the plugin and fully restart Claude Code, and you'll be on the current week's beta. If you'd rather be told when a new one lands, the Watch setting in [Get notified of new versions](#get-notified-of-new-versions) below emails you.
+
+If something breaks, say so — either on the [Discord](https://discord.gg/Z7ftKnSjR) or by telling Claude in your own project, which knows how to file a report and will show you the text before anything is sent.
+
 ### Coming from Sovereign Implementer?
 
 That was this plugin's old name. Claude Code follows the old name to the new one automatically and rewrites its own settings, but it still needs fetching under the new name — so install `throughliner@flintcraft` once and fully restart. Everything in your projects stays where it is. (The automatic follow-along needs Claude Code 2.1.193 or newer.)

@@ -93,13 +93,7 @@ project work, not bookkeeping.
 ## Batch the human stops in Processed  [SILENT] when nothing moves; [BRIEF] when it does
 
 **One pass, over Processed only: put `[user]` and `[audit]` lines at the end.**
-Everything else the close used to reorder is repealed.
-
-```
-repealed — do not reinstate:
-    build-order re-derivation across Processed
-    the Unprocessed reorder by unblock-potential
-```
+That is the whole of the close's reordering.
 
 **`Blocks:` / `Depends on:` headers stay retired.** The one dependency
 field that exists is `Blocked by:`, written on the item that is held and naming
@@ -155,7 +149,9 @@ trust the self-check:  exits non-zero -> NOTHING was written. A slug-set
 ```
 narration scales:
     changes what /next would pick next  ->  flag it clearly
-        "Moved [slug-a] above [slug-b] so it builds first — say if not."
+        "Moved 'Rewrite the welcome email' [welcome-email-rewrite] above
+         'Add a plan picker' [plan-picker], so the email lands first —
+         say if not."
     a trivial tidy (no pick-order change)  ->  one line
     no reorder needed                      ->  say nothing
 ```
@@ -322,7 +318,7 @@ not recorded anywhere.** Skipping moves nothing and edits nothing, so it leaves 
 trace; a skipped item simply returns next session, and no file is reintroduced to
 hold them.
 
-## 2. Commit
+## 2. Commit  [BRIEF, PROMPT]
 
 Run the commit core in done.md. Staged paths are the changed method docs
 (QUEUE.md, SPEC.md, LOG/), plus the hand-edited files where this was a handmade

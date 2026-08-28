@@ -92,9 +92,10 @@ loading procedure docs from a docset that had already been retired. Bumping to
    bytecode never gets snapshotted into the installed host (disposable — Python
    regenerates them as needed):
    `Get-ChildItem "plugin\throughliner" -Recurse -Directory -Filter __pycache__ | Remove-Item -Recurse -Force`.
-   (No zip is built here — the local marketplace sources the plugin from the
-   `plugin/throughliner` folder, and the CLI snapshots that folder directly. The zip
-   only changes at Release.)
+   (The install itself uses no zip — the local marketplace sources the plugin from
+   the `plugin/throughliner` folder, and the CLI snapshots that folder directly.
+   The zip step 7 archives is for the channel and for the release to package, not
+   for this install.)
 3. **Run the test suites and stop if any fails.** They exist, they pass,
    and for a period nothing ran them — which is how a `session_start.py` emitting a
    rejected payload shape stayed dead and invisible, sessions compensating by
@@ -108,7 +109,7 @@ loading procedure docs from a docset that had already been retired. Bumping to
    **The honest limit, which travels with them and must never be dropped: the
    schema check asserts output *shape*, not *delivery*.** A correctly-shaped hook
    can still be discarded before it reaches a session. These suites do not replace
-   step 9's liveness ask; they are the half a machine can do.
+   the liveness proof after the restart; they are the half a machine can do.
 4. **Prune the plugin cache** at
    `~/.claude/plugins/cache/flintcraft/throughliner/`, keeping the build
    about to be installed and the three most recent. Nothing else ever removes these,
@@ -155,16 +156,38 @@ loading procedure docs from a docset that had already been retired. Bumping to
    exclusion the push's version-clean moved the source stamp on its own, and the
    host read as stale in exactly the sessions most likely to be checking. It also
    means a pure release bump leaves the stamp where it is.
-7. **Check the CLI's version against the app's.** The `claude` CLI and the desktop
+7. **Archive this build's zip and its readme.** The stamps have just been proved
+   equal, so the folder on disk *is* the installed build — which is the one moment
+   the bytes are known good. Build the zip from `plugin/throughliner/` and write it
+   plus a readme into `plugin/rezip-archive/`:
+
+   ```bash
+   Compress-Archive -Path "plugin\throughliner" -DestinationPath "plugin\rezip-archive\throughliner-v<VERSION>.zip"
+   ```
+
+   (Zip the folder, not its contents — internal paths must start with
+   `throughliner/`. The `__pycache__` sweep in step 2 already ran, so nothing
+   compiled is caught in it; verify by listing the zip's entries.)
+
+   The readme sits beside it as `throughliner-v<VERSION>.md` and carries **exactly
+   what the channel post for this build says** — its label, its `Commit:` line, and
+   its version. That equality is the point: the archive is a local mirror of the
+   test-rezips-for-nerds channel, one entry per build, so the label a release picks
+   by is read from a file here rather than from a person reading Discord.
+
+   **Prune to the newest 15**, mirroring what the channel shows. The folder is
+   gitignored — every build is rebuildable byte-for-byte from its `Commit:` line, so
+   committing the zips would store what git already holds.
+8. **Check the CLI's version against the app's.** The `claude` CLI and the desktop
    app can be on different builds, and a plugin behaviour that depends on a recent
    Claude Code version will then work in one and not the other. Note the mismatch
    plainly if there is one rather than debugging past it.
-8. Tell Alex to do a **full app restart, not just a new session** — plugin skills
+9. Tell Alex to do a **full app restart, not just a new session** — plugin skills
    register at app launch, and on Windows a normal quit can leave the app running,
    so she must fully quit (confirming the process has exited, via Task Manager if
    needed) and relaunch. Say: "Host refreshed via the CLI — nothing has been
    published. Fully restart the app to load it for private testing."
-9. **Prove the hooks are alive after the restart** — the delivery half that
+10. **Prove the hooks are alive after the restart** — the delivery half that
    step 3 cannot give. A hook that is well-formed, installed, and silently
    dropped looks exactly like a working one from this side.
 
@@ -215,13 +238,18 @@ and the entry's two-step lifecycle are in `CLAUDE.md`'s Discord posts section.
 
 The rezip is the moment a feature lands in the installed build, which makes it
 the moment a tip about that feature becomes noticeable. Read what this rezip
-carries — the commits since the last one — and add a line to
-`ANNOUNCEMENT-IDEAS.md` at the project root for each feature a tip could
-explain, in whatever format that file already uses. Pooling only: a candidate
-is not postable until a release clears it, which is the release step below.
+carries — the commits since the last one — and file a capture in Unprocessed for
+each feature a tip could explain, screened first against the posting brief's
+visibility test. A candidate is not postable until a release clears it, which is
+the release step below.
 
-Nothing is posted here, and a rezip carrying no user-facing feature adds
-nothing. Say in one line what was pooled, or that nothing was.
+**Captures, not a pool file.** The queue is the one file every session may write
+whatever it is doing; a rezip runs after a close, so the session has no build
+working file and the scope-lock treats it as a planning session — which refused
+the write to `ANNOUNCEMENT-IDEAS.md` outright the first time this step ran.
+
+Nothing is posted here, and a rezip carrying no user-facing feature files
+nothing. Say in one line what was captured, or that nothing was.
 
 ## Release (on request)
 
@@ -305,13 +333,17 @@ outright here.
      brand-new user who by definition can't diagnose it. Every other doc gets read
      by someone eventually. This one doesn't, so the release sweep is where it gets
      read.
-5. Archive current zip:
-   `mv plugin/throughliner.zip plugin/release-zip-archive/throughliner-v<OLD_VERSION>.zip`
-6. Prune `plugin/release-zip-archive/` to the three most recent zips (delete oldest).
-7. Delete all `__pycache__` folders under `plugin/throughliner/` so compiled Python
-   bytecode never ships in the zip (disposable — Python regenerates them as needed):
-   `Get-ChildItem "plugin\throughliner" -Recurse -Directory -Filter __pycache__ | Remove-Item -Recurse -Force`
-8. **Run the test suites and stop if any fails**, the same runner the rezip uses:
+5. **Identify the build being released, from the rezip archive.** The pick is a
+   file read, not a judgment: open `plugin/rezip-archive/` and take the entry the
+   release is for — its readme carries the label, the version and the `Commit:`
+   line. That commit is the build going out. Say the version and the commit in one
+   line before continuing.
+
+   **Nothing is picked from the working tree.** The archived zip was built at the
+   moment its build was installed and proved equal to the source, so it holds the
+   bytes that were actually tested; the tree has moved since, and packaging it
+   would ship a build nobody ran.
+6. **Run the test suites and stop if any fails**, the same runner the rezip uses:
 
    ```bash
    py resources/testing/run_all.py
@@ -320,43 +352,46 @@ outright here.
    The rezip already ran them, but a release can be asked for days later with
    commits landed since — and this is the last moment before something is
    published under a version number.
-9. **Compare the content stamps before packaging, and stop if they differ.** Run
-   `content_stamp()` (from `plugin/throughliner/hooks/session_start.py`) over
-   `plugin/throughliner/`, and compare it against the installed host's stamp
-   reported at this session's opening.
+7. **Check the archived zip against the commit its readme names, and stop if they
+   differ.** Run `content_stamp()` (from
+   `plugin/throughliner/hooks/session_start.py`) over the archived zip's extracted
+   contents, and over `git archive <the readme's commit>` — the same commit step 5
+   read.
 
    ```
-   stamps match     ->  the working tree is the build that was rezipped and
-                        tested. Carry on.
-   stamps differ    ->  ONE standalone turn: say plainly that the release would
-                        ship code nobody has run, name that the working tree has
-                        moved since the tested rezip, and stop there. Proceed
-                        only on Alex's next word.
+   stamps match     ->  the zip holds the build its readme claims. Carry on.
+   stamps differ    ->  ONE standalone turn: say plainly that the archived zip and
+                        the commit recorded beside it are not the same build, name
+                        which entry it is, and stop there. Proceed only on Alex's
+                        next word.
    ```
 
-   **A release releases a tested rezip.** That is the invariant this step
-   guards, and it is what makes a release safe to publish without re-testing
-   everything.
+   **A release releases a tested rezip.** That is the invariant this step guards,
+   and it is what makes a release safe to publish without re-testing everything.
+   Under the archive model the invariant holds by construction — the zip *is* the
+   tested build — so this step is checking that the archive's own bookkeeping is
+   intact, not that the working tree has stayed still.
 
-   **The packaging reads the working tree exactly as it stands**, with no
-   reference to what was last installed — so an edit landed since the tested
-   rezip goes out silently unless something compares. It belongs to a current or
-   future rezip, never to this release by accident.
+   **The working tree is not consulted at all**, which is the whole point of the
+   change: an edit landed since the tested rezip belongs to a current or future
+   rezip, and can no longer reach a release by accident.
 
    The warning stops nothing on its own: warn-don't-enforce governs, and Alex may
-   knowingly release the working tree.
-10. Repackage:
-   `Compress-Archive -Path "plugin\throughliner" -DestinationPath "plugin\throughliner.zip"`
-   (zip the folder, not its contents — internal paths must start with `throughliner/`).
-   Verify: list the zip's entries and confirm none contain `__pycache__` — if any do,
-   stop and fix before pushing.
-11. Stage every dirty path in `plugin/throughliner/` (run
+   knowingly release anyway.
+8. Repackage — **copy, do not build**:
+   `cp plugin/rezip-archive/throughliner-v<PICKED_VERSION>.zip plugin/throughliner.zip`
+   The archived zip already has the right internal paths (`throughliner/…`) and
+   already passed the `__pycache__` check when it was built. Verify anyway: list the
+   zip's entries and confirm none contain `__pycache__` — if any do, stop and fix
+   before pushing.
+9. Stage every dirty path in `plugin/throughliner/` (run
    `git status --porcelain plugin/throughliner/` and stage each listed path — catches
-   any sweep edits from the consistency sweep), plus the zip in `plugin/`, archive changes in
-   `plugin/release-zip-archive/`, plugin.json, and the LOG/ changes (including the
-   hash-backfill edits). Commit: "Bump to v<VERSION> and repackage".
-12. `git push`.
-13. Publish a GitHub Release for the new version, so users who subscribed via Watch
+   any sweep edits from the consistency sweep), plus the zip in `plugin/`,
+   plugin.json, and the LOG/ changes (including the hash-backfill edits). Commit:
+   "Bump to v<VERSION> and repackage". Nothing from `plugin/rezip-archive/` is
+   staged — it is gitignored.
+10. `git push`.
+11. Publish a GitHub Release for the new version, so users who subscribed via Watch
     → Releases get notified — a plain `git push` does not fire that notification;
     only a published Release does. Use `gh`:
     - Tag and title = the new version (e.g. `v1.13.0`).
@@ -383,7 +418,7 @@ outright here.
       the tag `v<VERSION>`, set the same title, paste the summary as the notes,
       attach `plugin/throughliner.zip`, and **Publish release**. The step never silently
       does nothing.
-14. Update the installed host via the `claude` CLI, then tell Alex to fully restart
+12. Update the installed host via the `claude` CLI, then tell Alex to fully restart
     the app. Same mechanism as the Rezip reload step — the host reads a frozen cache
     snapshot, so without a CLI update + full restart it keeps running the old build.
     The marketplace is already registered from earlier testing, so this is just:
@@ -393,7 +428,7 @@ outright here.
     not a hand-off to Alex.** Then tell Alex: "Released and pushed. I've updated the
     host via the CLI so it's running the released version — fully quit and relaunch
     the app to load it."
-15. **Write the release's own session record, and settle the item that scheduled
+13. **Write the release's own session record, and settle the item that scheduled
     it.** A release usually runs after the close, so nothing else will record it
     — and a release nobody recorded is the one piece of work that leaves the
     project with no trail at all.
@@ -414,21 +449,22 @@ outright here.
 
 ### Clear the tip candidates this release ships
 
-The release is what makes a pooled tip candidate postable, so this is where the
-pool is marked. Read `ANNOUNCEMENT-IDEAS.md` against the features this release
-shipped, mark each candidate those features clear, and leave a note in that file
-saying which are cleared and by which version.
+The release is what makes a tip candidate postable, so this is where the open
+candidates are marked. Read the tip-candidate captures in Unprocessed against the
+features this release shipped, and append one line to each that this release
+clears, naming the version that cleared it.
 
-Nothing is posted here either. The note is read by the next /plan, which files
-the cleared candidates as dated post items on the one-a-day rhythm — new or
-updated features first, historical tips on slow news days. Say in one line which
-candidates were cleared, or that none were.
+Nothing is posted here either. Those lines are read by the next /plan, which
+files the cleared candidates as dated post items — new or updated features
+first, historical tips on slow news days. Say in one line which candidates were
+cleared, or that none were.
 
-**Archive accuracy.** Only the Release ritual ever builds the zip — neither Rezip
-nor Push touches it — so the zip sitting in the working tree is always the last
-released one, and the copy archived into `plugin/release-zip-archive/` at the archive step of the next
-release faithfully reflects the prior release. Git history remains the authoritative
-record either way, since each release commits `throughliner.zip`.
+**Archive accuracy.** The rezip builds every zip and the release only copies one,
+so `plugin/rezip-archive/` holds the newest 15 builds as they were installed, and
+`plugin/throughliner.zip` in the working tree is always the last released one. Git
+history remains the authoritative record either way, since each release commits
+`throughliner.zip` and every archived build is rebuildable byte-for-byte from the
+`Commit:` line in its readme.
 
 LOG entries are per-entry files — no log capping at push time. Existing `LOG/log.md`
 and `LOG/log-v*.md` files stay in place untouched: index references work by hash, so

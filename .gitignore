@@ -1,8 +1,9 @@
 *.zip
 !plugin/*.zip
-!plugin/zip-archive/*.zip
+plugin/rezip-archive/
 .throughliner/
 INBOX/
 __pycache__/
 *.pyc
 .claude/
+YouTube/

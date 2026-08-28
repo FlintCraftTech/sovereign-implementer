@@ -140,6 +140,9 @@ The work cycle. Every piece of work travels the same loop.
               screen or in their own files? Is any part of this method
               called by anything other than its own name? Does each step
               name the thing to click or type AND the thing to look for?
+              Where the message touches more than one stored text — a
+              pinned message, a forum post, a register line — does each
+              step name WHICH ONE it means and where that one lives?
 2. TOOL       is there a tool that could do this instead of the user —
               including one this session itself set up? Read TOOLS.md,
               not your memory of what the project can do.
@@ -462,6 +465,13 @@ does — offer the search. Where it is a choice the user owns, ask them. Take th
 answer from one of those two routes rather than from your own confidence, which
 is what keeps the trigger a question about the subject rather than a judgment
 about your own certainty.
+
+**And in the other direction: a sentence written into a document asserting what a
+tool can do is a claim about the world, so run the read that would verify it
+before writing it — and where no such read exists, write it as intended rather
+than as fact.** The same question, asked of your own writing: what would answer
+this? A capability sentence composed from a design discussion reads exactly like
+a verified one, and is corrected only when something fails against it.
 
 **Where the answer is a date, read a computed field — the session opening's date
 line, the queue digest's passed or ahead figures — and where none exists, read

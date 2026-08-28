@@ -84,8 +84,9 @@ to do, or something that already happened. Both get written; they go to differen
 files.
 
 **Work still to do → Unprocessed** [PROMPT]. Show the candidate set as ONE
-numbered message before anything is written, and wait. The user contests by
-number or says go, and a contested item is dropped or reworked one at a time.
+numbered message before anything is written, and wait. **End it with what each
+answer does: "Say go to file them all, or contest by number."** A contested item
+is then dropped or reworked one at a time.
 **What happens then depends on the answer:**
 
 ```
@@ -102,8 +103,10 @@ Placement is the standing one — appended to the bottom of Unprocessed, no
 judgment, no narration of the mechanics.
 
 **Where /plan was invoked earlier in this chat, the same message also offers to
-process the surfaced items now, one at a time** — entering plan.md's ordinary
-present-and-interview loop on the user's yes. In any other chat the offer is not
+process the surfaced items with you now, one at a time** — entering plan.md's
+ordinary present-and-interview loop on the user's yes. The offer says "with
+you": processing is done together, and wording it as something Claude does alone
+primes the user for the wrong interaction. In any other chat the offer is not
 made and this skill files only.
 
 **What already happened → this chat's LOG entry, as a marked tail.** Append rather

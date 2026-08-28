@@ -91,7 +91,7 @@ Run done.md's **Staleness sweep**.
 Routine bookkeeping — delete the file, no narration. Unlocks future builds. **Only
 after everything above is complete.**
 
-### 2.4 Commit
+### 2.4 Commit  [BRIEF, PROMPT]
 
 Run the commit core in done.md. No source-file edits are staged because the audit
 produced none — the staged paths are the QUEUE.md capture additions, the LOG/

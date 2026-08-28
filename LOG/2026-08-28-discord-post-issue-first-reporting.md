@@ -1,4 +1,4 @@
-# [HASH] — [user] done — issue-first reporting posted, then reclassified from announcement to tip on the user's judgment
+# 2e9cb18 — [user] done — issue-first reporting posted, then reclassified from announcement to tip on the user's judgment
 
 Cleared when its date passed and both builds it described had shipped — the correspondence scan it announces ran at this session's own opening. Posted to #announcements through the bot on the user's yes to the 2026-08-25 approved text (message 1542676046288261160). Two corrections then arrived from the user within minutes: "degrades gracefully" is not beginner-friendly, and the post is really a tip — *"This doesn't really announce something new. It just explains how to do something. Well it doesn't exactly, but it should."* The bot deleted its announcements copy (verified bot-authored first) and posted a genuinely how-to rewording to #tips (message 1542676960206131263), read back in place. The register line records the supersession; the misclassification became the recorded failure admitting [tip-test-wins-tiebreak]. Final text:
 

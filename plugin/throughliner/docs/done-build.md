@@ -235,7 +235,7 @@ Run done.md's **Staleness sweep**.
 Routine bookkeeping — delete the file, no narration. Unlocks future builds. **Only
 after everything above is complete.**
 
-### 2.4 Commit
+### 2.4 Commit  [BRIEF, PROMPT]
 
 Run the commit core in done.md.
 

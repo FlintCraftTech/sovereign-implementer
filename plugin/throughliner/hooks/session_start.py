@@ -50,12 +50,15 @@ import sys
 #   3  the Sovereign Implementer -> Throughliner identity rename: a project's
 #      two marker files are renamed `.si-version` -> `.throughliner-version`
 #      and `.si-format-epoch` -> `.throughliner-format-epoch`
-#   4  build blocks: every item cleared to run carries a delimited
-#      `--- Build block ---` region holding what changes in which files, how to
-#      tell it worked, its red-flag state and any refused option. A run reads a
-#      generated view built from those blocks instead of reading QUEUE.md, so an
-#      existing project's cleared items are structurally wrong until each gains
-#      one — a run against them halts on every item as underspecified.
+#   4  build blocks: every item cleared to run carried a delimited region
+#      holding what changes in which files, how to tell it worked, its
+#      red-flag state and any refused option. A run read a generated view
+#      built from those regions instead of reading QUEUE.md, so an existing
+#      project's cleared items were structurally wrong until each gained one.
+#      RETIRED 2026-08-27 — builds read the queue again, and the delimiters
+#      left in old records read as ordinary text. Deliberately no bump: an
+#      existing project's files are not made wrong by the retirement, which
+#      is the only thing an epoch is for.
 FORMAT_EPOCH = 4
 
 # The project records its own epoch here, written by /setup on completion.
@@ -299,9 +302,23 @@ def content_stamp(root):
     and returns a short hex stamp. Two directories with byte-identical
     tracked contents produce the same stamp; any file added, removed, or
     changed moves it. __pycache__ directories, compiled .pyc files and the
-    plugin CLI's `.in_use` bookkeeping marker are excluded — they're runtime
+    plugin CLI's `.in_use` and `.orphaned_at` markers are excluded — runtime
     artifacts, not part of the package, and never shipped in the zip, so they
     must not perturb the stamp. Returns "" on any error or a missing root.
+
+    **Line endings are normalised to LF before hashing.** With `core.autocrlf=true`
+    and no `.gitattributes`, a commit's blobs hold LF while the installed build on
+    disk holds CRLF, so hashing raw bytes made a build and the commit it was built
+    from stamp differently by construction. That defeats the one mechanical answer
+    to "is this build the build I think it is" — including the release ritual's
+    check of an archived zip against the commit its readme names, which compares a
+    working-tree walk against `git archive` output. Normalising costs one pass over
+    each file and makes the two comparable. A `.gitattributes` was refused: it
+    renormalises the whole working tree in one sweep, where this touches nothing
+    outside the function.
+
+    Every stamp moves once when this ships — the first session on the new build
+    reads a fresh host stamp and a fresh target stamp. Expected, not a fault.
 
     `.in_use` earns its place on that list the hard way: the CLI writes it
     into whichever installed build is active and removes it again, so with it
@@ -338,7 +355,9 @@ def content_stamp(root):
                 d for d in dirnames if d not in ("__pycache__", ".in_use")
             ]
             for filename in filenames:
-                if filename.endswith(".pyc") or filename == ".in_use":
+                if filename.endswith(".pyc") or filename in (
+                    ".in_use", ".orphaned_at"
+                ):
                     continue
                 full = os.path.join(dirpath, filename)
                 rel = os.path.relpath(full, root).replace(os.sep, "/")
@@ -350,6 +369,7 @@ def content_stamp(root):
                 content = f.read()
             if rel.endswith(".claude-plugin/plugin.json"):
                 content = _plugin_json_without_version(content)
+            content = content.replace(b"\r\n", b"\n")
             digest.update(content)
             digest.update(b"\0")
     except OSError:
@@ -842,11 +862,24 @@ CYCLE_OBSERVABLE_RE = re.compile(r"^\s*\*{0,2}Observable\s*:\*{0,2}\s*(.+?)\s*$"
                                  re.IGNORECASE)
 CYCLE_CADENCE_RE = re.compile(r"^\s*\*{0,2}Cadence\s*:\*{0,2}\s*(.+?)\s*$",
                               re.IGNORECASE)
+# A ritual's field: the word that fires it, standing where a cadence would be.
+CYCLE_TRIGGER_RE = re.compile(r"^\s*\*{0,2}Trigger\s*:\*{0,2}\s*(.+?)\s*$",
+                              re.IGNORECASE)
 ISO_DATE_IN_TEXT_RE = re.compile(r"\d{4}-\d{2}-\d{2}")
+# What ends a wrapped Cadence: or Observable: — the next labelled field, a list
+# item, or a blank line (checked separately). Deliberately broad on the label:
+# a definition may carry any field an author invents, and each of them ends the
+# one before it.
+CYCLE_FIELD_START_RE = re.compile(
+    r"^\s*(?:[-*+]\s|\d+\.\s|\*{0,2}[A-Z][A-Za-z0-9 ]{0,30}\s*:)")
 
 
-def cycles_facts(cwd):
-    """Each cycle definition's slug, cadence and observable, as written.
+def _parse_cycles_doc(cwd):
+    """Every definition in the cycles doc, as written — cycles and rituals alike.
+
+    The shared parse behind cycles_facts() and rituals_facts(). Returns None
+    where the project has no cycles doc, otherwise a list of dicts carrying
+    slug, description, cadence, observable and trigger, any of which may be None.
 
     Facts and never verdicts, the same register as the queue dependency facts:
     the hook reports what the doc says and what the observable currently reads,
@@ -855,10 +888,14 @@ def cycles_facts(cwd):
     sent register or a file's presence, and a hook that guessed at all of those
     would report a verdict it cannot stand behind.
 
-    Returns None where the project has no cycles doc, so a project with no
-    cycles pays nothing. Otherwise a list of (slug, description, cadence,
-    observable, last_date) tuples, any of which may be None where the
-    definition does not carry that line.
+    **Cadence and Observable run on across wrapped lines**, ending at a blank
+    line or the next field line. They used to be matched one line at a time, so
+    a naturally wrapped field was silently cut at the line break — and a
+    truncated cadence still reads like a cadence, so nothing downstream could
+    tell. Removing the constraint was preferred to documenting it: a format note
+    in every cycles doc would guard a limitation that can simply be deleted.
+
+    A project with no cycles doc pays nothing.
     """
     path = os.path.join(cwd, CYCLES_DOC)
     if not os.path.isfile(path):
@@ -871,32 +908,99 @@ def cycles_facts(cwd):
 
     cycles = []
     current = None
+    pending = None          # the field still absorbing wrapped continuation lines
     for line in lines:
         heading = CYCLE_HEADING_RE.match(line)
         if heading:
             current = {"slug": heading.group(2),
                        "description": heading.group(1).strip(),
                        "cadence": None,
-                       "observable": None}
+                       "observable": None,
+                       "trigger": None}
             cycles.append(current)
+            pending = None
             continue
         if current is None:
             continue
+
         observable = CYCLE_OBSERVABLE_RE.match(line)
         if observable and current["observable"] is None:
             current["observable"] = observable.group(1)
+            pending = "observable"
             continue
         cadence = CYCLE_CADENCE_RE.match(line)
         if cadence and current["cadence"] is None:
             current["cadence"] = cadence.group(1)
+            pending = "cadence"
+            continue
+        trigger = CYCLE_TRIGGER_RE.match(line)
+        if trigger and current["trigger"] is None:
+            current["trigger"] = trigger.group(1)
+            pending = "trigger"
+            continue
 
+        if pending is None:
+            continue
+        # A field runs on until a blank line or the next field line. Both are
+        # ends an author produces naturally, so a definition written with a
+        # wrapped cadence reads whole instead of being cut at the line break.
+        if not line.strip() or CYCLE_FIELD_START_RE.match(line):
+            pending = None
+            continue
+        current[pending] = "%s %s" % (current[pending], line.strip())
+
+    return cycles
+
+
+def _is_ritual(entry):
+    """A definition fired by a word rather than by a cadence.
+
+    The discriminator is what the definition carries, so the format grows
+    additively and every existing cycles doc stays valid: a cycle has a cadence,
+    a ritual has a trigger and no cadence.
+    """
+    return entry["trigger"] is not None and entry["cadence"] is None
+
+
+def cycles_facts(cwd):
+    """Each CYCLE definition's slug, cadence and observable, as written.
+
+    Ritual definitions are excluded — see rituals_facts() — so a ritual is never
+    reported as a cycle whose cadence is missing.
+
+    Returns None where the project has no cycles doc, otherwise a list of
+    (slug, description, cadence, observable, last_date) tuples.
+    """
+    entries = _parse_cycles_doc(cwd)
+    if entries is None:
+        return None
     out = []
-    for cycle in cycles:
-        observable = cycle["observable"]
+    for entry in entries:
+        if _is_ritual(entry):
+            continue
+        observable = entry["observable"]
         dates = ISO_DATE_IN_TEXT_RE.findall(observable or "")
-        out.append((cycle["slug"], cycle["description"], cycle["cadence"],
+        out.append((entry["slug"], entry["description"], entry["cadence"],
                     observable, max(dates) if dates else None))
     return out
+
+
+def rituals_facts(cwd):
+    """Each RITUAL definition's slug, name and trigger word, as written.
+
+    Name and trigger only, and deliberately nothing else: a ritual has no
+    cadence and no observable, so there is no due-ness to compute and nothing
+    for a session to file. What a session needs is to know the ritual exists and
+    what word runs it — the steps are read from the doc when that word is said.
+
+    Returns None where the project has no cycles doc, otherwise a list of
+    (slug, description, trigger) tuples.
+    """
+    entries = _parse_cycles_doc(cwd)
+    if entries is None:
+        return None
+    return [(entry["slug"], entry["description"], entry["trigger"])
+            for entry in entries if _is_ritual(entry)]
 
 
 WORKING_FILE_RE = re.compile(r"^_(build|plan)-(.+)\.md$")
@@ -1582,6 +1686,26 @@ def main() -> int:
                 "the observable and file one capture per due step."
                 % (len(cycles), "; ".join(described))
             )
+
+    # Rituals ride the same doc and are reported by name and trigger word only.
+    # No due-ness is computed for one and no capture is ever filed: a ritual has
+    # no cadence, so it runs when the user says its word and at no other time.
+    rituals = rituals_facts(cwd)
+    if rituals:
+        named = []
+        for slug, description, trigger in rituals:
+            part = f"[{slug}]"
+            if description:
+                part += f" {description}"
+            part += f" — fires on: {trigger or 'no trigger word stated'}"
+            named.append(part)
+        context_parts.append(
+            "[Throughliner] Rituals on file (%d): %s. A ritual runs when the "
+            "user says its word — nothing computes due-ness for one and nothing "
+            "files a capture for one. Read its steps from the cycles doc when "
+            "that word is said."
+            % (len(rituals), "; ".join(named))
+        )
 
     # Which isolation model is actually in force, measured rather than assumed.
     #

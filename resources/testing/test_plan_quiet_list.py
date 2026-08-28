@@ -69,11 +69,21 @@ CASES = [
     (os.path.join("LOG", "2026-08-11-entry.md"), True, "a log entry file"),
     # FAQ/ is on the list because the close REQUIRES an FAQ disposition, so a
     # denial there would break a mandated step. templates/ is deliberately off
-    # it: a template edit changes what every future consumer receives.
+    # it — a template edit changes what every future consumer receives — EXCEPT
+    # the two FAQ templates, on the same mandated-step ground: the FAQ template
+    # is canonical and FAQ/ is a copy of it, so the announcement-time rule
+    # cannot be obeyed without writing it.
     (os.path.join("FAQ", "faq.md"), True, "the FAQ the close must be able to write"),
     (os.path.join("FAQ", "index.md"), True, "the FAQ index"),
-    (os.path.join("plugin", "throughliner", "templates", "faq-template.md"), False,
-     "a template is denied — it changes what every consumer receives"),
+    (os.path.join("plugin", "throughliner", "templates", "faq-template.md"), True,
+     "the FAQ template passes — widened 2026-08-28, since the announcement-time "
+     "FAQ rule requires this write in the same turn as the sent-register line"),
+    (os.path.join("plugin", "throughliner", "templates", "faq-index-template.md"),
+     True, "its index template passes for the same reason"),
+    (os.path.join("plugin", "throughliner", "templates", "CLAUDE-TEMPLATE.md"),
+     False,
+     "every OTHER template is still denied — the widening is exactly the FAQ "
+     "pair, and this case is what proves it did not widen further"),
     # The plugin's version manifest, added 2026-08-16 ([scope-lock-blocks-the-rezip]).
     # The rezip runs after a close, which has deleted the build working file, so
     # every chat it can run in is classified as planning — and its first step is

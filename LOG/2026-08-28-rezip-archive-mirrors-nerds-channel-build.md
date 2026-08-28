@@ -1,0 +1,7 @@
+# [HASH] — Release-from-archive built: the rezip archives every zip at the proven-equal moment, and the release only copies
+
+The user's reconception, built as kept: `plugin/rezip-archive/` is a 15-entry local mirror of the test-rezips-for-nerds channel, one zip and one readme per build, the readme being the channel post's own text. The rezip's archive step sits immediately after the stamp comparison — the one moment the folder is provably the installed build — so a release ships tested bytes instead of whatever the tree has become. The release ritual's steps 5–8 were rewritten: identify the build from the archive readme, verify the archived zip's stamp against `git archive` of its recorded commit, copy rather than Compress-Archive. `discord_post.py`'s `build_plugin_zip()` became `archived_plugin_zip()` (`--attach-archived-zip [VERSION]`), so a channel entry attaches the bytes that were installed. `plugin/release-zip-archive/` retired and deleted — its three zips were tracked, so recoverable; GitHub Releases keeps every release's zip. Closes findings 1, 2 and 4 of the release-validation-chain research.
+
+Tick: done, confirmed — script parses, the new flag shows in `send --help`, and the observable greps return only the deliberate retirement sentence and the historical research file.
+Files touched: resources/release-ritual.md, resources/discord_post.py, CLAUDE.md, .gitignore; plugin/release-zip-archive/ deleted.
+Rule gate: run — an amendment to CLAUDE.md's existing Rezip/Release and test-rezips rules; the sentences it replaces went out in the same edit.
