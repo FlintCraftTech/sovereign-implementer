@@ -2,6 +2,49 @@
 
 One-line summaries of each session. Newest first.
 
+- [HASH] — chat-level record for the 2026-08-28 planning session: ~30 entries processed, cleared region rebuilt 1→36, three bot posts, two Gmail-connector issues filed, pacing repealed, seven gate runs none refused → 2026-08-28-chat-plan.md
+- [HASH] — plan — rezip archive reconceived (user): rezip builds and archives its own zip+readme, 15-item channel mirror, release ships the archived tested build; release-zip-archive retired → 2026-08-28-rezip-archive-mirrors-nerds-channel.md
+- [HASH] — plan — content_stamp() to normalise CRLF and exclude .orphaned_at, so a commit can be compared to an installed build → 2026-08-28-content-stamp-normalises-line-endings.md
+- [HASH] — plan — beta item's QUEUE.md write resolved: the announcement becomes a release-cycle template (user's reconception); capture deleted → 2026-08-28-beta-tester-pathway-files-line-names-queue.md
+- [HASH] — plan — decision step to check the cycles doc before recommending; admitted on a live same-session failure → 2026-08-28-recommendation-checks-cycles-first.md
+- [HASH] — plan — rituals kept as a shipped feature: named step lists in the cycles doc, procedure-shaped work offered a ritual, promotion to cycle; SPEC sentence written → 2026-08-28-ritual-definitions-and-offers.md
+- [HASH] — plan — process-now offers reworded "with you" (user's wording) → 2026-08-28-process-now-offer-says-with-you.md
+- [HASH] — plan — disposition ask reworded to the user's two-part form: agreement first, the move as its consequence → 2026-08-28-disposition-ask-two-part-form.md
+- [HASH] — [user] done — how-to forum send permission granted, confirmed from the API; [howto-posts-bot-authorship] lifted → 2026-08-28-bot-needs-howto-send-permission.md
+- [HASH] — plan — retired-term findings settled as comment rewords in both hooks → 2026-08-28-live-rules-name-retired-terms.md
+- [HASH] — plan — Taskflow bridge re-dated 2026-09-28 (their export/import unbuilt); boundary scrub settled → 2026-08-28-taskflow-personal-bridge.md
+- [HASH] — [user] done — issue-first post shipped, then deleted and reposted to #tips as a how-to on the user's tip-not-news judgment → 2026-08-28-discord-post-issue-first-reporting.md
+- [HASH] — plan — tip test wins the two-kinds tie + visibility joins the posting brief, both gated on recorded failures → 2026-08-28-tip-test-wins-tiebreak.md
+- [HASH] — [user] done — install-from-zip route in the nerds pin; whole pin compressed and pasted by the user → 2026-08-28-install-from-zip-route-described.md
+- [HASH] — plan — Discord replies to the bot read at the planning opening (replies subcommand + host clause) → 2026-08-28-discord-replies-scan.md
+- [HASH] — plan — twelve tip candidates screened for visibility: all pass, two borderline with grounds; screen capture deleted → 2026-08-28-tip-candidates-need-visibility-screen.md
+- [HASH] — plan — audit finding: both close docs' commit steps gain [BRIEF, PROMPT] → 2026-08-28-ca-commit-steps-untagged.md
+- [HASH] — plan — audit finding: feedback-and-inbox.md gains tags throughout, sends [BRIEF, PROMPT] → 2026-08-28-ca-feedback-doc-untagged.md
+- [HASH] — plan — audit finding: done-plan's repeal block relocates to self-authoring-rules → 2026-08-28-ca-repeal-block-in-shipped-doc.md
+- [HASH] — plan — audit finding: next-audit's restated Files rule becomes a one-clause pointer → 2026-08-28-ca-audit-restates-files-rule.md
+- [HASH] — plan — audit finding: both history passages leave feedback-and-inbox.md; purpose-clause defence lost to the reclassification test → 2026-08-28-ca-superseded-version-narrated.md
+- [HASH] — plan — audit finding: reorder specimen to name items by opening words, slugs after → 2026-08-28-ca-reorder-specimen-bare-slugs.md
+- [HASH] — plan — audit finding: audit-halt specimen leads with the recommendation; seventh finding closed → 2026-08-28-ca-audit-halt-offers-menu.md
+- [HASH] — plan — two-stored-texts limb reclassified into the hand-over checkpoint's question 1 → 2026-08-28-handover-named-neither-of-two-quotes.md
+- [HASH] — plan — one-post-a-day pacing REPEALED (user, twice stated); no public claim to correct; seven queue mentions swept → 2026-08-28-one-post-a-day-is-per-channel.md
+- [HASH] — plan — reverse capability check admitted: verify a tool-capability sentence before writing it → 2026-08-28-claude-md-asserted-bot-posting-channels-unchecked.md
+- [HASH] — plan — cycles parser to continue wrapped Cadence/Observable lines; placed before the rituals build → 2026-08-28-cycles-fields-are-single-line.md
+- [HASH] — plan — SPEC's owed rescan sentence written; debt capture deleted → 2026-08-28-spec-owes-rescan-recommendation.md
+- [HASH] — plan — tip pooling ends: the rezip's noticing step files captures; ANNOUNCEMENT-IDEAS.md reverts to static archive → 2026-08-28-tip-pooling-step-blocked-by-scope-lock.md
+- [HASH] — plan — FAQ template pair joins the planning writable list; three owed FAQ entries ride the build → 2026-08-28-faq-writes-at-announcement-unblocked.md
+- [HASH] — plan — audit close gains the rescan-first clause, the fourth close-naming site → 2026-08-28-audit-close-missing-rescan-clause.md
+- [HASH] — plan — three walkthroughs corrected in-session to the bot-posts-on-your-yes route; capture deleted → 2026-08-28-queue-walkthroughs-say-claude-cannot-post.md
+- [HASH] — plan — cycles diagrams re-held behind the rituals build, drift grounds recorded → 2026-08-28-cycles-mermaid-diagrams.md
+- [HASH] — plan — ordering ask gains "the usual way"; SPEC sentence updated → 2026-08-28-ordering-ask-hides-the-default.md
+- [HASH] — plan — candidate-set ask states what "go" does → 2026-08-28-contest-by-number-ask-unexplained.md
+- [HASH] — plan — law-prose article kept and CLEARED with source map, the user's arc, and the platform-agnostic giveaway; co-writing observation filed → 2026-08-28-law-prose-article.md
+- [HASH] — plan — [audit] recycle sweep kept: mine the announcement channel's full history for tip subjects → 2026-08-28-announcements-to-tips-recycle-sweep.md
+- [HASH] — [user] done — red-flags tip posted with the user's strengthened cannot-anticipate caveat, her closing paragraph verbatim → 2026-08-28-tip-red-flags.md
+- [HASH] — plan — stop hook to ignore specimen-shaped slugs (the docs' own placeholder vocabulary) → 2026-08-28-stop-hook-placeholder-slugs.md
+- [HASH] — plan — self-hosting seed kept: /setup seeds the self-authoring discipline, add-only, both entry points; SPEC sentence written → 2026-08-28-setup-self-hosting-seed.md
+- [HASH] — plan — YouTube/ folder created and its gitignore line kept as a build; demo-guide and pop-out captures filed → 2026-08-28-youtube-folder-gitignored.md
+- [HASH] — plan — nerds welcome to become a bot-authored sticky re-bumped per entry post, held behind the archive rework; old-pin retirement filed behind it → 2026-08-28-nerds-welcome-sticky-rebump.md
+- [HASH] — release — v1.21.1 published from d31b553 (the tested test2 build), zip packaged from that commit not the working tree, beta fast-forwarded to it, host update deliberately skipped; supersedes v1.21.0 as recommended install → 2026-08-27-release-v1-21-1.md
 - b97573d — plan — release plan settled: tested test2 identified byte-for-byte as d31b553, to release as v1.21.1 from that commit with beta pointed there; [beta-tester-pathway] lifted, [howto-posts-bot-authorship] re-pointed at the send-permission grant; overwrite-check deleted (premise gone); 3 captures + advisory filed on the broken release chain → 2026-08-27-chat-plan-3.md
 - beac9d2 — chat-level record for the 2026-08-27 build run: 13 built, 2 audits filed (19 findings), 4 walk-throughs all done, the bot's first Discord post, and five of this session's own rules broken by the session that wrote them → 2026-08-27-chat-build-2.md
 - beac9d2 — build — `resources/discord_post.py` created: standard-library Discord client (send/edit/delete/list/attach/set-avatar, emoji-tolerant channel resolution); CLAUDE.md's "no route to Discord" replaced by the route with the approval gate restated; `edit` left unconfirmed → 2026-08-27-discord-posting-bot.md

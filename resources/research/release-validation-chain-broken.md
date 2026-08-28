@@ -1,5 +1,7 @@
 # The release chain cannot deliver a validated build — findings from 2026-08-27
 
+**Dispositions written 2026-08-28:** findings 1, 2 and 4 → [rezip-archive-mirrors-nerds-channel] (the rezip builds and archives its own zip, the release packages the archived build); finding 3 → [content-stamp-normalises-line-endings]. The findings stand as written until those items ship.
+
 Written at the end of the 2026-08-27 build session, when a request to release the
 build that had just been validated could not be carried out. This is a defect
 report for the next planning session, not a research finding about the outside

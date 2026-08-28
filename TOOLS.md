@@ -22,10 +22,17 @@ capability is absent.
   them unevenly (measured 2026-08-27 by computing effective permissions from
   the guild roles plus each channel's overwrites — not by test-posting, which
   would send real messages). It **can** post to test-rezips-for-nerds,
-  general-chat and give-and-get-support; it **cannot** post to tips,
-  announcements or the how-to forum, each returning HTTP 403 "Missing
-  Permissions" (code 50013). Reading tips and announcements works, which is why
-  the gap is invisible until a send is attempted.
+  general-chat, give-and-get-support, and — since the user's grants of
+  2026-08-27, both proven by real sends — **tips and announcements**. The how-to forum was the last gap (HTTP 403 at
+  first send attempt); the user granted it 2026-08-28 and the grant was
+  confirmed from the API — view, create posts and send in threads all true
+  ([bot-needs-howto-send-permission], done). Reading
+  a channel works even where posting is refused, which is why a send gap is
+  invisible until a send is attempted.
+- The bot's **edit path is proven** (2026-08-27): it edited its own v1.21.1
+  announcement in #announcements (message 1542476078835175527) to fold in a
+  link, on the user's yes, and the edited message read back in place. This was
+  the first genuine edit, closing the question [bot-edit-path-unproven] carries.
 - Channel IDs are deliberately not recorded here (this file is committed to a
   public repository — the user's decision, 2026-08-27). A session needing one
   looks it up through the bot's API in one call.
@@ -35,6 +42,17 @@ capability is absent.
   deleting others' messages and pinning — never rewriting them.
 - Posting is gated by the standing approval rule: nothing leaves the machine
   without the user seeing the exact text and saying yes.
+
+## Web endpoints (learned live 2026-08-28)
+
+- **LinkedIn refuses the anonymous web fetcher** — HTTP 999 with no body. The
+  route that works is the user's own logged-in Chrome (the Claude-in-Chrome
+  tools), used with her direction for her own pages.
+- **A raw Discord API call from a script needs a `User-Agent` header**
+  (e.g. `DiscordBot (throughliner, 1.0)`) or it is refused with HTTP 403 before
+  auth is even considered. `resources/discord_post.py` already sets its own;
+  the trap is ad-hoc scripts, where a valid Bot token still 403s without it —
+  cost one wrong diagnosis on 2026-08-28.
 
 ## Inkscape on this machine (learned live 2026-08-27)
 
