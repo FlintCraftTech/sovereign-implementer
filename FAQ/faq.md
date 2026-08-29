@@ -81,7 +81,9 @@ passed yet.
 A `/plan` run opens by checking the queue for problems — work marked ready that
 contradicts its own notes, items that name no files to change, work waiting on
 itself in a loop — and reports what it finds. Then it asks one question: is
-there anything you want to prioritise, or should Claude pick the order?
+there anything you want to prioritise, or shall Claude order them the usual way?
+"The usual way" means the standard order the method applies when nothing is
+prioritised — you get told in one line which order was used.
 
 You don't have to process everything in one sitting. `/plan`, `/done`, fresh
 chat, `/plan` again is a normal rhythm.
@@ -252,3 +254,27 @@ The honest limit, which matters more than the feature: Claude cannot anticipate
 every exposure or breach. It catches what is in view, and there is no way to
 know what it missed. So Throughliner will never tell you a project is secure —
 it shows you what it sees and hands you the decision.
+
+## Can I use this method with a tool other than Claude Code?
+
+Yes, by porting it — and people are already doing that. Throughliner is a
+plugin for Claude Code, so it will not simply run elsewhere, but what it
+actually consists of is plain documents plus a handful of small Python scripts
+that fire at certain moments in a session. Everything is public in the
+project's repository and readable without knowing how to code.
+
+What a port takes on is the mapping: your tool has its own way of starting a
+session and running commands, and someone has to decide which of Throughliner's
+moments correspond to which of yours. That part is judgement, and nobody can do
+it for you from here.
+
+Two kinds of port are emerging, and both are welcome. One follows this project
+closely and carries as many of its features as the other tool allows. The other
+takes the idea somewhere of its own — its own name, its own decisions, adopting
+only the changes it wants. Neither is the right answer; what matters is being
+able to say which one a given port is, so people know what they are installing.
+
+If you are considering it, the project's Discord server is where the people
+already porting are, and there is a showcase channel for ports and for projects
+built with the method. More support for porters is being written; ask there
+rather than working it out alone.

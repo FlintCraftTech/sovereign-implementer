@@ -1,4 +1,4 @@
-# [HASH] — Rituals built: named step lists with a trigger word, offered on procedure-shaped work, promoted to cycles when they gain a cadence
+# 4efdcff — Rituals built: named step lists with a trigger word, offered on procedure-shaped work, promoted to cycles when they gain a cadence
 
 The user's structural read shipped as designed: a ritual is the turn-steps component of a cycle standing alone — no cadence, fired on the user's word — living in the same cycles doc. plan.md's decision step gained the authoring arm, a two-armed offer block (recurring-shaped → cycle, procedure-shaped → ritual, each offered once in the message already discussing the work), and the promotion clause. The parser split into `_parse_cycles_doc()` feeding `cycles_facts()` and a new `rituals_facts()`; the discriminator is what a definition carries (trigger and no cadence), so the format grows additively, every existing doc stays valid, and no epoch bump is owed. Session start reports rituals by name and trigger only — no due-ness exists to compute, and no capture is ever filed for one.
 

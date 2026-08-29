@@ -1,4 +1,4 @@
-# [HASH] — Disposition ask rebuilt to the user's two-part form: agreement to the recommendation, the move as its consequence
+# 4efdcff — Disposition ask rebuilt to the user's two-part form: agreement to the recommendation, the move as its consequence
 
 The recommend step's ask rule and specimens now carry her form — "Would you agree with that? If so I'll move it into Processed, cleared to run." — with the reason operative: an ask about the mechanics turns a natural "agreed" into consent to a write rather than a readable verdict on the substance. Her clarification travelled too: the recommendation is never the move itself, and where agreement doesn't land, processing simply continues. The delete ask is unchanged, since it already asks the fate question directly.
 

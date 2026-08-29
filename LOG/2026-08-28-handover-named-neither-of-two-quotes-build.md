@@ -1,4 +1,4 @@
-# [HASH] — The stored-texts limb written into the hand-over checkpoint's own question
+# 4efdcff — The stored-texts limb written into the hand-over checkpoint's own question
 
 The reclassify-don't-exempt rule applied on its recorded misapplication: the cross-reference to the walkthrough rules is what did not fire when a hand-over said "the quoted install line" against a post holding two quotes. Question 1 of the read-back block now carries the limb in its own text — where the message touches more than one stored text, does each step name which one it means and where it lives? The full statement in the `[user]` walkthrough rules stays canonical; the checkpoint carries the question form.
 

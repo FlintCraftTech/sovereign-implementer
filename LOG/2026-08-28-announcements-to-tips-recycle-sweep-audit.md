@@ -1,4 +1,4 @@
-# [HASH] — [audit] Announcement history swept: all 22 posts read, five recycle into tips, one post found actively false
+# 4efdcff — [audit] Announcement history swept: all 22 posts read, five recycle into tips, one post found actively false
 
 The run the item asked for, through the bot: every message in #announcements back to the channel's first (2026-07-30), plus the sent register and the seed archive for what they cover, each subject tested against the two-kinds and visibility tests.
 

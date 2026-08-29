@@ -1,4 +1,4 @@
-# [HASH] — Audit-halt specimen leads with the recommendation, the doc-write as the named escape
+# 4efdcff — Audit-halt specimen leads with the recommendation, the doc-write as the named escape
 
 The specimen offered a flat two-option menu where the doc's own contract has a preference. It now recommends filing findings as captures and keeps the direct doc-write as the escape on the user's say-so; its lead-in changed from "Ask which the user wants" to "Lead with the recommendation". Closes the seventh and last finding of the 2026-08-27 compliance audit.
 

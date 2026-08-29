@@ -1,4 +1,4 @@
-# [HASH] — The FAQ templates join the planning writable list, and the three owed entries land
+# 4efdcff — The FAQ templates join the planning writable list, and the three owed entries land
 
 The scope-lock's `_is_plan_quiet_path()` admits exactly the two FAQ template paths and nothing else in templates/ — the literals written lowercase with forward slashes to match how the relative path is built, since normcasing them would swap in backslashes on Windows and never match, the same inversion the file already records for QUEUE.md. The templates-are-denied comment carries the exception and its ground: the FAQ template is canonical, FAQ/ is a copy of it, and the announcement-time rule could not be obeyed without the write — the twice-in-two-days collision. Three entries written and re-copied to FAQ/ byte-identical: updating and which build to be on; reporting a problem and how the answer returns; what a red flag means, ending on the honest limit in the user's own framing. The suite's template case was updated, and a CLAUDE-TEMPLATE.md case added — the one that proves the widening went no further than the pair.
 

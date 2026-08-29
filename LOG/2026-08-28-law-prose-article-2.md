@@ -44,7 +44,9 @@ The claims list was published as an artifact on the user's request — she was o
 Two corrections from the user during this turn, both changing what the claim contains:
 
 - **The fifteen-year interest is not Throughliner's and does not belong in this article.** It is Simply Sew, and it is the ADHD article's material. Claude had folded it into this claim's framing; the user corrected it.
-- **Throughliner is about four months old, and the repository's first commit (2026-06-01) is not the start.** The user's account, given here and not previously on record anywhere: the method was originally developed **inside Cowork, because she was too scared to use Claude Code**, for roughly a month before the Claude Code repository begins. That reconciles her four months with the repo's just-under-three.
+- **Throughliner is about four months old, and the repository's first commit (2026-06-01) is not the start.** The user's account, given here and not previously on record anywhere: the method was originally developed **inside Cowork**, for roughly a month before the Claude Code repository begins. That reconciles her four months with the repo's just-under-three.
+
+  **Correction, 2026-08-29.** This paragraph originally read "because she was too scared to use Claude Code". That was Claude's paraphrase, not her account, and she challenged it when the fact was processed into [cowork-origin-month-unrecorded]. **Her words: she found it intimidating and needed support, and she received that support from nice people on Discord.** The wrong wording is recorded here rather than quietly removed, because a credit for someone's own reasoning is exactly the thing this project's provenance rule says to check when it is challenged.
 
 **The corrected arc is the stronger one, and it is the recommendation the user agreed:** three rule-writing approaches tried and two abandoned — prose with no system, pseudocode, law prose — with the rulebook trebling to 21,445 words and a 65-commit rollback, all inside the project's first four months. The timespan is the hook rather than an aside.
 

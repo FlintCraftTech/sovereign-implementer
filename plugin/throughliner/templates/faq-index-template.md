@@ -29,3 +29,6 @@ announced yet, not that questions aren't welcome: just ask in chat.
   their way into your queue. [faq.md](faq.md)
 - **What does a red flag mean in my queue?** — how a risk gets marked, the two
   ways it clears, and the limit on what Claude can promise. [faq.md](faq.md)
+- **Can I use this method with a tool other than Claude Code?** — porting it
+  yourself, what you would be taking on, and where the people already doing it
+  are. [faq.md](faq.md)

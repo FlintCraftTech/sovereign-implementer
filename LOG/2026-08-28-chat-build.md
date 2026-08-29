@@ -1,4 +1,4 @@
-# [HASH] — Chat-level record for the 30-item build run of 2026-08-28
+# 4efdcff — Chat-level record for the 30-item build run of 2026-08-28
 
 The largest run this project has made: 29 build items and one audit, worked top-down from a cleared region rebuilt the day before, plus both `[user]` walk-throughs addressed — one halted on findings, one deferred mid-processing by the user. Two INBOX deliveries triaged (five messages across the session), the weekly release computed not due at both ends of the session, and the rescan run before the close on the user's command.
 
@@ -17,3 +17,16 @@ Wind-down re-scan: covered by the rescan just run, plus the mail triage and one 
 Advisory: filed — [forward-advisory].
 
 This session ran across an interruption and resumed; all dates are 2026-08-28.
+
+## After the close
+
+**The 1.21.1-test1 rezip ran** — pushed (`4efdcff` to origin/main), version bumped, `__pycache__` swept, suites 27/27, cache pruned to two prior builds, installed via the CLI, stamps proved equal (`8c874952044d` both sides, the first stamps computed under the new line-ending normalisation), CLI at 2.1.220. Awaiting the user's full app restart.
+
+**The new archive step was refused on its first ever run, and the refusal is the finding**: the scope-lock classifies a post-close session as planning, and `plugin/rezip-archive/` is on no writable list — the exact shape this run had just fixed for tip pooling, filed as [rezip-archive-blocked-by-scope-lock]. No archive entry exists for this build; it is rebuildable from `4efdcff`. The readme drafted for it, so the eventual entry does not recompose it:
+
+> **v1.21.1-test1** — under testing; use at your own risk.
+> Commit: 4efdcff
+> Version: 1.21.1-test1
+> The 30-item run's build: release-from-archive (this archive is its first artifact), the beta channel's two-event Wednesday turn, rituals in the cycles doc, the self-hosting seed at /setup, the FAQ-at-announcement unblock, seven compliance fixes across the shipped docs, the stop hook's placeholder carve-out, and the content stamp made line-ending blind.
+
+**Tip-candidate check:** one filed, [tip-candidate-rituals] — rituals are the build's user-visible feature not already covered by a queued post item; the beta channel is owned by [beta-launch-announcement], and the rest of the build is internal under the visibility test.

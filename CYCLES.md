@@ -59,3 +59,112 @@ original pick rule was "newest rezip at least a week old". Its week-old property
 now lives in the promotion step above rather than in the pick — step 2 releases a
 build that has had exactly that week, so the property is enforced by the turn's
 shape instead of by the selector reading a date.
+
+## Tips posting [tips-posting]
+
+**Artifact:** the 💡tips channel on the Throughliner Discord.
+
+**Cadence:** every three days, declared by the user 2026-08-29.
+
+**Observable:** the date of the most recent tips line in `INBOX/sent.md`, which
+records the channel per post.
+
+Declared rather than derived — the definition says which, and this one is the
+user's. The record could not have supplied it: one tip had gone out at the time
+this was written.
+
+**Material.** The tip candidates in QUEUE.md's Unprocessed section — filed at
+rezips as features land, recycled from old announcements, or noticed any other
+way. A turn draws from that pool rather than inventing a subject. New or updated
+features first; recycled and historical tips on slow news days.
+
+**Steps of one turn.**
+1. Pick a candidate. Prefer one whose capture carries a release's version line,
+   which is what marks a feature as shipped and so postable. Where none is
+   marked, take a recycled tip — those describe features that shipped long ago,
+   so they need a drift check rather than a release.
+2. Verify every claim against the **installed** plugin, at post time rather than
+   draft time. Where a claim has drifted, rewrite it or hold the post.
+3. Read the how-to topics' lines in `INBOX/sent.md` for claims this post
+   touches. A needed tweak is the bot editing its own how-to post, under the
+   approval rule like any send.
+4. Draft it. The post walks the reader through the how-to — what to type, where
+   to look, what tells them it worked — rather than reporting that a capability
+   exists, and stays under 2,000 characters.
+5. The bot posts it to 💡tips on the user's explicit yes to the exact text, then
+   reads the message back.
+6. Write the register line in `INBOX/sent.md` in that same turn — date, channel,
+   intent, what it claimed, and a pointer to the text. **Read the claim off the
+   approved text as it stands, never from what the session settled.**
+7. Author the FAQ entry the post teaches, into
+   `plugin/throughliner/templates/faq-template.md` with its index line, then
+   re-copy both into `FAQ/`.
+8. Delete the spent candidate's capture from QUEUE.md.
+
+**No writable-paths declaration is needed, checked rather than assumed:** every
+path a turn writes — `INBOX/`, the two FAQ templates, `FAQ/`, `QUEUE.md` and a
+scratch draft file — is already permitted to a planning session. If a later step
+ever needs somewhere outside that, this definition gains the field that
+[ritual-declares-writable-paths] builds.
+
+**Not capped by anything else:** the one-post-a-day pacing was repealed
+2026-08-28, so this cadence is the only rhythm governing the channel.
+
+## Announced-claims sweep [announced-claims-sweep]
+
+**Artifact:** the claims recorded in `INBOX/sent.md` for channels that retire
+their old posts rather than recycling them — 📣announcements above all.
+
+**Cadence:** weekly, declared by the user 2026-08-29, matching the release
+cycle.
+
+**Observable:** the date of the most recent `LOG/` entry under this cycle's slug.
+
+Declared rather than derived, and the reason is the derivation the user chose:
+a release is the thing most likely to falsify a public claim, so the sweep runs
+at the rhythm of the thing that breaks its subject.
+
+**Why it exists, and what it does NOT cover.** Channels flagged to *return*
+their pruned posts re-check themselves — a pruned post comes back as a capture
+and its claims are verified before it is reposted ([channel-depth-and-recycling]).
+Channels flagged to *retire* get no such pass, so a claim there is checked only
+if some later change happens to repeal its exact wording and the grep over
+`INBOX/sent.md` happens to match. That gap is not hypothetical: the 2026-08-22
+announcement was falsified on 2026-08-27 and nothing fired for a week.
+
+**Steps of one turn.**
+1. Read `INBOX/sent.md` and take every claim line whose channel retires.
+2. Re-read each claim against the **installed** plugin, not the source tree.
+3. Where a claim no longer holds, file one capture naming the post, its message
+   id and what is now false. Satisfied while an open capture already carries
+   that post's id.
+4. Where every claim still holds, say so in one line. A sweep that ran and found
+   nothing must be distinguishable from one that never ran.
+5. Record the turn in `LOG/` under this cycle's slug.
+
+**Two limits, stated because this cycle is easy to over-read.** Its observable is
+written by the same session that runs the turn, so it records that a sweep
+happened and not that it was thorough — unlike the release cycle, whose
+observable is an external publication date. And its cost grows with the register:
+every turn re-reads every retained claim, so a long-lived channel makes a longer
+sweep.
+
+**Scope until [channel-depth-and-recycling] ships:** no channel carries a
+retire-or-return flag yet, so the sweep's scope is 📣announcements by name, plus
+the forums below.
+
+**The forums are in scope too, on the user's instruction 2026-08-29, and they
+need a second check the channels do not.** The ❓how-to-throughliner forum and
+the "how ports work" forum ([ports-forum]) both hold standing instructional
+posts whose claims go stale exactly as an announcement's do — and their lines are
+already in `INBOX/sent.md`, so step 1 reaches them with no change. A fourth cycle
+was considered and refused: one definition covering every published claim beats
+two that can drift apart.
+
+**The extra check is ordering.** A forum lists its topics by latest activity, so
+posting or commenting shuffles them out of their numbered sequence — observed
+2026-08-29 with the how-to topics displaying 3, 6, 5, 4, 2. So each turn also
+reads the forum's topic order and reports where it no longer matches the numbers
+in the titles. **Report only: re-ordering a forum is the user's to do, and
+whether it can be done at all is one of the questions
+[howto-posts-bot-authorship]'s first step settles.**

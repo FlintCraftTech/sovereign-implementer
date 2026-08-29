@@ -1,4 +1,4 @@
-# [HASH] — YouTube/ joins .gitignore
+# 4efdcff — YouTube/ joins .gitignore
 
 One line, on the user's direction: the folder holds the channel's working material until it pops out as its own project.
 

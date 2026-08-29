@@ -1,4 +1,4 @@
-# [HASH] — The self-hosting seed built: /setup offers the self-authoring discipline to method builders, add-only
+# 4efdcff — The self-hosting seed built: /setup offers the self-authoring discipline to method builders, add-only
 
 setup.md gained the section with both entry points — a question at fresh setup for someone building a method, plugin or port, and an on-request path on an adopted project — under the top-up's never-overwrite discipline, with an explicit statement of what is deliberately not seeded and why (the release rituals and rule scripts are one repository's machinery; the discipline generalises, the tooling does not). Three templates authored by generalisation from the named host sources: the self-hosting CLAUDE.md block carrying the rule gate, the disposition-on-the-item pattern with its record line, and host-versus-target — with the honest limits kept in rather than smoothed away (nothing tells an honest disposition from a dishonest one) — plus the retired-terms register and compliance-audit checklist templates.
 

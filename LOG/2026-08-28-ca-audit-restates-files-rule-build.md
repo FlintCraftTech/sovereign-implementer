@@ -1,4 +1,4 @@
-# [HASH] — next-audit.md's restated empty-Files-list rule replaced by a pointer at its parent
+# 4efdcff — next-audit.md's restated empty-Files-list rule replaced by a pointer at its parent
 
 Four lines of restatement became one clause naming next.md's self-scoping step, per the names-not-step-numbers cross-reference rule; next.md untouched. The eviction-debt signature the audit lens exists for, repaid.
 

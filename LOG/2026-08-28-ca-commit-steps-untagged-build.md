@@ -1,4 +1,4 @@
-# [HASH] — Every commit step in the done family now carries [BRIEF, PROMPT]
+# 4efdcff — Every commit step in the done family now carries [BRIEF, PROMPT]
 
 done-build.md §2.4 and done-plan.md §2 gained the tag matching done.md's Commit core — and the build found a third untagged commit step the audit finding had not noticed, in done-audit.md §2.4. It was included because the item's own observable ("no untagged commit step remains in the done family") cannot be met without it; the file was added to the run's Files list before editing.
 

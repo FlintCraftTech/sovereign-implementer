@@ -2,39 +2,71 @@
 
 One-line summaries of each session. Newest first.
 
-- [HASH] — chat-level record for the 30-item build run: 29 builds + 1 audit shipped, both [user] items addressed (one halted on findings, one deferred), ~24 captures filed, advisory filed, two rules exercised in the run that shipped them → 2026-08-28-chat-build.md
-- [HASH] — build — beta channel wired: two-event Wednesday turn (promote then pick), README beta section, announcement as reusable cycle template → 2026-08-28-beta-tester-pathway.md
-- [HASH] — build — release-from-archive: rezip archives each build's zip+readme at the proven-equal moment, release copies instead of building, release-zip-archive deleted → 2026-08-28-rezip-archive-mirrors-nerds-channel-build.md
-- [HASH] — build — content_stamp() normalises CRLF→LF and excludes .orphaned_at; LF/CRLF trees proved to stamp identical → 2026-08-28-content-stamp-normalises-line-endings-build.md
-- [HASH] — build — plan.md decision step reads the cycles doc before recommending; cycle-owned artifacts shaped as cycle material → 2026-08-28-recommendation-checks-cycles-first-build.md
-- [HASH] — build — cycles parser continues wrapped Cadence/Observable fields to a blank line or next field; suite covers the live wrapped case → 2026-08-28-cycles-fields-are-single-line-build.md
-- [HASH] — build — rituals shipped: trigger-word step lists in the cycles doc, two-armed offer at the decision step, promotion clause, rituals_facts() reported at session start, format additive so no epoch bump → 2026-08-28-ritual-definitions-and-offers-build.md
-- [HASH] — build — process-now offers say "with you" at both sites; descriptive uses left → 2026-08-28-process-now-offer-says-with-you-build.md
-- [HASH] — build — disposition ask reworded to the two-part form (agreement first, move as consequence); exercised same-session on the law-prose claims → 2026-08-28-disposition-ask-two-part-form-build.md
-- [HASH] — build — retired terms "keep-step" and the build-block marker reworded out of hook comments; rule checks clean; [compliance-audit-lag] filed from the checks' one finding → 2026-08-28-live-rules-name-retired-terms-build.md
-- [HASH] — build — posting rules gain the tip-test tie-break, the walks-the-how-to requirement, and the visibility criterion → 2026-08-28-tip-test-wins-tiebreak-build.md
-- [HASH] — build — discord_post.py `replies` subcommand (read-only, all readable channels) + planning-opening clause; run live, no replies yet → 2026-08-28-discord-replies-scan-build.md
-- [HASH] — build — all four done-family commit steps tagged [BRIEF, PROMPT], including a third untagged one in done-audit.md the finding missed → 2026-08-28-ca-commit-steps-untagged-build.md
-- [HASH] — build — feedback-and-inbox.md fully tagged, every send step [BRIEF, PROMPT] → 2026-08-28-ca-feedback-doc-untagged-build.md
-- [HASH] — build — both history passages evicted from feedback-and-inbox.md, verified already on record in the 08-13/08-15 entries → 2026-08-28-ca-superseded-version-narrated-build.md
-- [HASH] — build — done-plan.md reorder specimen reworded to opening-words-then-slug → 2026-08-28-ca-reorder-specimen-bare-slugs-build.md
-- [HASH] — build — done-plan.md's do-not-reinstate block relocated to self-authoring-rules.md as a citation of 7c9922a's entry → 2026-08-28-ca-repeal-block-in-shipped-doc-build.md
-- [HASH] — build — next-audit.md's restated Files-list rule replaced by a pointer at next.md's self-scoping step → 2026-08-28-ca-audit-restates-files-rule-build.md
-- [HASH] — build — audit-halt specimen leads with the recommendation; last 2026-08-27 compliance-audit finding closed → 2026-08-28-ca-audit-halt-offers-menu-build.md
-- [HASH] — build — hand-over checkpoint question 1 gains the stored-texts limb in its own text, on the recorded misapplication → 2026-08-28-handover-named-neither-of-two-quotes-build.md
-- [HASH] — build — one-post-a-day pacing repealed outright; no public claim of it on the register, so no correction owed → 2026-08-28-one-post-a-day-is-per-channel-build.md
-- [HASH] — build — capability claims get the reverse-direction check (verify before writing); held two claims unverified later the same session → 2026-08-28-claude-md-asserted-bot-posting-channels-unchecked-build.md
-- [HASH] — build — tip pooling ends: rezip files captures, ANNOUNCEMENT-IDEAS.md read-only seed, release marks captures by appended line → 2026-08-28-tip-pooling-step-blocked-by-scope-lock-build.md
-- [HASH] — build — FAQ templates join the planning writable list (exactly the pair); three owed entries written and copied to FAQ/; suite proves the widening stops there → 2026-08-28-faq-writes-at-announcement-unblocked-build.md
-- [HASH] — build — next-audit.md's close gains the rescan-first clause, the fourth site → 2026-08-28-audit-close-missing-rescan-clause-build.md
-- [HASH] — build — YouTube/ gitignored → 2026-08-28-youtube-folder-gitignored-build.md
-- [HASH] — build — ordering ask becomes "order them the usual way" at both sites plus the FAQ's description → 2026-08-28-ordering-ask-hides-the-default-build.md
-- [HASH] — build — candidate-set ask states what "go" does at both sites → 2026-08-28-contest-by-number-ask-unexplained-build.md
-- [HASH] — build — self-hosting seed: setup.md's two entry points + three templates generalised from the host sources, fixture-tested add-only → 2026-08-28-setup-self-hosting-seed-build.md
-- [HASH] — build — stop hook ignores placeholder slugs (derived boundary, residual stated); suite covers both directions → 2026-08-28-stop-hook-placeholder-slugs-build.md
-- [HASH] — [audit] — announcement history swept, all 22 posts: five tip recycles + coverage note filed; the 2026-08-22 builds-don't-read-the-queue post found falsified by the 08-27 retirement → 2026-08-28-announcements-to-tips-recycle-sweep-audit.md
-- [HASH] — [user] halted — how-to re-homing stopped at step 3: topics hold 2–5 of the user's messages each, and whether deleting a forum starter deletes the topic is unresolved (search split); deferred to /plan on her word → 2026-08-28-howto-posts-bot-authorship.md
-- [HASH] — [user] deferred — law-prose article: claims 1–6 settled one at a time under the new two-part ask (claim 2 split, Cowork origin month recorded, ~151 figure ruled out), claim 7 presented unanswered, 8–14 fresh → 2026-08-28-law-prose-article-2.md
+- [HASH] — chat-level record for the 2026-08-29 planning session: ~30 entries processed, cleared region 2→28, ports made the top priority, one announcement posted and edited twice, two false records corrected → 2026-08-29-chat-plan.md
+- [HASH] — plan — an MCP-server brief became an [audit]: a run's fixed read cost (~250KB before any edit) dwarfs what MCP could save, and half the brief's tool table already exists as scripts → 2026-08-29-run-token-cost-audit.md
+- [HASH] — plan — outbound register gets a deletion guard rather than being un-ignored; per-file exposure read off the folder, user declined publication, red flag cleared by design with the residual accepted → 2026-08-29-sent-register-untracked.md
+- [HASH] — plan — co-authored drafts go to an editable `.txt` with a read-back loop; a tested `CLAUDE.md` finding overturned live, and #83476 written on as a do-not-wait dependency → 2026-08-29-co-authoring-txt-draft-loop.md
+- [HASH] — plan — co-writing reframed as planning work surfacing inside a walkthrough; drafting half split off, [co-writing-shape-question] merged in and deleted, claims-one-at-a-time refused by the user → 2026-08-29-co-writing-flavour.md
+- [HASH] — plan — rezip archive takes the narrow carve-out on a four-day release deadline; the archive folder found never to have existed, fallback written in, precedent-stretch stated honestly → 2026-08-29-rezip-archive-blocked-by-scope-lock.md
+- [HASH] — plan — rituals declare the paths their steps write; the "how does the hook know which ritual is running" unknown dissolved by the `plugin.json` carve-out already being unconditional → 2026-08-29-ritual-declares-writable-paths.md
+- [HASH] — plan — compliance audit kept with its scope refreshed by re-running the check; the done family is what is uncovered, not the files the snapshot named → 2026-08-29-compliance-audit-lag.md
+- [HASH] — plan — seventeen tip items become one posting cycle's material rather than seventeen decisions; [tips-posting] authored, every-three-days, and the bulk-keep route correctly refused → 2026-08-29-tips-posting.md
+- [HASH] — plan — the residual the tips cycle leaves: nothing tells the ladder those captures belong to a cycle, and neither existing hold field fits → 2026-08-29-cycle-material-captures-still-ranked.md
+- [HASH] — plan — cross-project research copied in and labelled a snapshot; the absolute-path option already barred by the scrub list, pull-check refused with its precedent named → 2026-08-29-cross-project-research-citation.md
+- [HASH] — plan — the orphaned artifact is a delivery problem not an eviction failure: the retiring record names `BUILD-VIEW.md` explicitly; fix is a shipped manifest read at session start, report-never-delete → 2026-08-29-retired-feature-leaves-orphan.md
+- [HASH] — plan — the observable's files join the decision step's four-item list; the matching /next clause refused as duplication, with the legacy-item cost stated → 2026-08-29-self-scoping-misses-observable-files.md
+- [HASH] — plan — capability-claim rule widened to outside surfaces; the specific Discord question moved onto [howto-posts-bot-authorship]'s walkthrough, which is rewritten to six steps → 2026-08-29-walkthrough-asserts-unchecked-surface.md
+- [HASH] — plan — one spoken trigger for a reader who cannot open the file; the user caught a draft rule that would have made Claude interrogate her, and the mechanism is deliberately unnamed → 2026-08-29-rendering-for-a-reader-away-from-the-files.md
+- [HASH] — plan — Cowork origin month moves to the history section, pointing at both surviving traces; a wrong paraphrase of the user's account corrected in a committed record → 2026-08-29-cowork-origin-month-unrecorded.md
+- [HASH] — plan — /rescan's undetectability claim reworded out, two durable cross-check sources named, and the asymmetry written in as untouchable; reaches `done.md` too → 2026-08-29-compaction-has-a-designable-tell.md
+- [HASH] — plan — the checkpoint count dropped half of what the user asked for; her 2026-08-27 wording on record proves it, and the ban's reasoning is what went wrong → 2026-08-29-checkpoint-count-dropped-ready-number.md
+- [HASH] — plan — issue check gains a third limb; its first run found `claude-code#83476`, a live dependency on work cleared the same morning. Bound stated: reaches issues the account is involved in → 2026-08-29-issue-check-foreign-repos.md
+- [HASH] — plan — `resources/captures/` identified as 2026-08-09 revert debris and cleared for deletion; three of four files byte-identical duplicates, one unique, one reference → 2026-08-29-repo-debris-proven-fixes.md
+- [HASH] — plan — inventory audit for "I don't know what half these files are", scoped by a derived test (restored-and-duplicated) rather than a vague brief; 12MB tree surveyed → 2026-08-29-repo-inventory-audit.md
+- [HASH] — plan — the product-forward root question kept as its own item, held on the inventory; the 4.7MB icon found to reclaim nothing since history keeps the blob → 2026-08-29-repo-cleanup-product-forward.md
+- [HASH] — plan — post drafts leave the queue on principle not to shorten it (10 lines of 772); LOG ruled out as their home by the user, destination deferred to the cleanup → 2026-08-29-post-drafts-leave-the-queue.md
+- [HASH] — plan — cross-platform section states a personal decision as a project fact; first of four port items filed on the user making ports her top priority → 2026-08-29-cross-platform-section-speaks-for-others.md
+- [HASH] — plan — two port flavours named so a port can declare itself; admitted as a definition rather than a rule, and a registry of who runs which refused → 2026-08-29-port-flavours-named.md
+- [HASH] — plan — a changelog written for ports, derivable because the ship boundary is already a folder; marks host-only changes a porter must not carry across → 2026-08-29-port-facing-changelog.md
+- [HASH] — plan — "how ports work" forum with four posts; the ports announcement posted the same session against the shipped-only rule on the user's judgment, then edited twice → 2026-08-29-ports-forum.md
+- [HASH] — plan — the bot cannot create a forum topic (HTTP 400 / 50008), found by trying; blocks two cleared items, filed at the top because the scope-lock refused the fix → 2026-08-29-bot-cannot-create-forum-topics.md
+- [HASH] — plan — weekly sweep over announced claims, scoped to channels that retire rather than recycle; widened to the forums with an ordering check, fourth cycle refused → 2026-08-29-announced-claims-sweep.md
+- [HASH] — plan — announcements back catalogue moves under the bot, the sweep doubling as a claims audit; the 2026-08-22 post found live while the register said unposted → 2026-08-29-announcement-back-catalogue-rehomed.md
+- [HASH] — plan — channel depth with a return-or-retire flag, so pruning is what makes a post "arise"; depth derived from cadence, held on the bot owning the channel → 2026-08-29-channel-depth-and-recycling.md
+
+- 4efdcff — chat-level record for the 30-item build run: 29 builds + 1 audit shipped, both [user] items addressed (one halted on findings, one deferred), ~24 captures filed, advisory filed, two rules exercised in the run that shipped them → 2026-08-28-chat-build.md
+- 4efdcff — build — beta channel wired: two-event Wednesday turn (promote then pick), README beta section, announcement as reusable cycle template → 2026-08-28-beta-tester-pathway.md
+- 4efdcff — build — release-from-archive: rezip archives each build's zip+readme at the proven-equal moment, release copies instead of building, release-zip-archive deleted → 2026-08-28-rezip-archive-mirrors-nerds-channel-build.md
+- 4efdcff — build — content_stamp() normalises CRLF→LF and excludes .orphaned_at; LF/CRLF trees proved to stamp identical → 2026-08-28-content-stamp-normalises-line-endings-build.md
+- 4efdcff — build — plan.md decision step reads the cycles doc before recommending; cycle-owned artifacts shaped as cycle material → 2026-08-28-recommendation-checks-cycles-first-build.md
+- 4efdcff — build — cycles parser continues wrapped Cadence/Observable fields to a blank line or next field; suite covers the live wrapped case → 2026-08-28-cycles-fields-are-single-line-build.md
+- 4efdcff — build — rituals shipped: trigger-word step lists in the cycles doc, two-armed offer at the decision step, promotion clause, rituals_facts() reported at session start, format additive so no epoch bump → 2026-08-28-ritual-definitions-and-offers-build.md
+- 4efdcff — build — process-now offers say "with you" at both sites; descriptive uses left → 2026-08-28-process-now-offer-says-with-you-build.md
+- 4efdcff — build — disposition ask reworded to the two-part form (agreement first, move as consequence); exercised same-session on the law-prose claims → 2026-08-28-disposition-ask-two-part-form-build.md
+- 4efdcff — build — retired terms "keep-step" and the build-block marker reworded out of hook comments; rule checks clean; [compliance-audit-lag] filed from the checks' one finding → 2026-08-28-live-rules-name-retired-terms-build.md
+- 4efdcff — build — posting rules gain the tip-test tie-break, the walks-the-how-to requirement, and the visibility criterion → 2026-08-28-tip-test-wins-tiebreak-build.md
+- 4efdcff — build — discord_post.py `replies` subcommand (read-only, all readable channels) + planning-opening clause; run live, no replies yet → 2026-08-28-discord-replies-scan-build.md
+- 4efdcff — build — all four done-family commit steps tagged [BRIEF, PROMPT], including a third untagged one in done-audit.md the finding missed → 2026-08-28-ca-commit-steps-untagged-build.md
+- 4efdcff — build — feedback-and-inbox.md fully tagged, every send step [BRIEF, PROMPT] → 2026-08-28-ca-feedback-doc-untagged-build.md
+- 4efdcff — build — both history passages evicted from feedback-and-inbox.md, verified already on record in the 08-13/08-15 entries → 2026-08-28-ca-superseded-version-narrated-build.md
+- 4efdcff — build — done-plan.md reorder specimen reworded to opening-words-then-slug → 2026-08-28-ca-reorder-specimen-bare-slugs-build.md
+- 4efdcff — build — done-plan.md's do-not-reinstate block relocated to self-authoring-rules.md as a citation of 7c9922a's entry → 2026-08-28-ca-repeal-block-in-shipped-doc-build.md
+- 4efdcff — build — next-audit.md's restated Files-list rule replaced by a pointer at next.md's self-scoping step → 2026-08-28-ca-audit-restates-files-rule-build.md
+- 4efdcff — build — audit-halt specimen leads with the recommendation; last 2026-08-27 compliance-audit finding closed → 2026-08-28-ca-audit-halt-offers-menu-build.md
+- 4efdcff — build — hand-over checkpoint question 1 gains the stored-texts limb in its own text, on the recorded misapplication → 2026-08-28-handover-named-neither-of-two-quotes-build.md
+- 4efdcff — build — one-post-a-day pacing repealed outright; no public claim of it on the register, so no correction owed → 2026-08-28-one-post-a-day-is-per-channel-build.md
+- 4efdcff — build — capability claims get the reverse-direction check (verify before writing); held two claims unverified later the same session → 2026-08-28-claude-md-asserted-bot-posting-channels-unchecked-build.md
+- 4efdcff — build — tip pooling ends: rezip files captures, ANNOUNCEMENT-IDEAS.md read-only seed, release marks captures by appended line → 2026-08-28-tip-pooling-step-blocked-by-scope-lock-build.md
+- 4efdcff — build — FAQ templates join the planning writable list (exactly the pair); three owed entries written and copied to FAQ/; suite proves the widening stops there → 2026-08-28-faq-writes-at-announcement-unblocked-build.md
+- 4efdcff — build — next-audit.md's close gains the rescan-first clause, the fourth site → 2026-08-28-audit-close-missing-rescan-clause-build.md
+- 4efdcff — build — YouTube/ gitignored → 2026-08-28-youtube-folder-gitignored-build.md
+- 4efdcff — build — ordering ask becomes "order them the usual way" at both sites plus the FAQ's description → 2026-08-28-ordering-ask-hides-the-default-build.md
+- 4efdcff — build — candidate-set ask states what "go" does at both sites → 2026-08-28-contest-by-number-ask-unexplained-build.md
+- 4efdcff — build — self-hosting seed: setup.md's two entry points + three templates generalised from the host sources, fixture-tested add-only → 2026-08-28-setup-self-hosting-seed-build.md
+- 4efdcff — build — stop hook ignores placeholder slugs (derived boundary, residual stated); suite covers both directions → 2026-08-28-stop-hook-placeholder-slugs-build.md
+- 4efdcff — [audit] — announcement history swept, all 22 posts: five tip recycles + coverage note filed; the 2026-08-22 builds-don't-read-the-queue post found falsified by the 08-27 retirement → 2026-08-28-announcements-to-tips-recycle-sweep-audit.md
+- 4efdcff — [user] halted — how-to re-homing stopped at step 3: topics hold 2–5 of the user's messages each, and whether deleting a forum starter deletes the topic is unresolved (search split); deferred to /plan on her word → 2026-08-28-howto-posts-bot-authorship.md
+- 4efdcff — [user] deferred — law-prose article: claims 1–6 settled one at a time under the new two-part ask (claim 2 split, Cowork origin month recorded, ~151 figure ruled out), claim 7 presented unanswered, 8–14 fresh → 2026-08-28-law-prose-article-2.md
 - 2e9cb18 — chat-level record for the 2026-08-28 planning session: ~30 entries processed, cleared region rebuilt 1→36, three bot posts, two Gmail-connector issues filed, pacing repealed, seven gate runs none refused → 2026-08-28-chat-plan.md
 - 2e9cb18 — plan — rezip archive reconceived (user): rezip builds and archives its own zip+readme, 15-item channel mirror, release ships the archived tested build; release-zip-archive retired → 2026-08-28-rezip-archive-mirrors-nerds-channel.md
 - 2e9cb18 — plan — content_stamp() to normalise CRLF and exclude .orphaned_at, so a commit can be compared to an installed build → 2026-08-28-content-stamp-normalises-line-endings.md
