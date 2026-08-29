@@ -1,4 +1,4 @@
-# [HASH] — plan — the announcements back catalogue moves under the bot, and the sweep doubles as a claims audit
+# 7b751b6 — plan — the announcements back catalogue moves under the bot, and the sweep doubles as a claims audit
 
 **The user's decision**, given while processing the announcement-sweep coverage note: she is happy for her own posts to be deleted and replaced with Throughliner-project posts, so they stay editable as further falsifications occur. The back catalogue is short, so it is done once; after that, as corrections arise.
 

@@ -1,4 +1,4 @@
-# [HASH] — plan — co-authored drafts go to an editable `.txt` with a read-back loop, and a tested finding is overturned
+# 7b751b6 — plan — co-authored drafts go to an editable `.txt` with a read-back loop, and a tested finding is overturned
 
 Split out of [co-writing-flavour] on the user's direction. The capture proposed processing a fourteen-claim list one claim at a time; she refused that outright — *"the interaction was long and probably too tedious, not time-saving"*, an experimental ask at the time — and gave the better diagnosis in its place.
 

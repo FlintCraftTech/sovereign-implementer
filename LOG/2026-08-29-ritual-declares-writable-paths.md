@@ -1,4 +1,4 @@
-# [HASH] — plan — rituals declare the paths their steps write, and the load-bearing unknown dissolved on inspection
+# 7b751b6 — plan — rituals declare the paths their steps write, and the load-bearing unknown dissolved on inspection
 
 Filed at the settlement of [rezip-archive-blocked-by-scope-lock] as the general fix for a failure that has now happened twice: a ritual step needing to write somewhere the session running it may not.
 

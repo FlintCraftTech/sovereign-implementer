@@ -1,4 +1,4 @@
-# [HASH] — plan — two port flavours named, so a port can say what it is
+# 7b751b6 — plan — two port flavours named, so a port can say what it is
 
 **The user's observation and her definitions**, from two people porting Throughliner to other harnesses: a port that *accepts changes at face value and adds no new ones of its own beyond what its system required to fit*, and a port that is *unique and special, which may or may not accept changes derived from the changelogs*.
 

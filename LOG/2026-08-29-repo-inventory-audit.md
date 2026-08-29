@@ -1,4 +1,4 @@
-# [HASH] — plan — an inventory audit answers "I don't know what half these files are", scoped by the revert rather than by a vague brief
+# 7b751b6 — plan — an inventory audit answers "I don't know what half these files are", scoped by the revert rather than by a vague brief
 
 Reasoning in [2026-08-29-repo-debris-proven-fixes](2026-08-29-repo-debris-proven-fixes.md), which took the part that needed no investigation. The user's complaint was that she has no idea what half the files in the repository are for; an inventory that explains each one is the answer, and deciding their fates is separate work.
 

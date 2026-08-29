@@ -177,6 +177,8 @@ Then four questions:
 
   **What checks the disposition, and what nothing checks.** Two board signals read it, and only together. BORN checks the line *exists*. CONTRADICTED checks it isn't contradicted by its own commit: where a commit's always-loaded rule-statement count **rose** and its LOG entry says `not needed`, that is a contradiction between two artifacts that are supposed to agree, detectable with no judgment. A fall or no change is never a finding — an eviction pass owes no defence. **Neither can tell whether a gate recorded as `run` ran honestly**; a dishonest "run — considered and kept" defeats both completely. **The third reader is the user, and only where the gate was narrated at the decision step** — see the narration obligation above; that reaches her in the sessions she is in, and it is a chance to object rather than a check. Say so rather than letting the three read as full coverage: a check that over-claims makes the corpus look guarded when it is only partly guarded. Both mechanical checks are bounded by a baseline commit (`DISPOSITION_BASELINE` in `resources/rule_signals.py`), so neither reports work done before the obligation existed.
 
+  **A `Retired artifacts:` line also appends its entry to `plugin/throughliner/retired-artifacts.md`, in the same move.** That shipped list is what carries the fact out of this repository: a retirement removes the code that writes an artifact, never the artifact from the consumer projects that already ran it, and every one of those keeps an orphan nothing produces and nothing reads. `session_start` reads the list and names any listed path still present — report only, never delete, consistent with the top-up being add-only. One clause on the existing close line rather than a second obligation, the way README-sync rides the SPEC-sync trigger. The authoring half stays host-only; the reading half ships, because the orphan sits in their projects.
+
   **The `Retired:` line rides the same disposition rather than being a second close obligation** — one line, one place, carrying both what the gate decided and what this session retired. It appends to `resources/retired-terms.md`, which is what lets the board report every rule still naming a retired mechanism.
 
   **Host-only by residence**, like the rules above it: consumers never author method rules and would be baffled by the obligation.
@@ -243,6 +245,8 @@ Then four questions:
 
   Host-only — the write-up is a dev artifact and consumers have no such pass.
 - **Old plugin history.** The plugin was rebuilt from scratch on 2026-06-01, and both this folder and the GitHub repo (`FlintcraftTech/throughliner`) start there — the remote is not a pre-rebuild archive. Some pre-rebuild history does survive locally, as the `v17`–`v157` orphan tags, which are not ancestors of HEAD. Anything earlier than that, if it exists at all, would be on Alex's old machine. Don't send a session chasing pre-rebuild commits on GitHub; there are none.
+
+  Before this repository existed, the method was developed inside Cowork for roughly a month. Alex moved to Claude Code with support from people on Discord, having found starting alone intimidating. Two traces of that period survive here: the `v17`–`v157` orphan tags, and a single back-reference in `LOG/log-v1.5.2.md` to a decision dated 2026-05-22, ten days before the first commit. No pre-rebuild log entry itself survives, and the legacy logs never name the venue — so this paragraph is the only place it is recorded.
 
 ### Self-hosting dependency ordering
 
@@ -354,7 +358,7 @@ The limit is **2,000 characters**, which is Discord's.
 
 **The planning opening's correspondence check also runs the replies read** — `py resources/discord_post.py replies --since <date>`, anchored to the most recent planning session's record, the same anchor the issues check uses and with no state file. One capture per reply carrying something new, satisfied while an open capture with its slug exists; an owed reply is drafted and sent only on an explicit yes to the exact text, under the send gate above. Replies arriving mid-session wait for the next opening, as INBOX mail does. Recomputing the anchor from the record rather than storing it means a forgotten check costs nothing and no file can go stale.
 
-**The draft-edit flow.** A draft is written to a `.txt` file and opened in Notepad — the side panel opens `.md` read-only and `.txt` not at all, both tested. Alex edits, saves and says done; the script then posts that file's exact bytes on her explicit yes. Editing the file directly beats negotiating wording change-by-change in chat. A post-post correction is the bot editing its own message, since nobody can edit anyone else's Discord message.
+**The draft-edit flow** is the general co-authoring mechanism in `docs/skill-nonspecific-rules.md`'s walkthrough requirements, applied to a post. A draft is written to a `.txt` file and edited in the desktop side panel, which opens `.txt` for editing with a save button — so Alex decides when her edits land. She edits, saves and says done; the script then posts that file's exact bytes on her explicit yes. Editing the file directly beats negotiating wording change-by-change in chat. A post-post correction is the bot editing its own message, since nobody can edit anyone else's Discord message.
 
 Per-post manual copying stays available whenever Alex prefers it. The bot's environment facts — where the token lives, which channels are reachable, why channel ids are not kept on file — are in `TOOLS.md`.
 
@@ -377,7 +381,7 @@ PREVIOUS entry posting the new one unlocks the edit of the one before it: a
                usability rating out of 5, given by Alex at that moment.
 ```
 
-The posting step attaches the build's zip from `plugin/rezip-archive/` — `--attach-archived-zip` on the posting script — so every entry carries the bytes that were actually installed and tested rather than a zip built at posting time from a tree that has moved on. Drafting, approval and posting run the ordinary way — Notepad draft file, explicit yes to the exact text, the bot posts, a register line with a pointer confirmed to resolve. The prune runs in the same pass, keeping the channel and the archive at the same 15.
+The posting step attaches the build's zip from `plugin/rezip-archive/` — `--attach-archived-zip` on the posting script — so every entry carries the bytes that were actually installed and tested rather than a zip built at posting time from a tree that has moved on. Drafting, approval and posting run the ordinary way — a `.txt` draft file edited in the side panel, explicit yes to the exact text, the bot posts, a register line with a pointer confirmed to resolve. The prune runs in the same pass, keeping the channel and the archive at the same 15.
 
 **An edit to an entry updates that build's readme in the same turn, under the same approval as the edit.** The archive readme and the channel post are the same text by design — that equality is what lets a release read a label from a local file — so changing a label or backfilling outcomes in one and not the other silently breaks the lookup the whole model rests on.
 
@@ -392,7 +396,9 @@ When a session opens from a Claude-authored handoff or context prompt — a resu
 
 ## Cross-platform ports
 
-This project — the **canonical** SI for Claude Code — is the only port under active development. A **Codex** port once existed as a separate distribution with its own procedure docs and hooks, but it has been **shelved indefinitely** (dormant since 2026-07-28). The method now evolves solely on the Claude side; there is no live two-way relationship to maintain, and no Codex-side work to weigh against.
+This project is the **canonical** Throughliner, for Claude Code. **Other people are porting it to other harnesses, and ports are a supported thing this project actively helps** — two flavours are recognised, one tracking this project closely and one diverging under its own name, and both are welcome. Where the mechanics live: [port-flavours-named] defines the two flavours in the shipped docs, and [port-facing-changelog] produces the per-release changelog a tracking port surveys, marking the host-only changes that must not be ported.
+
+**Alex's own Codex port is shelved indefinitely** (dormant since 2026-07-28), and the reason is hers rather than a judgment about porting: she found running a port herself mentally destabilising while developing in isolation. That says nothing about what anyone else may want.
 
 **The port's working folder and its `codex/si-port` branch were deleted on 2026-08-14, and there is nothing left to read.** The folder was a git worktree of this repository, so `git worktree list` reported it as live work every session. Removing the worktree and dropping the branch ref was chosen over rewriting history: a rewrite changes every commit hash, and this project's LOG entries are full of hashes that are the record the whole method rests on. The port's commits are therefore unreachable rather than erased, recoverable from the reflog until git garbage-collects them; the branch tip was `59da478`. Uncommitted edits sitting in that folder were discarded on Alex's explicit decision after being told they could not be recovered.
 

@@ -1,4 +1,4 @@
-# [HASH] — plan — an MCP-server brief became an audit, because the fixed read cost dwarfs what MCP could save
+# 7b751b6 — plan — an MCP-server brief became an audit, because the fixed read cost dwarfs what MCP could save
 
 The user brought in a build brief proposing a local MCP server shipped inside the plugin, giving Claude purpose-built tools for the method's file work. Her stated problem was the token cost of a run.
 

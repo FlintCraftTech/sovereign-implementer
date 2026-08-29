@@ -1,4 +1,4 @@
-# [HASH] — plan — a "how ports work" forum, and the announcement that went out ahead of it
+# 7b751b6 — plan — a "how ports work" forum, and the announcement that went out ahead of it
 
 **The forum name and all four post subjects are the user's:** starting a port from outside Throughliner, starting one from inside it, pulling changes and where the relevant ones are found, and communicating your port flavour so it is legible. Both "from inside" and "pulling changes" describe artifacts that do not exist yet, which is why this sits last of the four port items — placement carries the ordering, not a `Blocked by:` line, which would have pushed it out of the priority position she set.
 

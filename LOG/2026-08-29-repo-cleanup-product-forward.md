@@ -1,4 +1,4 @@
-# [HASH] — plan — the product-forward question kept as its own item, held on the inventory that has to run first
+# 7b751b6 — plan — the product-forward question kept as its own item, held on the inventory that has to run first
 
 Reasoning in [2026-08-29-repo-inventory-audit](2026-08-29-repo-inventory-audit.md). Filed as a stub mid-session so [post-drafts-leave-the-queue] had something to resolve against, then reshaped at processing into the third of the three cleanup pieces.
 

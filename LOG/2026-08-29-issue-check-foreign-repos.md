@@ -1,4 +1,4 @@
-# [HASH] — plan — the issue check gains a third limb, and its first run found a live dependency on work cleared the same morning
+# 7b751b6 — plan — the issue check gains a third limb, and its first run found a live dependency on work cleared the same morning
 
 A consumer reported that the planning opening's issue check sees only issues the register records and new ones on a repository the project owns — so issues elsewhere, including on the tool the method runs inside, are invisible to every project.
 

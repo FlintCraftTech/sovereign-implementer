@@ -1,4 +1,4 @@
-# [HASH] — plan — seventeen tip items became one posting cycle's material instead of seventeen decisions
+# 7b751b6 — plan — seventeen tip items became one posting cycle's material instead of seventeen decisions
 
 The ladder reached a tip candidate and the queue held **eighteen** items of the same shape — eleven from the features audit, five recycled from old announcements, a coverage note and one from a rezip. Presenting them one at a time would have been thirty-odd turns of exactly the tedium the user had named an hour earlier.
 

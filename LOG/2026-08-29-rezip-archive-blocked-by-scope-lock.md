@@ -1,4 +1,4 @@
-# [HASH] — plan — the rezip archive takes the narrow carve-out now, because the release cycle is four days away
+# 7b751b6 — plan — the rezip archive takes the narrow carve-out now, because the release cycle is four days away
 
 The archive step was refused on its first ever run: a rezip happens after a close, so the scope-lock reads the session as planning, and `plugin/rezip-archive/` is not on the planning writable list.
 

@@ -1,4 +1,4 @@
-# [HASH] — plan — /rescan's undetectability claim is reworded out, and the asymmetry is written in as untouchable
+# 7b751b6 — plan — /rescan's undetectability claim is reworded out, and the asymmetry is written in as untouchable
 
 `/rescan` claims compaction is undetectable from the inside, and its whole design — a stopping point held in the conversation, no durable marker — rests on that. The user's observation: a `/next` run leaves recognisable traces, and their absence is a tell.
 

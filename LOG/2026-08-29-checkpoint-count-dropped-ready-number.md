@@ -1,4 +1,4 @@
-# [HASH] — plan — the checkpoint count dropped half of what the user asked for, and her own recorded wording proves it
+# 7b751b6 — plan — the checkpoint count dropped half of what the user asked for, and her own recorded wording proves it
 
 The user noticed a checkpoint showing one number where she had asked for two: *"when I asked for one to be displayed, the other disappeared. I meant we needed both."* She asked whether a rule had produced it.
 

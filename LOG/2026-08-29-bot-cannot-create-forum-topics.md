@@ -1,4 +1,4 @@
-# [HASH] — plan — the bot cannot create a forum topic, found by trying, and it blocks two items already cleared
+# 7b751b6 — plan — the bot cannot create a forum topic, found by trying, and it blocks two items already cleared
 
 Attempting to post the showcase guidelines through the bot failed:
 

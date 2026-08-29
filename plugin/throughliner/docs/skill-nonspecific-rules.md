@@ -308,9 +308,26 @@ structured explanation shown to    ->  one item per line, never aligned
                                        at the user's width
 ```
 
-**Pointing is unconditional — there is no user override.** The reader away from
-the file is served by the plain-English summary that opens each item's
-discussion; seeing exact wording means opening the file.
+**Pointing is the unprompted default, and nothing detects a reason to depart
+from it.** The reader away from the file is served by the plain-English summary
+that opens each item's discussion; seeing exact wording means opening the file.
+
+**The one departure is spoken: where the user says they cannot open the file,
+doc-resident text comes into the message instead, for the rest of that chat.**
+Nothing is stored and nothing is inferred — the trigger is them saying so. It
+takes the shape the show-first switch already has, and moves one way only,
+toward more showing.
+
+```
+trigger:   the user says they can't open it — on a phone, driving the session
+           remotely, reading over someone's shoulder. Nothing else fires.
+effect:    doc-resident text comes inline — for this chat only
+floor:     pointing stays the default for every chat where nobody said so
+```
+
+**No route is named here.** How a session gets the text in front of them is its
+own affair; naming a mechanism would be a capability claim about every
+consumer's setup, which nothing here can verify.
 
 **Write, then verify, then point — in that order.** A pointer to content written
 this turn goes out only after the Write returned success *and* a re-read confirms
@@ -467,11 +484,18 @@ is what keeps the trigger a question about the subject rather than a judgment
 about your own certainty.
 
 **And in the other direction: a sentence written into a document asserting what a
-tool can do is a claim about the world, so run the read that would verify it
-before writing it — and where no such read exists, write it as intended rather
-than as fact.** The same question, asked of your own writing: what would answer
-this? A capability sentence composed from a design discussion reads exactly like
-a verified one, and is corrected only when something fails against it.
+tool can do, or what an outside surface permits, is a claim about the world, so
+run the read that would verify it before writing it — and where no such read
+exists, write it as intended rather than as fact.** The same question, asked of
+your own writing: what would answer this? A capability sentence composed from a
+design discussion reads exactly like a verified one, and is corrected only when
+something fails against it.
+
+**It bites hardest in a `[user]` walkthrough**, where a step asserting what
+someone else's website, app or service allows is handed to a non-coder to
+perform with nobody to ask. Where the surface can be tested harmlessly — a
+throwaway of your own to act on rather than anything of theirs — that test is
+the read, and it goes into the walkthrough as its first step.
 
 **Where the answer is a date, read a computed field — the session opening's date
 line, the queue digest's passed or ahead figures — and where none exists, read
@@ -549,6 +573,22 @@ whole finding falls or only part of it:
 The queue digest reads that line back: any queue entry whose prose names a
 superseded research file is flagged, so the correction reaches the decisions
 built on it.
+
+**A finding another project owns is copied in, carrying a line naming the
+owning project, and its index line is written in the same move.** Name the
+project and never a path — the scrub checklist bans a file path that identifies
+a person or an organisation from a committed document, so a citation by absolute
+path is already barred:
+
+```
+**Copied from: <project>** — <what it settles>, copied <YYYY-MM-DD>
+```
+
+The digest reads that line the way it reads `Superseded by:`, and flags every
+entry naming such a file as resting on a **snapshot**. **That label is permanent
+and is not a staleness check** — nothing reads the owning project, so whether
+the original has moved on is unknown rather than checked. Say so wherever this
+is described.
 
 **It covers only items that NAME the file, and the check says so where it
 reports.** An item scoped on a finding it never cites is not reached. State that
@@ -814,7 +854,14 @@ real and equally bad; neither warning may be louder than the other. (How a
   - ending at the item's own observable, with cleanup after the test filed as
     its own item rather than written as trailing steps — a walkthrough that
     carries on past the thing it was proving has no point anyone can check it
-    against.
+    against;
+  - where a step has the user edit text Claude drafted, writing that draft to a
+    `.txt` file whose location the step names, then reading it back only when
+    they say to, asking whether there is anything else, and repeating until
+    they say they are finished. `.txt` is what the desktop side panel opens for
+    editing, with a save button, so the user decides when their edits land —
+    and editing the text directly is what stops co-authored work collapsing
+    into Claude work the user describes changes to.
 
 The `[freeform]` tag names **work done by hand rather than by /next** — because it
 is large, or because it characteristically cannot run inside a run. Its main job

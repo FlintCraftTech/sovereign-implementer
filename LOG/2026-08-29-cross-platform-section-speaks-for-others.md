@@ -1,4 +1,4 @@
-# [HASH] — plan — the cross-platform section states a personal decision as a project fact, and ports become the top priority
+# 7b751b6 — plan — the cross-platform section states a personal decision as a project fact, and ports become the top priority
 
 Claude reported the section as false now that two people are porting. **The user's correction is the better diagnosis and is what the item records:** *"that's from when I was developing in isolation. I found running a port very mentally destabilising. Says nothing of what others may want, though."*
 

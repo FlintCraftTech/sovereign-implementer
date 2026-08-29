@@ -47,6 +47,30 @@ def make_project(log_files=()):
     return d
 
 
+def drive_tool(cwd, tool_name, tool_input):
+    """Drive the hook with any tool and input — the general form of drive_write.
+
+    Needed because the register's guard has two halves: a Write, and a shell
+    command that removes or truncates the file.
+    """
+    payload = {"cwd": cwd, "tool_name": tool_name,
+               "tool_input": tool_input, "session_id": "test-session"}
+    proc = subprocess.run(
+        [sys.executable, HOOK],
+        input=json.dumps(payload),
+        capture_output=True,
+        text=True,
+        env={**os.environ, "PYTHONDONTWRITEBYTECODE": "1"},
+    )
+    if not proc.stdout.strip():
+        return {}
+    try:
+        out = json.loads(proc.stdout)
+    except json.JSONDecodeError:
+        return {}
+    return out.get("hookSpecificOutput") or {}
+
+
 def drive_write(cwd, relpath):
     payload = {
         "cwd": cwd,
@@ -114,6 +138,52 @@ def main():
     check("new name passes the guard",
           out.get("permissionDecision") != "deny",
           str(out))
+
+    # --- the outbound register ------------------------------------------
+    #
+    # `INBOX/sent.md` is the index of everything the project has sent, and the
+    # mailbox is gitignored on every path — so unlike every other project
+    # document it has no history and an overwrite is final. Write-only, like
+    # its LOG sibling: the register is appended to and edited at every approved
+    # send, and both go through Edit.
+
+    d = make_project()
+    os.makedirs(os.path.join(d, "INBOX"), exist_ok=True)
+    register = os.path.join("INBOX", "sent.md")
+    with open(os.path.join(d, register), "w", encoding="utf-8") as f:
+        f.write("- 2026-08-01 — somewhere — a claim\n")
+
+    out = drive_write(d, register)
+    check("a Write over the outbound register is refused",
+          out.get("permissionDecision") == "deny", str(out))
+    check("the refusal says why there is no undo",
+          "no backup" in out.get("permissionDecisionReason", ""),
+          out.get("permissionDecisionReason", ""))
+    check("the refusal points at Edit",
+          "Use Edit" in out.get("permissionDecisionReason", ""),
+          out.get("permissionDecisionReason", ""))
+    check("the file is untouched",
+          os.path.getsize(os.path.join(d, register)) > 0,
+          "the guard must not itself modify the file")
+
+    edit_out = drive_tool(d, "Edit", {
+        "file_path": os.path.join(d, register),
+        "old_string": "a claim", "new_string": "a corrected claim"})
+    check("an Edit of the register is not refused",
+          edit_out.get("permissionDecision") != "deny", str(edit_out))
+
+    for command, expected, what in (
+        ("rm INBOX/sent.md", "deny", "removal"),
+        ("echo x > INBOX/sent.md", "deny", "a truncating redirect"),
+        ("mv INBOX/sent.md elsewhere.md", "deny", "a rename away"),
+        ("echo x >> INBOX/sent.md", "pass", "an append"),
+        ("grep tips INBOX/sent.md", "pass", "a read"),
+        ("rm INBOX/archive/old-message.md", "pass", "an unrelated mailbox file"),
+    ):
+        shell = drive_tool(d, "Bash", {"command": command})
+        got = shell.get("permissionDecision", "pass")
+        check(f"shell: {what} -> {expected}", got == expected,
+              f"{command!r} got {got}")
 
     print()
     if _failures:

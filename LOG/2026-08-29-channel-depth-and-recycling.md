@@ -1,4 +1,4 @@
-# [HASH] — plan — channel depth with a return-or-retire flag, so pruning becomes the thing that makes a post "arise"
+# 7b751b6 — plan — channel depth with a return-or-retire flag, so pruning becomes the thing that makes a post "arise"
 
 **The user's design.** A channel is only so many posts deep; old posts are pruned; and a pruned post **returns as a capture** for correction and reposting. Her reason answers the hole she had spotted a minute earlier: correcting posts only as they arise never reaches the ones nothing happens to, so they rot unchecked. Pruning is what makes every post eventually arise.
 

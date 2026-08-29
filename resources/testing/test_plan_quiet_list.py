@@ -97,6 +97,16 @@ CASES = [
      "the version manifest the rezip must bump"),
     (os.path.join("plugin", "throughliner", ".claude-plugin", "marketplace.json"), False,
      "a sibling in the same folder is still denied"),
+    # The rezip archive, permitted 2026-08-29 after the archive step was denied
+    # on its first ever run. A FOLDER where the manifest above is one path —
+    # defensible because it is gitignored build output rather than part of the
+    # plugin package, which the third case here is the guard on.
+    (os.path.join("plugin", "rezip-archive", "throughliner-v1.21.1-test1.zip"),
+     True, "a build's archived zip"),
+    (os.path.join("plugin", "rezip-archive", "throughliner-v1.21.1-test1.md"),
+     True, "the readme beside it, which is the channel post's own text"),
+    (os.path.join("plugin", "throughliner", "hooks", "session_start.py"), False,
+     "a sibling under the plugin package is still denied"),
     ("README.md", False, "an ordinary project file is denied"),
     (os.path.join("plugin", "throughliner", "docs", "plan.md"), False,
      "a shipped doc is denied"),
@@ -240,6 +250,57 @@ if got != "deny":
     failures.append(("CLAUDE.md", "deny", got, "denied again once cleaned up"))
 print(f"[{'ok' if got == 'deny' else 'FAIL'}] setup marker cleaned up -> {got} "
       "(the exemption ends with the run)")
+
+# --- ritual-declared paths ---------------------------------------------------
+#
+# A ritual definition names the paths its steps write, and the standing list
+# permits exactly those. The declaration is committed text written at a planning
+# session with the user present, which is what distinguishes it from the
+# self-declared marker refused beside the manifest carve-out.
+
+RITUAL_TARGET = os.path.join(_tmp, "build-output", "artifact.zip")
+UNDECLARED_TARGET = os.path.join(_tmp, "build-output-other", "artifact.zip")
+
+got = _decide(_tmp, RITUAL_TARGET)
+if got != "deny":
+    failures.append(("build-output/", "deny", got,
+                     "denied with no cycles doc at all"))
+print(f"[{'ok' if got == 'deny' else 'FAIL'}] no cycles doc -> {got} "
+      "(a project without one behaves exactly as before)")
+
+with open(os.path.join(_tmp, "CYCLES.md"), "w", encoding="utf-8") as _f:
+    _f.write(
+        "# CYCLES\n\n"
+        "## Repackage [repackage]\n\n"
+        "**Artifact:** the built zip.\n\n"
+        "**Trigger:** the user says \"repackage\".\n\n"
+        "**Writes:** `build-output/`\n\n"
+        "**Steps of one turn.**\n"
+        "1. Build the zip into that folder.\n"
+    )
+
+got = _decide(_tmp, RITUAL_TARGET)
+if got != "pass":
+    failures.append(("build-output/", "pass", got,
+                     "a declared path is permitted"))
+print(f"[{'ok' if got == 'pass' else 'FAIL'}] declared path -> {got} "
+      "(the ritual's own definition permits it)")
+
+got = _decide(_tmp, UNDECLARED_TARGET)
+if got != "deny":
+    failures.append(("build-output-other/", "deny", got,
+                     "an undeclared sibling is still denied"))
+print(f"[{'ok' if got == 'deny' else 'FAIL'}] undeclared sibling -> {got} "
+      "(a near-miss prefix does not widen the declaration)")
+
+got = _decide(_tmp, os.path.join(_tmp, "README.md"))
+if got != "deny":
+    failures.append(("README.md", "deny", got,
+                     "the standing list is otherwise unchanged"))
+print(f"[{'ok' if got == 'deny' else 'FAIL'}] ordinary file, cycles doc present "
+      f"-> {got} (declaring one path widens nothing else)")
+
+os.remove(os.path.join(_tmp, "CYCLES.md"))
 
 print()
 if failures:

@@ -1,4 +1,4 @@
-# [HASH] — plan — the observable's files join the decision step's list, and the matching /next clause is refused
+# 7b751b6 — plan — the observable's files join the decision step's list, and the matching /next clause is refused
 
 `/next` derives a run's scope from an item's **Changes** line, but the **Observable** line routinely names other files — the suite that must pass, the sibling doc an acceptance check greps. Twice in one run those were missing, the scope-lock refused them mid-build, and the run stopped to ask. Nothing was built out of scope; the cost was two interruptions in a run designed not to need any.
 

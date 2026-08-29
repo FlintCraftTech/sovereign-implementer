@@ -1,4 +1,4 @@
-# [HASH] — plan — cross-project research is copied in and labelled a snapshot; the absolute-path option was already barred
+# 7b751b6 — plan — cross-project research is copied in and labelled a snapshot; the absolute-path option was already barred
 
 A consumer project reported that a work item citing research a sibling project owns must either use an absolute path that breaks silently, or a copy with no link to the original — and that the `Superseded by:` safety net stops at the project boundary.
 

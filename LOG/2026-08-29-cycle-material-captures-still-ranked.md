@@ -1,4 +1,4 @@
-# [HASH] — plan — the residual the tips cycle leaves: nothing tells the ladder those captures belong to a cycle
+# 7b751b6 — plan — the residual the tips cycle leaves: nothing tells the ladder those captures belong to a cycle
 
 Reasoning in [2026-08-29-tips-posting](2026-08-29-tips-posting.md). Filed as a capture rather than papered over, because the cycle solves the decision problem and not the presentation one.
 

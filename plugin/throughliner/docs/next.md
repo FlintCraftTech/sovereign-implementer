@@ -259,7 +259,9 @@ render(run):                        # full rule: skill-nonspecific-rules.md, vie
     one-line pointer naming the items, linking to QUEUE.md
 ```
 
-The pointer is unconditional — the token-saving path, with no user override.
+The pointer is the unprompted default — the token-saving path. The one departure
+is the spoken one in skill-nonspecific-rules.md's view-in-doc rendering: where
+the user has said they cannot open the file, the text comes into the message.
 These items already exist in QUEUE.md, so
 confirm the link resolves before sending it.
 

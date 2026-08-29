@@ -453,6 +453,25 @@ spending the user's attention on something they were told at the first statement
 > so this is what I could still see rather than a guarantee I've caught
 > everything.
 
+**Cross-check the conversation against the durable artifacts on disk, and where
+they disagree say so louder than the sentence above.** This re-scan looks back
+over the same conversation with the same blind spot, so it carries the same
+check. The build working file lists exactly which items were ticked, and `git
+diff HEAD -- QUEUE.md` is already how this close recovers what a planning
+session did — so thirty items ticked against six visible in the conversation is
+two counts disagreeing rather than a judgement about memory:
+
+> The files say more happened in this chat than I can still see — [what
+> disagrees]. Earlier parts of our conversation have dropped out of view, so
+> this look-back is missing whatever was in them.
+
+**The asymmetry is the safety property and is never softened.** Absent artifacts
+are positive evidence that earlier material dropped out of view. Present
+artifacts prove only that the recent stretch is intact and say nothing about the
+earliest, which is what this reaches for. **So it warns and never gives an
+all-clear** — "I can see everything, so nothing was lost" is a false guarantee at
+the one moment the user is relying on this to be complete.
+
 **Say it as written rather than conveying its sense**, and **name the limit in
 the sentence's own terms — what was still in view — and stop there.** Session
 length, duration and message count are observable proxies for compaction rather

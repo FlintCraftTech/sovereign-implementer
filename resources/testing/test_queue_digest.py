@@ -630,6 +630,147 @@ def test_no_runs_alone_work_says_none():
     shutil.rmtree(root, ignore_errors=True)
 
 
+def test_whats_next_answers_only_the_pick():
+    """The scoped mode prints the rung, the item, its line number and its text.
+
+    Nothing else: the whole point is that re-deriving a pick costs a scoped
+    call rather than the full digest, which runs to thousands of tokens.
+    """
+    root = project(
+        unprocessed=(
+            "#### Cited by another entry [alpha]\nProse.\n"
+            "\n"
+            "#### Cites alpha [beta]\nThis depends on [alpha].\n"
+        ),
+    )
+    out = digest.render_whats_next(
+        digest.parse(os.path.join(root, "QUEUE.md")), root,
+        os.path.join(root, "QUEUE.md"))
+    check("the rung is named", out.startswith("Rung "), out)
+    check("the top item is the most-cited one", "[alpha]" in out, out)
+    check("its starting line number is given", "Starts at line" in out, out)
+    check("its text is included", "Prose." in out, out)
+    check("nothing else is printed", "median entry length" not in out, out)
+    shutil.rmtree(root, ignore_errors=True)
+
+
+def test_whats_next_rung_changes_when_the_queue_changes_beneath_it():
+    """The rung is re-derived at every pick, which is why this is a recurring
+    cost and not a field the opening digest could carry."""
+    root = project(
+        unprocessed=(
+            "#### Carries an uncleared risk [risky]\nProse.\n"
+            "Red flag · State: uncleared\n"
+            "\n"
+            "#### Cited by another entry [alpha]\nProse.\n"
+            "\n"
+            "#### Cites alpha [beta]\nThis depends on [alpha].\n"
+        ),
+    )
+    queue = os.path.join(root, "QUEUE.md")
+    items = digest.parse(queue)
+
+    rung, _, item = digest.whats_next(items, root, queue)
+    check("an uncleared red flag takes rung 1",
+          rung == 1 and item["slug"] == "risky", f"rung {rung}")
+
+    rung, _, item = digest.whats_next(items, root, queue, skip=("risky",))
+    check("skipping it falls through to rung 2",
+          rung == 2 and item["slug"] == "alpha", f"rung {rung}")
+    shutil.rmtree(root, ignore_errors=True)
+
+
+def test_whats_next_respects_a_capture_bowing_out():
+    """`Not before:` on a capture means do not OFFER it again, which is what a
+    pick does."""
+    root = project(
+        unprocessed=(
+            "#### Waiting on something outside the project [held]\nProse.\n"
+            "Not before: 2999-01-01\n"
+            "\n"
+            "#### Ordinary capture [ordinary]\nProse.\n"
+        ),
+    )
+    queue = os.path.join(root, "QUEUE.md")
+    _, _, item = digest.whats_next(digest.parse(queue), root, queue)
+    check("a dated-out capture is not offered",
+          item["slug"] == "ordinary", str(item and item["slug"]))
+    shutil.rmtree(root, ignore_errors=True)
+
+
+def test_incoming_citations_are_computed_not_guessed():
+    """Rung 2's field is computed here and nowhere else, which is what makes
+    'every rung reads a computed field' true rather than aspirational."""
+    root = project(
+        unprocessed=(
+            "#### Cited twice [alpha]\nProse.\n"
+            "\n"
+            "#### First citer [beta]\nSee [alpha].\n"
+            "\n"
+            "#### Second citer [gamma]\nAlso [alpha].\n"
+        ),
+    )
+    counts = digest.incoming_citations(
+        digest.parse(os.path.join(root, "QUEUE.md")))
+    check("the count is two", counts.get("alpha") == 2, str(counts))
+    check("an entry does not cite itself", counts.get("beta") == 0, str(counts))
+    shutil.rmtree(root, ignore_errors=True)
+
+
+def _with_research(root, name, body):
+    """Drop a research file into a fixture project."""
+    folder = os.path.join(root, "resources", "research")
+    os.makedirs(folder, exist_ok=True)
+    with open(os.path.join(folder, name), "w", encoding="utf-8") as f:
+        f.write(body)
+    return root
+
+
+def test_copied_finding_flags_the_item_as_resting_on_a_snapshot():
+    """A finding another project owns is copied in, never pointed at.
+
+    The citing item then rests on a copy taken on a date, and the digest says
+    so. The label is permanent: nothing reads the owning project, so this is
+    not and must never be described as a staleness check.
+    """
+    root = project(
+        processed=(
+            "#### Scoped on a sibling's finding [a]\n"
+            "Rests on resources/research/borrowed-finding.md.\n"
+        ),
+    )
+    _with_research(
+        root, "borrowed-finding.md",
+        "# Borrowed finding\n\n"
+        "**Copied from: the recipe project** — what the connector returns, "
+        "copied 2026-08-20\n\nBody.\n",
+    )
+    _, out = run(root)
+    check("the citing item is flagged as resting on a snapshot",
+          "[a] rests on a SNAPSHOT" in out, out[-600:])
+    check("the flag names the owning project",
+          "the recipe project" in out, out[-600:])
+    check("the output states it is not a staleness check",
+          "not a staleness check" in out, out[-900:])
+    shutil.rmtree(root, ignore_errors=True)
+
+
+def test_research_without_the_copied_line_prints_no_snapshot_flag():
+    """The other direction: an ordinary local finding is not a snapshot."""
+    root = project(
+        processed=(
+            "#### Scoped on our own finding [a]\n"
+            "Rests on resources/research/local-finding.md.\n"
+        ),
+    )
+    _with_research(root, "local-finding.md",
+                   "# Local finding\n\nBody, owned here.\n")
+    _, out = run(root)
+    check("no snapshot flag for a finding this project owns",
+          "rests on a SNAPSHOT" not in out, out[-600:])
+    shutil.rmtree(root, ignore_errors=True)
+
+
 def test_median_age_is_computed_not_judged():
     """Rung 3 is an intersection of two medians, so BOTH must be printed.
 
@@ -811,6 +952,12 @@ if __name__ == "__main__":
     test_age_prints_in_this_repository()
     test_runs_alone_reports_what_is_ahead_of_it()
     test_no_runs_alone_work_says_none()
+    test_whats_next_answers_only_the_pick()
+    test_whats_next_rung_changes_when_the_queue_changes_beneath_it()
+    test_whats_next_respects_a_capture_bowing_out()
+    test_incoming_citations_are_computed_not_guessed()
+    test_copied_finding_flags_the_item_as_resting_on_a_snapshot()
+    test_research_without_the_copied_line_prints_no_snapshot_flag()
     test_median_age_is_computed_not_judged()
     test_median_age_absent_without_dates()
     test_held_since_degrades_without_git()

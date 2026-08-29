@@ -1,4 +1,4 @@
-# [HASH] — plan — co-writing reframed as planning work surfacing inside a walkthrough, with the drafting half split off
+# 7b751b6 — plan — co-writing reframed as planning work surfacing inside a walkthrough, with the drafting half split off
 
 Reasoning in [co-authoring-txt-draft-loop], which took the buildable half. What stayed here is the question a `.txt` loop does not answer.
 

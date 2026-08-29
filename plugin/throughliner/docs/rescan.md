@@ -72,10 +72,32 @@ can't tell (the conversation      ->  read the captures filed earlier today and
 **The stopping point is held in the conversation, and nothing is written to a
 file for it.** A durable marker was weighed and refused: it is a new artifact,
 and this method deletes the state files it invents. Where the conversation has
-been summarised the memory of it is gone — and that is undetectable from the
-inside, exactly as a compaction is — so the fallback is the captures already
-filed. A stretch that yielded nothing yields nothing again, so the cost of
-re-reading it is re-reading, not duplicate items.
+been summarised the memory of it is gone, so the fallback is the captures
+already filed. A stretch that yielded nothing yields nothing again, so the cost
+of re-reading it is re-reading, not duplicate items.
+
+**Cross-check the conversation against the durable artifacts on disk, and say so
+loudly where they disagree.** The files record what happened whether or not the
+conversation still does, so this is two counts disagreeing rather than a
+judgement about memory:
+
+```
+a build chat     ->  the build working file lists exactly which items were
+                     ticked. Thirty listed against six visible in the
+                     conversation is a disagreement, not an impression.
+a planning chat  ->  `git diff HEAD -- QUEUE.md`, which is already how the
+                     close recovers what a planning session did.
+```
+
+**The asymmetry is the safety property and is never softened.** Absent artifacts
+are positive evidence that earlier material has dropped out of view. **Present
+artifacts prove only that the recent stretch is intact and say nothing at all
+about the earliest** — which is exactly what this scan reaches for, since
+summarising takes the oldest material first.
+
+**So this raises a warning and never gives an all-clear.** A session reporting
+"I can see everything, so nothing was lost" would hand the user a false
+guarantee at the one moment they are relying on the scan to be complete.
 
 ## Step 2: File what you find  [BRIEF]
 
@@ -137,6 +159,14 @@ spending the user's attention on something they were told at the first statement
 > I can't tell whether any of our earlier conversation has dropped out of view,
 > so this is what I could still see rather than a guarantee I've caught
 > everything.
+
+**Where the cross-check above FAILS — the conversation cannot account for work
+the files record — say that too, and louder.** It is new information the user
+does not otherwise get, and it fires only when it has something to say:
+
+> The files say more happened in this chat than I can still see — [what
+> disagrees]. Earlier parts of our conversation have dropped out of view, so
+> this scan is missing whatever was in them.
 
 **Say it as written rather than conveying its sense, and name no observable
 proxy** — length, duration, message count. Each stands in for the thing that

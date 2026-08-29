@@ -112,6 +112,19 @@ RESEARCH_CITE_RE = re.compile(r"resources/research/([a-z0-9][a-z0-9._-]*\.md)")
 SUPERSEDED_RE = re.compile(r"^\**Superseded by:?\**\s*(.+)$",
                            re.IGNORECASE | re.MULTILINE)
 
+# A finding another project owns, copied in rather than pointed at. The copy
+# carries a `Copied from:` line naming the owning project — never a path, since
+# the always-loaded scrub list bans a path that identifies a person or an
+# organisation from a committed document, which is the same reason the address
+# book lives inside the gitignored mailbox.
+#
+# What this flag says is that the item rests on a SNAPSHOT: a copy taken on a
+# date. It is a permanent label and NOT a staleness check, and must never be
+# described as one — nothing reads the other project's folder, so nothing here
+# can tell whether the original has changed since.
+COPIED_FROM_RE = re.compile(r"^\**Copied from:?\**\s*(.+)$",
+                            re.IGNORECASE | re.MULTILINE)
+
 # Any [slug] appearing in an item's prose. The always-loaded rules require a
 # cross-reference to be written as a slug in prose — they say a slug in prose is
 # the only thing that makes a cross-reference exist at all — so prose is where
@@ -347,6 +360,41 @@ def _superseded_research(item, root):
     return hits
 
 
+def _snapshot_research(item, root):
+    """Research files this item cites that are copies another project owns.
+
+    Returns a list of (filename, the owning project as the line names it).
+
+    Same coverage limit as the superseded check above, and the same reason: it
+    reaches an item that NAMES the file. An item resting on a copied finding it
+    never cites stays invisible.
+
+    Reads the same head of the file as the superseded check, so an item citing
+    both pays one read per file rather than two.
+    """
+    if not root:
+        return []
+    hits, seen = [], set()
+    for line in item["prose"]:
+        for name in RESEARCH_CITE_RE.findall(line):
+            if name in seen:
+                continue
+            seen.add(name)
+            path = os.path.join(root, "resources", "research", name)
+            try:
+                with open(path, "r", encoding="utf-8") as f:
+                    head = f.read(4000)
+            except OSError:
+                continue
+            match = COPIED_FROM_RE.search(head)
+            if match:
+                owner = " ".join(match.group(1).split())
+                if len(owner) > 90:
+                    owner = owner[:90].rstrip() + "…"
+                hits.append((name, owner))
+    return hits
+
+
 def shipped_slugs(root, wanted=None):
     """Slugs that have a LOG entry, mapped to what KIND of record it is.
 
@@ -541,6 +589,15 @@ def contradictions(items, root=""):
                 f"[{slug}] is scoped against resources/research/{name}, which "
                 f"is marked superseded by {by} — re-read the item's premise "
                 "before building it"
+            )
+
+        for name, owner in _snapshot_research(item, root):
+            found.append(
+                f"[{slug}] rests on a SNAPSHOT: resources/research/{name} is a "
+                f"copy of a finding owned by {owner}. That is a permanent "
+                "label and not a staleness check — nothing here reads the "
+                "other project, so whether the original has moved on is "
+                "unknown rather than checked"
             )
 
         if item["section"] == "Processed":
@@ -875,6 +932,12 @@ def render(items, root="", queue_path="QUEUE.md"):
         "reached by this check — read it as partial coverage, not a clean bill."
     )
     out.append(
+        "A SNAPSHOT flag says a cited finding is a copy another project owns. "
+        "It is permanent and says nothing about currency: nothing reads the "
+        "owning project, so whether the original has changed since the copy was "
+        "taken is unknown rather than checked."
+    )
+    out.append(
         "The same limit binds `Cites research:`. It reports what an item names; "
         "an item that restates a finding in its own words prints nothing, and "
         "nothing detects that. A blank there means no citation was written, "
@@ -919,19 +982,167 @@ def render(items, root="", queue_path="QUEUE.md"):
     return "\n".join(out)
 
 
+def incoming_citations(items):
+    """How many OTHER entries cite each entry's slug. Rung 2 of the ladder.
+
+    Computed here and nowhere else, which is what makes the claim that every
+    rung reads a computed field true rather than aspirational: before this, the
+    count was worked out by hand at every pick.
+    """
+    counts = {item["slug"]: 0 for item in items if item["slug"]}
+    for item in items:
+        for cited in set(citations(item)):
+            if cited in counts and cited != item["slug"]:
+                counts[cited] += 1
+    return counts
+
+
+def whats_next(items, root, queue_path, skip=(), picked=0, today=None):
+    """Which rung the ladder falls to, and that rung's top item.
+
+    Answers the one question a pick actually asks, so re-deriving it costs a
+    scoped call rather than a full digest. The rung is re-derived at EVERY pick
+    because the queue changes underneath the answer — entries leave it, get set
+    aside, new ones land — so this is a recurring cost rather than a one-off,
+    which is why the opening digest's fields cannot stand in for it.
+
+    `skip` and `picked` are session state the script cannot see: which entries
+    the user set aside this session, and how many picks have been made (rung 4
+    alternates on that parity). Without them the mode would answer wrongly the
+    moment anything was skipped, which is the case it exists for.
+
+    Returns (rung number, rung name, item) or (None, why not, None).
+    """
+    import datetime
+    ages = first_seen(root, queue_path)
+    today = today or datetime.date.today().isoformat()
+
+    pool = []
+    for item in items:
+        if item["section"] != "Unprocessed":
+            continue
+        if item["slug"] and item["slug"] in skip:
+            continue
+        # A capture bows out while a date holds it or a named entry is open —
+        # both mean "do not OFFER this again", which is what a pick does.
+        if item["not_before"] and item["not_before"] > today:
+            continue
+        if any(_entry_open(items, ref) for ref in item["blocked_by"]):
+            continue
+        pool.append(item)
+
+    if not pool:
+        return None, "nothing in Unprocessed is offerable right now", None
+
+    flagged = [i for i in pool if i["flag"] == "uncleared"]
+    if flagged:
+        return 1, "an uncleared red flag", flagged[0]
+
+    counts = incoming_citations(items)
+    cited = [i for i in pool if i["slug"] and counts.get(i["slug"], 0) > 0]
+    if cited:
+        cited.sort(key=lambda i: (-counts[i["slug"]], i["first_line"]))
+        return 2, ("unblock potential — %d other entries cite it"
+                   % counts[cited[0]["slug"]]), cited[0]
+
+    in_section = [i for i in items if i["section"] == "Unprocessed"]
+    med_lines = median_lines(in_section)
+    med_age = median_first_seen(in_section, ages)
+
+    def is_long(item):
+        return med_lines is not None and entry_lines(item) >= med_lines
+
+    def age_of(item):
+        return ages.get(item["slug"]) or "9999-99-99"
+
+    def is_old(item):
+        return med_age is not None and age_of(item) <= med_age
+
+    both = sorted([i for i in pool if is_long(i) and is_old(i)],
+                  key=age_of)
+    if both:
+        return 3, "both longer and older than the section's medians", both[0]
+
+    # Rung 4 alternates: oldest first, with every other pick required to be one
+    # of the long entries. Alternation is what makes a short old entry
+    # reachable at all — ordering by one key then the other only relabels the
+    # starvation under a new name.
+    by_age = sorted(pool, key=age_of)
+    if picked % 2 == 1:
+        long_ones = [i for i in by_age if is_long(i)]
+        if long_ones:
+            return 4, "alternating — this pick must be a long entry", long_ones[0]
+    return 4, "alternating — oldest first", by_age[0]
+
+
+def _entry_open(items, slug):
+    return any(i["slug"] == slug for i in items)
+
+
+def render_whats_next(items, root, queue_path, skip=(), picked=0):
+    """The scoped answer: the rung, the item, its line number, its text."""
+    rung, why, item = whats_next(items, root, queue_path, skip, picked)
+    if item is None:
+        return "Next: nothing — %s." % why
+
+    try:
+        with open(queue_path, "r", encoding="utf-8") as handle:
+            lines = handle.read().splitlines()
+    except OSError:
+        lines = []
+    text = "\n".join(lines[item["first_line"] - 1:item["last_line"]])
+
+    out = [
+        "Rung %d: %s" % (rung, why),
+        "Next: [%s] — %s" % (item["slug"] or "NO-SLUG", item["heading"]),
+        "Starts at line %d of %s" % (item["first_line"], queue_path),
+        "",
+        text,
+    ]
+    return "\n".join(out)
+
+
 def main(argv):
-    if len(argv) != 2:
-        print("usage: queue_digest.py <QUEUE.md path>", file=sys.stderr)
+    args = argv[1:]
+    scoped = False
+    skip = []
+    picked = 0
+    path = None
+
+    index = 0
+    while index < len(args):
+        token = args[index]
+        if token == "--next":
+            scoped = True
+        elif token == "--skip":
+            index += 1
+            skip = [s for s in args[index].split(",") if s] if index < len(args) else []
+        elif token == "--picked":
+            index += 1
+            try:
+                picked = int(args[index])
+            except (IndexError, ValueError):
+                picked = 0
+        elif path is None:
+            path = token
+        index += 1
+
+    if path is None:
+        print("usage: queue_digest.py <QUEUE.md path> "
+              "[--next [--skip slug,slug] [--picked N]]", file=sys.stderr)
         return 1
     try:
-        items = parse(argv[1])
+        items = parse(path)
     except OSError as exc:
-        print(f"queue_digest: cannot read {argv[1]}: {exc}", file=sys.stderr)
+        print(f"queue_digest: cannot read {path}: {exc}", file=sys.stderr)
         return 1
     # The project root is the queue file's own folder, so the research files an
     # item cites can be opened without asking for a second argument.
-    root = os.path.dirname(os.path.abspath(argv[1]))
-    print(render(items, root, argv[1]))
+    root = os.path.dirname(os.path.abspath(path))
+    if scoped:
+        print(render_whats_next(items, root, path, tuple(skip), picked))
+    else:
+        print(render(items, root, path))
     return 0
 
 

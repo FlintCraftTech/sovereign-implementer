@@ -877,7 +877,6 @@ ARCHIVAL_PATHS = (
     # terms will always name them.
     "resources/rule_signals.py",
     "resources/research/",
-    "resources/captures/",
     "resources/testing/",
     "resources/plugin-behaviour-retired.md",
     "INBOX/archive/",

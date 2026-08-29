@@ -1,4 +1,4 @@
-# [HASH] — plan — a changelog written for ports, because the ship boundary is already a folder
+# 7b751b6 — plan — a changelog written for ports, because the ship boundary is already a folder
 
 **The user's question decided this item's existence:** can their AI systems simply survey the changelogs on the repo since the version they last ported from, and apply the changes from there?
 

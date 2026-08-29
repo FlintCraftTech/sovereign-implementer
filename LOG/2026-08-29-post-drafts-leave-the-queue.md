@@ -1,4 +1,4 @@
-# [HASH] — plan — post drafts leave the queue on principle, not to shorten it, and the LOG is ruled out as their home
+# 7b751b6 — plan — post drafts leave the queue on principle, not to shorten it, and the LOG is ruled out as their home
 
 The user's position, and the narrowing is hers: the captures are not in dispute — what does not belong in the queue is the full post text. A finished draft is a deliverable rather than work-reasoning, and the method's own render rule already says doc-resident text is pointed at rather than pasted.
 

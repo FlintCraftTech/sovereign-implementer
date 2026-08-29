@@ -45,6 +45,39 @@ There is a safe empirical test available and not taken: the bot could create its
 
 She offered the deferral herself — *"go ahead or we can defer this to plan and transform into a user line"* — and after the search failed to settle the deletion question, accepted the defer-to-plan recommendation and moved to the next item. The item stays in the queue for /plan to reshape; the two design questions it must answer (whether deleting a forum starter deletes the topic, and what happens to the follow-up messages) are recorded above, along with the safe bot-side test not yet run.
 
+## 2026-08-29 — the walk-through resumed, and the open question is settled
+
+The item was rewritten at the 2026-08-29 planning session to open with the throwaway-topic test. That test ran today, on the user's explicit yes to the exact text, and it answers the question the 2026-08-28 drive halted on.
+
+**The bot could not create a forum topic at all until this run.** `resources/discord_post.py` gained forum mode as [bot-cannot-create-forum-topics] earlier in the same /next run; this test is its first live exercise, so it doubles as that build's confirmation.
+
+**The commands were run by the user in her own terminal, not by Claude.** This session's auto mode blocked the outbound post at the classifier. The route was not worked around — the block was reported, the user chose to run it herself, and she was walked through it one command at a time. One deviation from the approved text is recorded: the 🧪 emoji was dropped from the test topic's title, because Windows PowerShell mangles emoji passed to a program as an argument and a corrupted title would have muddied the reading. She was told before running it.
+
+**(a) A forum topic SURVIVES its opening message being deleted.** Settled by observation rather than by search:
+
+```
+topic created        1543081212803940402 — and its OPENING MESSAGE SHARES
+                     THAT ID, which is the fact the question turned on
+follow-up posted     1543083058910199861
+opening deleted      prune --keep 1, scoped to that thread
+after the delete     the topic is STILL LISTED in the forum, still readable,
+                     keeping its id and its name, holding only the follow-up
+```
+
+So the 2026-08-28 search's more optimistic reading was right, and the pessimistic summary was wrong. **Step 5 of the walkthrough is therefore safe**: the user deleting her original after the bot has posted its replacement in the same topic does not destroy the topic or the replacement.
+
+**(b) The forum sorts by latest activity, and the answer is partial — stated as partial.** The six how-to topics returned in the order 6, 5, 4, 3, 2, 1 both before and after the test, unchanged by a new topic being created beside them. The test topic sat at the top throughout. **What this does NOT prove is that posting into an existing topic bumps it up the list**, because the test topic was already top and had nowhere to move. The clean proof arrives during the re-homing itself, which posts into all six.
+
+**Left behind, and needing the user's hand:** the test topic still exists, now holding one message. The bot cannot delete a topic — that is a route the script does not have — so removing it is hers to do in Discord. **She deleted it the same turn and confirmed it was gone**, so the forum is back to its six how-to topics and nothing of the test remains.
+
+## Outcome 2026-08-29 — DEFERRED again, on the user's own word, with step 1 now settled
+
+Her words: *"can you capture this for later processing? I don't have the energy to do all this right now."* Step 2 — confirming that her follow-up messages in each topic are edit notes to be deleted alongside each original — was put to her and not answered, so it stays open.
+
+**What the deferral costs, and it is small:** step 1's two questions are answered above and do not need re-running. What remains is the re-homing itself, six topics of fetch-show-post-delete-register.
+
+**Why it stopped where it did.** Every outbound post in this session was blocked by the auto-mode classifier, so each one had to be pasted into a terminal by the user — three commands to run one test. Six topics is about twelve more. That cost is what she declined, rather than the work itself, and it is filed as [discord-script-permission-rule] so a later session does not meet the same wall.
+
 ## What was NOT done
 
 Step 1's second half — showing each post's current text unchanged — was deliberately held. Fetching six posts verbatim into this record is work the approach may discard, and the approach is now an open question.

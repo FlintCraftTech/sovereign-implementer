@@ -1,4 +1,4 @@
-# [HASH] — plan — one spoken trigger for a reader who cannot open the file, and the user caught a draft that would have made Claude interrogate her
+# 7b751b6 — plan — one spoken trigger for a reader who cannot open the file, and the user caught a draft that would have made Claude interrogate her
 
 Raised mid-walkthrough on remote control: *"sorry can you please give it to me as a card?"* The render rule points at files unconditionally, which assumes the reader could open one — fine for a single queue item, not for a fourteen-part deliverable being approved piece by piece.
 

@@ -1,4 +1,4 @@
-# [HASH] — plan — the orphaned artifact is a delivery problem, not an eviction-rule failure, and the report's diagnosis is corrected
+# 7b751b6 — plan — the orphaned artifact is a delivery problem, not an eviction-rule failure, and the report's diagnosis is corrected
 
 A consumer reported that retiring the generated build view left a 15KB `BUILD-VIEW.md` at their project root, that their version top-up reported nothing to do, and that this project's eviction rule had fired for the in-queue half and missed the generated file.
 

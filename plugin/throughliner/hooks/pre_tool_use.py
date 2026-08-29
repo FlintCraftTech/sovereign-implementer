@@ -74,6 +74,18 @@ COMMIT_ALL = re.compile(r"\bgit\b.*\bcommit\b.*\s(?:-a\b|-am\b|--all\b)")
 # before the single-char ones so `&&` isn't split as two empty `&` halves.
 SEGMENT_SPLIT = re.compile(r"&&|\|\||[;|\n]")
 
+# Destruction of the outbound register through the shell. The register has no
+# git history to restore from — its folder is gitignored on every path — so an
+# `rm`, a truncating redirect or a `mv` away from the name is final. Matched on
+# the filename with either separator, since a segment may carry a Windows path.
+# Deliberately narrow: it catches removal, truncation and rename, and lets
+# everything that merely reads the file through.
+SENT_REGISTER_DESTRUCTION = re.compile(
+    r"(?:\brm\b|\bdel\b|\bRemove-Item\b|\bmv\b|\bmove\b|\bClear-Content\b|"
+    r"\btruncate\b|(?<!>)>(?!>))[^\n]*INBOX[/\\]sent\.md"
+    r"|INBOX[/\\]sent\.md[^\n]*\|\s*(?:Out-File|Set-Content)\b",
+    re.IGNORECASE)
+
 # Appended to every git-safety denial: the patterns match command text,
 # not intent, so a denial can fire on a command that only carries the
 # pattern as data.
@@ -862,6 +874,103 @@ def _is_plan_quiet_path(filepath: str, cwd: str) -> bool:
         "plugin/throughliner/.claude-plugin/plugin.json"
     ).replace("\\", "/"):
         return True
+    # The rezip archive. HOST-ONLY BY RESIDENCE, like the manifest above: the
+    # folder exists only in the repository that develops the method, so in a
+    # consumer project this permits nothing that exists.
+    #
+    # Same shape of failure as the manifest's, found the same way — live, on the
+    # archive step's first ever run. The rezip archives each build's zip and
+    # readme at the one moment the folder is provably the installed build, and a
+    # rezip runs after a close, so the session is classified as planning and the
+    # write is denied. There is no permitted chat shape for it either.
+    #
+    # A FOLDER here where its sibling is one path, which is a step beyond that
+    # precedent and is said plainly rather than passed off as the same move. It
+    # is defensible because `plugin/rezip-archive/` is gitignored build output
+    # rather than part of the plugin package: permitting it opens nothing under
+    # `plugin/throughliner/`, where a sibling write is still denied.
+    #
+    # SUPERSEDED WHEN [ritual-declares-writable-paths] SHIPS **and** the rezip
+    # exists as a ritual definition declaring this path — not before, or the
+    # rezip loses its only permitted route.
+    if rel.startswith(os.path.normcase("plugin/rezip-archive")
+                      .replace("\\", "/") + "/"):
+        return True
+    return False
+
+
+CYCLES_DOC = "CYCLES.md"
+# The paths a definition declares its steps write. Matched with the same
+# tolerance the cycles parser gives Cadence:, Observable: and Trigger: — the
+# label plain or bolded — because these are written by hand in a document a
+# person reads.
+CYCLE_WRITES_RE = re.compile(r"^\s*\*{0,2}Writes\s*:\*{0,2}\s*(.+?)\s*$",
+                             re.IGNORECASE)
+
+
+def _ritual_declared_paths(cwd: str) -> list[str]:
+    """Paths the project's own cycles doc declares its rituals' steps write.
+
+    A ritual's steps routinely need somewhere outside the planning session's
+    standing list — a build folder, a generated artifact — and the alternative
+    is a carve-out in this file per ritual, which has now been written twice.
+    So a definition names the paths it writes and the lock reads them.
+
+    **This is not the self-declared marker refused beside the manifest
+    carve-out.** That objection is against a session granting itself
+    permission. A ritual's declaration lives in CYCLES.md, written at a
+    planning session with the user present and committed — exactly as a
+    `[freeform]` session's list comes from a queued item's Files line. Who
+    wrote the permission and when is the distinction, not whether a file is
+    read at check time. Keep that true or this becomes the refused thing.
+
+    **Declared paths are permitted whenever the project is open, not only while
+    the ritual runs**, on the user's decision of 2026-08-29. The cost is stated
+    rather than buried: a declared path is writable in any session. Nothing
+    needs to detect which ritual is running, and the manifest carve-out has
+    worked this way unconditionally with nothing going wrong.
+
+    The field is read wherever it appears rather than only on definitions with
+    no cadence: the authoring rule sites it on rituals, but a cycle whose turn
+    runs a ritual's steps has the identical need, and a definition that declares
+    nothing contributes nothing either way.
+
+    A project with no cycles doc gets an empty list and pays one `isfile`.
+    """
+    path = os.path.join(cwd, CYCLES_DOC)
+    if not os.path.isfile(path):
+        return []
+    try:
+        with open(path, "r", encoding="utf-8") as handle:
+            lines = handle.read().splitlines()
+    except OSError:
+        return []
+
+    declared = []
+    for line in lines:
+        match = CYCLE_WRITES_RE.match(line)
+        if not match:
+            continue
+        for chunk in match.group(1).split(","):
+            chunk = chunk.strip().strip("`").strip().replace("\\", "/")
+            chunk = chunk.lstrip("./")
+            # A declaration of the project root itself would permit everything,
+            # which is the one shape that turns this into the bypass above.
+            if chunk and chunk not in ("/", ".."):
+                declared.append(chunk.rstrip("/"))
+    return declared
+
+
+def _is_ritual_declared_path(filepath: str, cwd: str) -> bool:
+    """True where the cycles doc declares this path, or a folder above it."""
+    if not _is_inside(filepath, cwd):
+        return False
+    rel = os.path.relpath(os.path.normpath(filepath), os.path.normpath(cwd))
+    rel = os.path.normcase(rel).replace("\\", "/")
+    for declared in _ritual_declared_paths(cwd):
+        target = os.path.normcase(declared).replace("\\", "/")
+        if rel == target or rel.startswith(target + "/"):
+            return True
     return False
 
 
@@ -1066,6 +1175,36 @@ def _is_log_entry_overwrite(tool_name: str, filepath: str, cwd: str) -> bool:
     return os.path.exists(filepath)
 
 
+SENT_REGISTER = os.path.join("INBOX", "sent.md")
+
+
+def _is_sent_register_overwrite(tool_name: str, filepath: str, cwd: str) -> bool:
+    """True for a Write whose target is the outbound register.
+
+    `INBOX/sent.md` is the one-line index of everything the project has sent or
+    posted, and it is what the repeal check greps for claims already announced.
+    It sits inside a mailbox that is gitignored on every path, so unlike every
+    other project document it has NO HISTORY to restore from and an accidental
+    deletion is final.
+
+    WRITE ONLY, like its LOG sibling. The register is appended to and edited
+    constantly — every approved send writes a line in the same turn — and both
+    go through Edit, so nothing correct is caught.
+
+    The register is not un-ignored to fix this: the folder's ignore is what
+    keeps the address book's identifying paths out of a published repository,
+    and a project's outbound record is not necessarily something its owner
+    wants public.
+
+    The limit, stated rather than implied: a hook sees only what goes through
+    Claude's tools. A file deleted outside the app, or a lost disk, is not
+    reached by this.
+    """
+    if tool_name != "Write":
+        return False
+    return _normalise(filepath) == _normalise(os.path.join(cwd, SENT_REGISTER))
+
+
 def _is_build_file(filepath: str, cwd: str, build_files: list[str]) -> bool:
     """Check if a path is in the build's file list."""
     norm = _normalise(filepath)
@@ -1172,6 +1311,19 @@ def main() -> int:
         # compound command, so tokens from unrelated segments can't combine
         # across a shell operator (the cross-segment false-denial bug).
         for segment in _split_segments(command):
+            if SENT_REGISTER_DESTRUCTION.search(segment):
+                return _deny(
+                    "[Throughliner] BLOCKED: this would delete or empty the "
+                    "record of everything this project has sent, and that "
+                    "record has no backup.\n\n"
+                    f"File: {SENT_REGISTER}\n\n"
+                    "The mailbox folder is deliberately kept out of git, so "
+                    "this one file has no history to restore from.\n\n"
+                    "Use Edit to change a line in it. Nothing else needs to "
+                    "touch the whole file."
+                    + PATTERN_AS_DATA_NOTE
+                )
+
             if RESET_HARD.search(segment):
                 return _deny(
                     "[Throughliner] BLOCKED: `git reset --hard` destroys "
@@ -1329,6 +1481,21 @@ def main() -> int:
             "use Edit — appending to a record is always allowed."
         )
 
+    # A Write over the outbound register destroys the only copy — the mailbox is
+    # gitignored, so there is no history to restore from. Unconditional for the
+    # same reason as its LOG sibling: every scope branch permits INBOX/.
+    if _is_sent_register_overwrite(tool_name, filepath, cwd):
+        return _deny(
+            "[Throughliner] BLOCKED: this would write over the record of "
+            "everything this project has sent, and that record has no backup.\n\n"
+            f"File: {SENT_REGISTER}\n\n"
+            "The mailbox folder is deliberately kept out of git — it holds "
+            "other projects' folder paths — so this one file has no history to "
+            "restore from and an overwrite is final.\n\n"
+            "Use Edit instead. Adding a line, or changing one, is always "
+            "allowed; replacing the whole file is what is refused."
+        )
+
     # Rule 1: the working file's Files: section governs editability. Tri-state:
     # no section = skip enforcement, present but empty = method docs only,
     # entries listed = enforce the list.
@@ -1480,6 +1647,7 @@ def main() -> int:
             or _is_scratchpad_dir(filepath, cwd)
             or _is_tools_file(filepath, cwd)
             or _is_inbox_dir(filepath)
+            or _is_ritual_declared_path(filepath, cwd)
             or _is_build_file(
                 filepath, cwd,
                 _freeform_scope_files(cwd, data.get("session_id", "")),
@@ -1491,7 +1659,9 @@ def main() -> int:
                 f"About to edit: {filepath}\n\n"
                 "A planning session may write QUEUE.md, SPEC.md, CYCLES.md, "
                 "TOOLS.md, anything in "
-                "LOG/, research notes and its own scratch files. Everything "
+                "LOG/, research notes and its own scratch files — plus any "
+                "path a ritual definition in CYCLES.md declares its steps "
+                "write. Everything "
                 "else is work, and work gets queued and built rather than done "
                 "here.\n\n"
                 "Add this to the queue as a piece of work instead, and tell the "

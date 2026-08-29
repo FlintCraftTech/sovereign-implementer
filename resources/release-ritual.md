@@ -410,8 +410,25 @@ outright here.
       changed and why it matters in plain English for the Discord reader, and name
       it plainly as a testing build.
     - Attach the zip: `plugin/throughliner.zip`.
+    - **Generate and attach the port-facing changelog**, so a port tracking this
+      project can survey what changed in the shipped package since the version it
+      last ported from:
+
+      ```
+      py plugin/throughliner/scripts/port_changelog.py . \
+          --from <PREVIOUS_TAG> --to v<VERSION> \
+          --out <scratchpad>/port-changelog-v<VERSION>.md
+      ```
+
+      `<PREVIOUS_TAG>` is the last-release tag already read from `gh release list`
+      at the top of this ritual. It writes to the session scratchpad rather than
+      into the repository: every release's copy is kept as a Release asset, so a
+      file per release in the tree would store what GitHub already holds. Where it
+      reports that nothing shipped, attach nothing and say so in the notes — a
+      release whose whole span is host-only work has nothing for a porter, and
+      an empty changelog would imply otherwise.
     - Command shape:
-      `gh release create v<VERSION> plugin/throughliner.zip --title "v<VERSION>" --prerelease --notes "<summary>"`.
+      `gh release create v<VERSION> plugin/throughliner.zip <scratchpad>/port-changelog-v<VERSION>.md --title "v<VERSION>" --prerelease --notes "<summary>"`.
     - If `gh` isn't authenticated in this session (the command errors on auth), don't
       silently skip the Release — tell Alex how to publish it from the GitHub web UI
       instead: on the repo's **Releases** page, click **Draft a new release**, create

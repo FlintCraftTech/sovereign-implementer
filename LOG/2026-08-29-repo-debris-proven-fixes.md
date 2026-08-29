@@ -1,4 +1,4 @@
-# [HASH] — plan — `resources/captures/` is revert debris, and deleting it is the one repo fix that needed no investigation
+# 7b751b6 — plan — `resources/captures/` is revert debris, and deleting it is the one repo fix that needed no investigation
 
 The user asked what the captures folder was, on the way to a wider repo cleanup. The answer settled its fate.
 

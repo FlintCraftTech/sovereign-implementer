@@ -1,4 +1,4 @@
-# [HASH] — plan — the compliance audit kept with its scope refreshed, and the refreshed list is not the one it was filed with
+# 7b751b6 — plan — the compliance audit kept with its scope refreshed, and the refreshed list is not the one it was filed with
 
 Filed by `rule_signals.py`'s audit-lag check, so nothing had weighed it before this turn — said plainly when it was introduced, since a script filed it and no person had looked.
 

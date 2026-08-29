@@ -1,4 +1,4 @@
-# [HASH] — plan — a weekly sweep over announced claims, scoped to what pruning cannot reach
+# 7b751b6 — plan — a weekly sweep over announced claims, scoped to what pruning cannot reach
 
 Authored after the user spotted the hole in correcting posts only as they arise: *"I don't know how that would work without rendering old things wrong as they're not checked because they don't 'arise'."* She was right, and today proved it — the 2026-08-22 announcement was falsified on the 27th and nothing fired for a week.
 

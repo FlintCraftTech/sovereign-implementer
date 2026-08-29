@@ -30,12 +30,26 @@ supply. urllib does everything needed here.
 ## Routes used, verified against Discord's docs 2026-08-27
 
     POST   /channels/{channel_id}/messages              send
+    POST   /channels/{forum_id}/threads                 create a forum topic
     PATCH  /channels/{channel_id}/messages/{message_id} edit (own messages only)
     DELETE /channels/{channel_id}/messages/{message_id} delete one
     GET    /channels/{channel_id}/messages              list, newest first
     GET    /users/@me/guilds                            find the server
     GET    /guilds/{guild_id}/channels                  resolve a channel name
+    GET    /guilds/{guild_id}/threads/active            resolve a thread name
     PATCH  /users/@me                                   set the bot's avatar
+
+## Forums are not text channels
+
+A forum channel holds threads, not messages, so posting to its /messages route
+fails with HTTP 400 "Cannot send messages in a non-text channel" (code 50008) —
+found live 2026-08-29. Creating a topic is a different call that carries a
+title, which is what `send --title` uses.
+
+Posting *into* an existing topic needs no new route: a thread's own id is a
+channel id, so /channels/{thread_id}/messages is the ordinary send. What was
+missing was only a way to name one — the guild channel list does not include
+threads — so channel resolution falls back to the guild's active threads.
 
 Bulk delete is deliberately NOT used. Its route refuses anything older than two
 weeks, and the entries this prunes are older than that by definition, so it
@@ -193,7 +207,13 @@ def normalise_channel_name(name):
 
 
 def resolve_channel(token, name):
-    """Find a channel id by its name, across every guild the bot is in."""
+    """Find a channel or thread id by its name, across every guild.
+
+    Threads are searched only when no channel matches, so a forum topic named
+    after its parent channel can never shadow the channel itself. A forum
+    topic's own id is a channel id, which is what lets the ordinary send post
+    into an existing topic once its name resolves.
+    """
     if name.isdigit():
         return name
     wanted = normalise_channel_name(name.lstrip("#"))
@@ -204,17 +224,44 @@ def resolve_channel(token, name):
             if normalise_channel_name(channel.get("name", "")) == wanted:
                 matches.append((channel["name"], channel["id"]))
 
+    if not matches:
+        matches = [(thread["name"], thread["id"])
+                   for thread in active_threads(token)
+                   if normalise_channel_name(thread.get("name", "")) == wanted]
+
     if len(matches) == 1:
         return matches[0][1]
     if len(matches) > 1:
         raise DiscordError(
-            "More than one channel matches %r: %s. Pass the channel id "
+            "More than one channel or topic matches %r: %s. Pass the id "
             "instead." % (name, ", ".join(m[0] for m in matches))
         )
     raise DiscordError(
-        "No channel named %r found in any server the bot is in. The bot may "
-        "not have been granted access to that channel." % name
+        "No channel or open forum topic named %r found in any server the bot "
+        "is in. The bot may not have been granted access to it, or the topic "
+        "may have gone inactive — archived threads are not listed." % name
     )
+
+
+def active_threads(token):
+    """Every open thread the bot can see, forum topics included.
+
+    Archived threads are deliberately not fetched: that is a per-channel route
+    rather than a per-guild one, so reaching it would mean a call for every
+    channel on every name lookup. A topic that has gone quiet is addressed by
+    its id instead, and the resolution error says so.
+    """
+    found = []
+    for guild in request(token, "GET", "/users/@me/guilds") or []:
+        try:
+            payload = request(
+                token, "GET", "/guilds/%s/threads/active" % guild["id"])
+        except DiscordError:
+            # One guild refusing the read must not hide every other guild's
+            # topics — the same posture the replies scan takes per channel.
+            continue
+        found.extend((payload or {}).get("threads", []))
+    return found
 
 
 def whoami(token):
@@ -258,6 +305,38 @@ def send(token, channel, body_path, attach=None):
         message = request(token, "POST", path, body={"content": text})
 
     return message
+
+
+def create_forum_topic(token, channel, title, body_path, attach=None):
+    """Open a new topic in a forum channel, with its opening message.
+
+    The forum's own /messages route refuses this — a forum holds threads, not
+    messages — so the title travels with the body on the threads route, and the
+    opening message is created in the same call rather than posted afterwards.
+    """
+    channel_id = resolve_channel(token, channel)
+    text = read_text(body_path)
+    check_length(text)
+    path = "/channels/%s/threads" % channel_id
+
+    if attach:
+        with open(attach, "rb") as handle:
+            payload = handle.read()
+        fields = [
+            ("payload_json", json.dumps({
+                "name": title,
+                "message": {
+                    "content": text,
+                    "attachments": [
+                        {"id": 0, "filename": os.path.basename(attach)}],
+                },
+            })),
+            ("files[0]", os.path.basename(attach), payload),
+        ]
+        return request(token, "POST", path, multipart=fields)
+
+    return request(token, "POST", path,
+                   body={"name": title, "message": {"content": text}})
 
 
 def archived_plugin_zip(project_root, version=None):
@@ -465,6 +544,55 @@ def prune(token, channel, keep=15, dry_run=False):
     return deleted, len(mine)
 
 
+def rebump_welcome(token, channel, welcome_path):
+    """Move the channel's welcome back to the bottom, where people are looking.
+
+    Discord opens a channel at the BOTTOM, so a pin at the top is where the
+    welcome is least likely to be read. There is no native bottom-pin; the
+    universal pattern is a sticky message a bot re-posts as the newest message.
+    This bot has no always-running process and so cannot react to other people's
+    messages — but test-rezips traffic is almost entirely the bot's own, so
+    re-bumping at each entry post keeps the welcome at the bottom exactly when
+    anyone looks.
+
+    The bot's own previous copy is deleted first and the source file's text
+    posted after, so the channel never briefly shows two.
+
+    **Only the bot's own unpinned message whose text matches the source file is
+    deleted**, by author id and by content — the existing pin, the user's posts
+    and every entry are untouchable by construction rather than by ordering
+    luck, the same guard the prune takes.
+
+    CONSENT, which this script cannot enforce and so states: the user's yes to
+    posting the entry covers re-bumping the welcome's UNCHANGED bytes. Any
+    change to the welcome text is a new send and needs its own explicit yes to
+    the exact text.
+    """
+    channel_id = resolve_channel(token, channel)
+    text = read_text(welcome_path)
+    check_length(text)
+    me = whoami(token)["id"]
+    wanted = text.strip()
+
+    removed = 0
+    for message in fetch_all(token, channel_id):
+        if message.get("author", {}).get("id") != me or message.get("pinned"):
+            continue
+        if (message.get("content") or "").strip() != wanted:
+            continue
+        request(token, "DELETE",
+                "/channels/%s/messages/%s" % (channel_id, message["id"]))
+        removed += 1
+        time.sleep(0.35)
+        # Only the most recent copy is expected to exist; stopping at one keeps
+        # a content collision from cascading into a sweep.
+        break
+
+    posted = request(token, "POST", "/channels/%s/messages" % channel_id,
+                     body={"content": text})
+    return removed, posted
+
+
 def set_avatar(token, image_path):
     """Set the bot's own avatar. Outward-facing — the caller owns the consent."""
     with open(image_path, "rb") as handle:
@@ -482,9 +610,16 @@ def main(argv=None):
     sub = parser.add_subparsers(dest="command", required=True)
 
     p_send = sub.add_parser("send", help="post the exact contents of a file")
-    p_send.add_argument("--channel", required=True, help="channel name or id")
+    p_send.add_argument("--channel", required=True,
+                        help="channel name or id — an open forum topic's name "
+                             "or id works too, and posts into that topic")
     p_send.add_argument("--body", required=True,
                         help="path to the approved text (sent verbatim)")
+    p_send.add_argument("--title",
+                        help="create a NEW forum topic with this title, in the "
+                             "forum named by --channel, with the body as its "
+                             "opening message. Omit it to post an ordinary "
+                             "message.")
     p_send.add_argument("--attach", help="optional file to attach")
     p_send.add_argument("--attach-archived-zip", metavar="VERSION", nargs="?",
                         const="", default=None,
@@ -492,6 +627,11 @@ def main(argv=None):
                              "— the test-rezips entry's download. Give a "
                              "version, or omit it for the newest archived "
                              "build. Nothing is built here.")
+    p_send.add_argument("--rebump-welcome", metavar="PATH",
+                        help="after posting, delete the bot's own previous "
+                             "copy of this file's text in the channel and "
+                             "repost it as the newest message — the sticky "
+                             "welcome. Usually resources/nerds-welcome.md.")
     p_send.add_argument("--prune-to", type=int, metavar="N",
                         help="after posting, keep only the newest N of the "
                              "bot's own unpinned messages in this channel")
@@ -539,6 +679,14 @@ def main(argv=None):
                     args.project_root, args.attach_archived_zip or None)
                 print("Attaching archived build %s (%d KB)"
                       % (attachment, os.path.getsize(attachment) // 1024))
+            if args.title:
+                thread = create_forum_topic(
+                    token, args.channel, args.title, args.body, attachment)
+                # The threads route returns the new thread; its own id is also
+                # the id of its opening message.
+                print("Created topic %r in #%s — topic id %s"
+                      % (args.title, args.channel, thread["id"]))
+                return 0
             message = send(token, args.channel, args.body, attachment)
             print("Posted to #%s — message id %s" % (args.channel, message["id"]))
             if args.prune_to is not None:
@@ -546,6 +694,16 @@ def main(argv=None):
                 print("Pruned %d old entr%s; %d of the bot's own remain."
                       % (removed, "y" if removed == 1 else "ies",
                          remaining - removed))
+            # Last, so the welcome ends up newest whatever else this run did.
+            # A prune that removed an older copy simply leaves nothing to
+            # delete here, which is why the two need no coordination.
+            if args.rebump_welcome:
+                dropped, message = rebump_welcome(
+                    token, args.channel, args.rebump_welcome)
+                print("Welcome re-bumped: %s, reposted as message id %s"
+                      % ("previous copy deleted" if dropped
+                         else "no previous copy found",
+                         message["id"]))
 
         elif args.command == "edit":
             edit(token, args.channel, args.message_id, args.body)

@@ -1,4 +1,4 @@
-# [HASH] — plan — the outbound register gets a deletion guard rather than being un-ignored, and the red flag clears by design
+# 7b751b6 — plan — the outbound register gets a deletion guard rather than being un-ignored, and the red flag clears by design
 
 A consumer project reported that `INBOX/sent.md` — the permanent record of everything sent or posted — sits inside a gitignored folder, so it has no history and one deletion ends it. It arrived carrying an uncleared red flag, and was the session's first item on that ground.
 

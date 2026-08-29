@@ -1,4 +1,4 @@
-# [HASH] — plan — the Cowork origin month moves into the history section, and a wrong paraphrase of the user's account is corrected
+# 7b751b6 — plan — the Cowork origin month moves into the history section, and a wrong paraphrase of the user's account is corrected
 
 The method was developed inside Cowork for roughly a month before this repository existed, which reconciles "about four months old" with a first commit of 2026-06-01. That fact sat in one session record.
 

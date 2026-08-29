@@ -1,4 +1,4 @@
-# [HASH] — plan — the capability-claim rule widens to outside surfaces, and the halted walkthrough is repaired in place
+# 7b751b6 — plan — the capability-claim rule widens to outside surfaces, and the halted walkthrough is repaired in place
 
 The how-to re-homing walkthrough halted at its own step 3 on two assumptions about Discord nobody had checked: that each how-to topic is a single post, and that deleting the opening post leaves the topic standing. Reading the live forum disproved the first — six topics each hold two to five further messages. The second is still unsettled; a search found support threads pointing both ways.
 

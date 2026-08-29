@@ -1018,6 +1018,67 @@ def _working_file(cwd: str, kind: str, session_id: str) -> str:
     return os.path.join(cwd, f"_{kind}-{safe_id}.md")
 
 
+RETIRED_ARTIFACTS_DOC = "retired-artifacts.md"
+RETIRED_ARTIFACT_RE = re.compile(r"^\s*-\s+`([^`]+)`\s*[—-]\s*(.+?)\s*$")
+
+
+def retired_artifacts_present(cwd: str) -> list:
+    """Artifacts of retired features still sitting in this project.
+
+    Returns (path, what produced it) for each one found. The list ships with the
+    plugin because the retiring happens in the development project and the
+    orphan sits in everyone else's: a retirement removes the code that writes an
+    artifact, never the artifact from projects that already ran it.
+
+    REPORT ONLY — nothing is deleted here, and nothing should be. The top-up is
+    add-only and never clobbers what a user has; removing a file from someone's
+    project is the thing that posture exists to prevent.
+
+    A trailing slash in a listed path means a folder. A project with none of
+    them present pays one file read.
+    """
+    doc = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                       RETIRED_ARTIFACTS_DOC)
+    try:
+        with open(doc, "r", encoding="utf-8") as handle:
+            lines = handle.read().splitlines()
+    except OSError:
+        return []
+
+    found = []
+    for listed, produced_by in _parse_retired_artifacts(lines):
+        target = os.path.join(cwd, listed.rstrip("/").replace("/", os.sep))
+        if os.path.exists(target):
+            found.append((listed, produced_by))
+    return found
+
+
+def _parse_retired_artifacts(lines) -> list:
+    """(path, what produced it) for each entry in the shipped list.
+
+    Fenced blocks are skipped, because the doc's own format example is written
+    in exactly the entry shape — a fence is how a document shows a format, so
+    the parser has to know the difference. A path escaping the project is
+    dropped rather than resolved.
+    """
+    out = []
+    fenced = False
+    for line in lines:
+        if line.lstrip().startswith("```"):
+            fenced = not fenced
+            continue
+        if fenced:
+            continue
+        match = RETIRED_ARTIFACT_RE.match(line)
+        if not match:
+            continue
+        listed, produced_by = match.group(1).strip(), match.group(2).strip()
+        if listed.startswith(("/", "\\")) or ".." in listed:
+            continue
+        out.append((listed, produced_by))
+    return out
+
+
 def leftover_working_files(cwd: str, session_id: str) -> list:
     """Working files belonging to some other session, newest first.
 
@@ -1965,6 +2026,18 @@ def main() -> int:
             "to one running right now in another chat. Nothing is deleted — a "
             "working file can hold the only record of what a crashed session did. "
             "If one is genuinely orphaned, /done can close out what it records."
+        )
+
+    # An artifact a retired feature left behind. Reported, never deleted — the
+    # file explains itself to nobody otherwise, and working out what it was took
+    # reading the plugin's source.
+    orphans = retired_artifacts_present(cwd)
+    for listed, produced_by in orphans:
+        context_parts.append("")
+        context_parts.append(
+            f"[Throughliner] {listed} is still in this project, and nothing "
+            f"produces or reads it any more: {produced_by} Nothing has been "
+            "deleted — whether to keep it is yours."
         )
 
     # Dirty-tree warning: uncommitted changes with no active build almost always
