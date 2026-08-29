@@ -1,4 +1,4 @@
-# [HASH] — The nerds-channel welcome becomes a source file the bot re-bumps to the bottom
+# 819f7f1 — The nerds-channel welcome becomes a source file the bot re-bumps to the bottom
 
 Discord opens a channel at the bottom, so a pinned welcome sits where it is least likely to be read. There is no native bottom-pin; the universal pattern is a sticky message a bot re-posts as the newest message. This bot has no always-running process and cannot react to other people's messages — but that channel's traffic is almost entirely the bot's own, so re-bumping at each entry post keeps the welcome at the bottom exactly when anyone looks.
 

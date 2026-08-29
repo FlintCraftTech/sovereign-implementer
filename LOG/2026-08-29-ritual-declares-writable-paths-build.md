@@ -1,4 +1,4 @@
-# [HASH] — A ritual names the paths its steps write, instead of the lock accumulating carve-outs
+# 819f7f1 — A ritual names the paths its steps write, instead of the lock accumulating carve-outs
 
 The same failure had happened twice — a ritual step needing to write somewhere the session running it may not — so it is a class rather than a case. A ritual definition now carries a `Writes:` field, and the planning branch of the scope-lock reads the project's own `CYCLES.md` and permits exactly what it names.
 

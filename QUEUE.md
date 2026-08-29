@@ -6,6 +6,87 @@ Two sections. **Processed** — agreed work, ordered top-to-bottom; /next builds
 
 ## Processed
 
+#### `workshop/` becomes a method folder, with `resources/` inside it [workshop-becomes-a-method-folder]
+**Your design, 2026-08-29**, reached while settling what a visitor to the repository sees first. Working material that is not the product lives in one folder every project gets, and `resources/` — research findings and re-read-later testing evidence — sits inside it as `workshop/resources/`.
+
+**Your reason, in your own framing:** only what is part of Throughliner stays in view, so someone shopping online for a method sees the method rather than the workshop. The method's own documents stay visible because they demonstrate it; everything they merely refer to does not.
+
+**Claude's objection was wrong and is recorded so it is not re-raised:** that `resources/` is a shipped concept and therefore not renameable here. This is the project that authors the method, and /setup's migration is what carries other projects across.
+
+**Rule gate: run — admitted as an amendment, costing no slot.** It renames and re-homes the subject of an existing rule rather than adding one. Parent: the two-kinds rule for `resources/` in `docs/skill-nonspecific-rules.md`.
+
+**Files, derived from a grep for `resources/` rather than from the discussion.**
+- `plugin/throughliner/docs/skill-nonspecific-rules.md` — the two-kinds rule, the three-way triage and the temp-files block reworded to `workshop/resources/`.
+- `plugin/throughliner/docs/plan.md` — the planning scope-lock's writable list.
+- `plugin/throughliner/docs/setup.md` — scaffolding creates `workshop/`.
+- `plugin/throughliner/docs/migrate-checklist.md` — gains the step that creates `workshop/` and moves an existing `resources/` inside it. This is the step that does the work in every project, including this one.
+- `plugin/throughliner/docs/next.md`, `done-build.md`, `rescan.md`, `feedback-and-inbox.md` — each names a `resources/` path.
+- `plugin/throughliner/hooks/pre_tool_use.py` — the planning session's writable path.
+- `plugin/throughliner/hooks/session_start.py` — `FORMAT_EPOCH` bumped, with a line in the epoch history saying what the new number means.
+- `plugin/throughliner/hooks/post_tool_use.py`, `stop.py`, `scripts/queue_digest.py`, `scripts/measure_written_shape_length.py` — changed only where the grep shows a path named.
+- `README.md` — the feature list, per the README-sync trigger.
+
+**Reads but does not change:** this project's own files under `resources/`. They move when /setup runs, at [workshop-migration-setup-run], not here.
+
+Observable: a grep for `resources/` across `plugin/throughliner/` returns only paths written as `workshop/resources/`, and the hook suites pass.
+**The observation reaches `resources/testing/`**, named among the files above because the suites are what the close must run before committing a hook change.
+
+**Refused: renaming `resources/` to `workshop/` outright.** That leaves one folder holding three kinds of thing, which is the defect that made the name feel wrong to begin with. The two-kinds rule survives, one level down.
+
+**Refused: nesting the other way as `resources/workshop/`.** Same objection, and it puts a host-shaped folder inside a method-shaped one.
+
+**The epoch bump halts every existing project at its next session until /setup migrates it.** That is the mechanism working rather than a cost to avoid, and it is how the user's other projects get carried across.
+
+**No `Runs alone` marker, checked rather than assumed:** this item edits files inside the package and moves no path, so nothing another item names goes stale while it builds. The folder move happens at [workshop-migration-setup-run], and the marker rides [repo-cleanup-product-forward], which is the build that moves paths.
+
+#### Audit findings always route to the queue, and the actionable filter comes out [audit-findings-always-queue]
+**Your ruling, 2026-08-29**, after the live instance the same day: Claude read the always-loaded triage's middle arm ("a finding -> the observing chat's LOG entry") over the audit procedure's "findings route to Unprocessed", and recommended routing the repository inventory out of the queue. Your words: findings of audits always belong in the queue — it's WORK (planned writing) that doesn't.
+
+**Two rewordings, one item.**
+- `plugin/throughliner/docs/skill-nonspecific-rules.md` — the three-way triage's middle arm gains the exclusion: it never covers an `[audit]` run's output, which goes to Unprocessed whatever it proposes. The reason, carried as operative text because the rule cannot be applied correctly without it: findings are filed for the user to weigh, and nobody processes a session record, so a finding parked there is one the user never meets.
+- `plugin/throughliner/docs/next-audit.md` — the compile step's "one finding per actionable change" becomes one finding per discrete observation. **Your ruling on the second half, distinct from the first:** Claude does not decide whether a finding is actionable — it already exercises enough discretion on what counts as a finding within the audit's parameters. Worth-doing is settled at /plan, with the user present. A filter running in a `[SILENT]` step before the work reaches the user can only drop things, never surface them.
+
+**Kept, on Claude's recommendation and your non-objection:** next-audit.md's `dropped` route for a finding Claude re-reads and finds factually wrong before filing — a correctness check, already fenced by that doc's own text from being a worth-it judgment or a user-rejection route.
+
+Rule gate: run — admitted as an amendment, costing no slot. Two existing statements reworded; parents are the three-way triage and the compile step's own sentence, and the old wordings are what the new ones evict.
+
+Observable: a grep for "actionable" in next-audit.md's compile step returns nothing, and the triage's middle arm names the audit exclusion.
+**Files:** `plugin/throughliner/docs/skill-nonspecific-rules.md`, `plugin/throughliner/docs/next-audit.md`.
+No SPEC sentence is owed, checked rather than assumed: SPEC describes audits as reporting findings for later review and never names where they land.
+
+#### Reusable priming prompt for demo recording sessions [recording-priming-prompt]
+**Your idea, raised in the site project's planning session and mailed here 2026-08-28** as the side that owns it; processed 2026-08-29. A prompt pasted at the start of any session being recorded: this is a demo, keep revealing information off the screen. Your reason, carried from the mail: a recording exposes more than the method being shown — the structure of the work, what is being tracked — and preventing it at the source is far cheaper than blurring it in the edit afterwards.
+
+**Both videos went scripted at processing, which shrinks this prompt's job without removing it:** the risks live in the margins a script does not cover — a session opening listing other projects' names, a file path carrying the username, an INBOX line naming a correspondent, an autocomplete showing real folders. Those appear uninvited, which is what a standing prompt is for.
+
+**The build:** write `YouTube/recording-priming-prompt.txt`, a paste-ready prompt instructing the recorded session to: never open or quote anything outside the demo project itself; never echo absolute paths, which carry the username; never touch `INBOX/`, the address book or the sent register on camera; use invented names and data only; and where a step would surface something real, say so and stop rather than showing it.
+
+Observable: the file exists and a read shows each named exposure covered. Its folder is gitignored, so the user can tune the wording by hand at any time after it exists.
+
+**Files:** `YouTube/recording-priming-prompt.txt` (created).
+
+Reusable by construction — every case-study recording wants it. The scripted-video sessions ([legal-demo-video-guide], [determinism-lesson-video]) are its first consumers.
+
+#### Every zip this project ships stores Windows path separators, which the zip format does not allow [zip-entries-use-backslash-separators]
+Found live 2026-08-29 during the 1.21.1-test2 rezip, and confirmed against the committed release zip. Filed by Claude.
+
+**What was observed.** Entries in the archive zip read `throughliner\skills\`, `throughliner\.claude-plugin\plugin.json`. The committed `plugin/throughliner.zip` — the artifact attached to every GitHub Release so far — has the identical shape.
+
+**Why it is a defect rather than a cosmetic detail.** The zip format specifies forward slashes as the path separator. Windows tools tolerate backslashes, which is why nobody here has ever seen a problem: the rezips are built, installed and tested on one Windows machine. A macOS or Linux tester unzipping the release plausibly gets flat files literally named `throughliner\skills\next.md` rather than a folder tree — and the install route in the pinned how-to post tells them to unzip it and add the extracted folder as a local marketplace.
+
+**The cause is `Compress-Archive` on Windows PowerShell 5.1**, which is what the ritual specifies.
+
+**Unverified, and it decides how urgent this is:** whether any tester has actually installed from the zip on a non-Windows machine. Nobody here can answer that by reading; it is a question for the testers, or for someone with a Mac to hand. **Do not treat the defect as proven harmful until that is known** — what is proven is that the bytes are non-conformant, not that anyone has been broken by them.
+
+**The fix, chosen at processing 2026-08-29 on Claude's recommendation and the user's agreement: rebuild the ritual's zip step in Python's `zipfile`.** Python writes conformant forward-slash paths, is already what everything else in this project runs on, and removes a PowerShell dependency from the ritual. Post-processing the entries was the alternative and lost as the more fragile half-measure.
+
+**Merged in at that processing: [pycache-sweep-runs-before-the-suites], deleted with its facts carried here.** Found in the same rezip: the ritual's bytecode sweep (step 2) runs before the test suites (step 3), which import the hooks and regenerate exactly the `__pycache__` folders the sweep deleted, so the zip (step 7) catches them — observed live, five bytecode entries in the first archive zip of the day. The Python zip step closes this permanently by excluding `__pycache__` at zip time, ending the sweep-ordering fragility instead of re-ordering around it. That item's open check was run and found unanswerable, recorded so it is not re-run: the installed cache does hold bytecode folders, but the hooks run from that cache and regenerate them at runtime, so the check cannot tell what the snapshot carried — the provable harm is confined to the zips.
+
+**Files:** `resources/release-ritual.md` — the zip step rewritten to a `py` one-liner (or small script) using `zipfile`, excluding `__pycache__`; the step-2 sweep may then be simplified or noted as belt-and-braces, the build's call. The release ritual's repackage step reads the archived zip, so fixing the rezip fixes both.
+Observable: a zip built by following the ritual end to end, its entries listed rather than trusted — every path uses forward slashes and no entry names `__pycache__`.
+
+**Ordering, in prose:** [host-rituals-migration] (held) will later move this ritual's steps into `CYCLES.md` definitions — whichever builds second reads the other's change rather than assuming the file's shape.
+
 #### [user] Re-home the how-to forum posts under the bot's authorship [howto-posts-bot-authorship]
 Filed 2026-08-27 with [posting-rule-two-kinds-and-tip-pipeline], from your instruction that the how-to topics be editable and maintainable by the bot. The constraint that makes this an item at all (recorded in `TOOLS.md`): a bot can only edit messages it authored itself, and the existing how-to posts are yours — so bot maintainability requires each one re-posted by the bot once, after which every later tweak is a bot edit under the approval rule.
 
@@ -97,6 +178,50 @@ Observable: four bot-authored posts in the forum, and four lines in `INBOX/sent.
 **Maintenance is not part of this item, on your instruction:** the forum's ordering and the factualness of its content are maintained on a cycle, the same way the how-to forum's claims are. [announced-claims-sweep] was widened to cover both rather than a fourth cycle being created.
 
 **Ordering:** last of the four port items. Posts 3 and 4 describe artifacts that [port-facing-changelog] and [port-flavours-named] create, so drafting them first would mean writing about things that do not exist. Carried by placement and this sentence rather than by a `Blocked by:` line, which would push it below the readiness line and out of the priority position you set.
+
+#### [user] Legal case run in Throughliner, scripted as a hypothetical — a YouTube video [legal-demo-video-guide]
+**Your idea, 2026-08-28; reshaped 2026-08-29 on your decision.** A video about running a family-law matter in Throughliner. Your virality read, unchanged: a legal case is a very weird project type to run inside Claude Code, which is exactly why it travels.
+
+**The unscripted demo is refused, in your words: "This is too hard."** That version had you setting up a legal-case-shaped project on camera, asking questions as though you did not know what Claude would suggest, while steering toward a structure you had already proved. It needed a steering guide written from your real case files so the naive-sounding questions would reliably arrive somewhere good. The guide, the destination structure and the naive-question device all go with it.
+
+**What replaces it: a script.** You describe your project's structure in detail with all identifiers removed, and the video presents it as a hypothetical case rather than one you ran. The structure is the real one that worked, which is what makes it worth watching; nothing ties it to a person or a matter.
+
+**Nothing sensitive is opened from this session.** The abstraction happens before the description reaches Claude, so no file of your legal project is read from here — the path and matter names stay unrecorded, per the scrub rule on identifying paths. A script is also reviewable cold before recording, which the unscripted version could never be.
+
+Output lands in `YouTube/`, gitignored (confirmed 2026-08-29 at `.gitignore` line 9, so the earlier hold on [youtube-folder-gitignored] is spent). [recording-priming-prompt] still applies, now for screen contents during recording rather than for what is said. [project-types-listicle-video] was raised as this item's replacement and kept as separate work instead. The slug is kept through the rename per the stable-slug rule, and no longer describes a demo.
+
+**This item stops at an approved script; recording and publishing are filed separately once it exists.** Two reasons, recorded so the cut is not re-argued: the script is the half Claude contributes to and the half carrying the identifier-stripping work, and a walkthrough that runs on past the thing it was proving has no point anyone can check it against. It also lets the item finish in one sitting rather than waiting on a camera.
+
+**Walkthrough.**
+1. You describe your legal project's structure in detail, identifiers already removed — what the source-of-truth document held, how the matter was broken into work, what the queue looked like. Claude asks follow-ups where the picture has gaps. Look for: a description you would be comfortable reading aloud on camera.
+2. Claude drafts the script into `YouTube/legal-case-script.txt`. You open that file in the desktop side panel, edit it directly, and save; say when you are done, and Claude reads it back and asks whether there is anything else, repeating until you say you are finished. Look for: your own edits present in the text Claude quotes back.
+3. You read the finished script once cold, hunting for anything that narrows it toward a real matter — a date, a sequence of events, an unusual detail. Look for: nothing that would identify the case to someone who already knew it.
+4. Tell this project it is signed off; the recording and publishing item is filed then.
+
+Observable: `YouTube/legal-case-script.txt` exists and you have said it is finished.
+**Files:** `YouTube/legal-case-script.txt` — gitignored working space, so this item publishes nothing.
+
+#### [user] Determinism lesson video — script drafted together, from the four-quadrant example bank [determinism-lesson-video]
+**Your idea, 2026-08-28; the arc, the heuristic and the quadrant requirement are yours. Processed 2026-08-29.** A lesson video: show Throughliner finding tools — doing things that never needed AI — then name what those tasks share: deterministic output. Your heuristic is the teachable core: *a good way to recognise when an output is deterministic is when you can imagine a tool that might accomplish it.* What the video is for, in your framing: helping people identify how to ask and what to ask for — more tools, or more AI — because the big waste is spending AI on work that does not need it.
+
+**Your addition at processing, which reshaped the item:** the video must dispel the equation most viewers hold — probabilistic = AI, deterministic = not AI — by showing the two off-diagonal cases: outputs that are probabilistic without AI, and deterministic work done with AI. Every example is classified as good or bad practice, which is what turns the taxonomy into advice. Your example: OCR — magic that reads an image without a chatbot; show a good use, then a bad one where AI does the same job dearer.
+
+**The example bank exists** — `resources/research/determinism-lesson-examples.md`, compiled at processing on your direction, covering all four quadrants with the good/bad call proposed on each and two claims flagged for re-verify at drafting. The bridge example in it is the lesson's strongest good-practice move: AI builds the deterministic tool once, then the tool runs free forever.
+
+**The knowledge hole is named and the walkthrough is built around it — your own words at processing: the hole in this is my knowledge.** So drafting starts with you working the examples, not with a script.
+
+**This item stops at an approved script, like [legal-demo-video-guide]** — recording and publishing file separately when it exists, and publishing waits behind the marketplace listing per your 2026-08-22 sequencing on [marketplace-submission].
+
+**Walkthrough.**
+1. Claude presents the example bank quadrant by quadrant, with its proposed good-or-bad call on each; you agree, overrule or add, until the distinction sits solidly with you — you cannot present a heuristic you are unsure of. Look for: your own verdict written against every example.
+2. Claude re-verifies the two flagged claims (Tesseract free/local/deterministic; LanguageTool's core rule-based) and drafts the script into `YouTube/determinism-lesson-script.txt`: your arc, the surviving examples, the heuristic, the bridge as the closing advice.
+3. You open that file in the desktop side panel, edit it directly, save, and say when you are done; Claude reads it back and asks whether there is anything else, repeating until you say you are finished.
+4. Tell this project it is signed off; the recording item is filed then.
+
+Observable: `YouTube/determinism-lesson-script.txt` exists and you have said it is finished.
+**Files:** `YouTube/determinism-lesson-script.txt` — gitignored working space, publishes nothing.
+
+**Ordering, in prose rather than a blocker:** the legal-case script ([legal-demo-video-guide]) goes first — the two design together in the YouTube folder's sessions, and [recording-priming-prompt] rides whichever records first, so one settled script shapes the second. (The intro-video capture once named here was deleted 2026-08-29 — you are exploring that concept outside the queue.)
 
 --- Cleared to run above this line ---
 
@@ -224,18 +349,74 @@ Filed 2026-08-28 with [nerds-welcome-sticky-rebump]. Once the welcome is bot-aut
 3. Tell this project; the register line for the pin is re-pointed at the bot's copy and this item closes.
 Blocked by: [nerds-welcome-sticky-rebump]
 
+#### [user] Rezip, restart, then run /setup so this project gets the workshop folder [workshop-migration-setup-run]
+**Your sequencing, 2026-08-29:** the migration does the move, rather than a bespoke build doing it and the migration recipe being written separately. This project's own folders get carried across by the shipped machinery, which is the strongest test that machinery can have.
+
+**The dependency is host-side and does not resolve in the session that builds [workshop-becomes-a-method-folder].** /setup runs from the installed plugin, not from the source in this repository, so the build has to be rezipped and the app fully restarted first — otherwise /setup migrates to the old shape and reports success.
+
+**Walkthrough.**
+1. Ask for a rezip once [workshop-becomes-a-method-folder] has been built and committed. Look for: the rezip reporting the installed stamp equal to the target's.
+2. Quit the desktop app completely and reopen it — plugins load at launch, so a reopened window is not enough. Look for: the session opening reporting the new version.
+3. Type /setup in this project. Look for: it reporting that the project's documents are on an older format and offering to migrate, rather than saying everything is current.
+4. Let the migration run. Look for: a `workshop/` folder at the project root with `resources/` inside it, and `research/` and `testing/` still sitting inside that.
+
+Observable: `workshop/resources/research/` and `workshop/resources/testing/` exist, and no `resources/` folder remains at the project root.
+
+**References break between this step and the cleanup, and the window is minutes rather than days.** Six root documents name `resources/` paths — `CLAUDE.md`, `SPEC.md`, `README.md`, `QUEUE.md`, `CYCLES.md`, `TOOLS.md` — and they are repaired by [repo-cleanup-product-forward], which runs in the same sitting once this finishes.
+Blocked by: [workshop-becomes-a-method-folder]
+
+#### Repo cleanup: foreground the product, and treat everything peripheral [repo-cleanup-product-forward]
+**Raised by you, 2026-08-29.** Your framing: you have no idea what half the files littering the repository are for, many may have outstayed their welcome, others need better organising or gitignoring — and you want the repository more product-forward, foregrounding what Throughliner is, with anything peripheral to the product itself treated by delete, reorganise, or gitignore.
+
+Filed at the moment you raised it so the reference from [post-drafts-leave-the-queue] resolves; processed in the same session, and split there into three pieces on your agreement. [repo-debris-proven-fixes] took what was already provable; [repo-inventory-audit] answers what each file is; this item keeps the presentation question, which is the one that needs your taste rather than a finding.
+
+**The question this owns: what a visitor to the repository sees first.** The root held seventeen tracked files with no separation between the product and the workshop. **Designed 2026-08-29 with the inventory in front of us**, so it is no longer held on the audit.
+
+**The principle you settled, which governs every call below:** tracked means part of Throughliner, and anything the project merely refers to is either moved into `workshop/` or gitignored. Your reason: someone shopping online for a method should see the method, not the workshop.
+
+**Stays at the root:** `README.md`, `INSTALL.md`, `LICENSE`, `plugin/`, `.claude-plugin/` and the dot-files — plus the method's own documents, which stay because they demonstrate it: `SPEC.md`, `CLAUDE.md`, `QUEUE.md`, `LOG/`, `FAQ/`, `CYCLES.md`, `TOOLS.md`. `EDITING-STATE-CONTRACT.md` stays because another application is built against it and needs a home a stranger can find. `self-authoring-rules.md` comes up to the root — your call, on the ground that it is one of the more interesting artifacts here and currently sits three levels down.
+
+**Moves into `workshop/`**, which exists by then, created by [workshop-migration-setup-run]: `ANNOUNCEMENT-IDEAS.md`, `FABLE-BRIEF.md`, the three image files, and the loose top level of `workshop/resources/` — `release-ritual.md`, `rule_signals.py`, `discord_post.py`, `rule-maintenance.md`, `method-compliance-audit-checklist.md`, `retired-terms.md`, `method-map.md`, `beta-offer-announcement-template.md`, `nerds-welcome.md`, `plugin-behaviour-retired.md`, `2026-08-09-emergency-revert-plan.md`, `queue-two-section-migration-recipe.md`. That leaves `workshop/resources/` holding `research/` and `testing/` only, which is what its own rule says it holds.
+
+**Moved rather than gitignored, on Claude's recommendation and your agreement.** Much of it is machinery rather than reference — the bot script posts to the Discord, and the rule checks and test suites are what a close is required to run. Ignoring them would leave them on one machine with no history behind them, which is the exposure a hook was built to guard against on the outbound register.
+
+**Gitignored:** the Discord post drafts folder, which is [post-drafts-leave-the-queue]'s destination. `YouTube/` and `INBOX/` already are.
+
+**One fact that bounds the ambition.** `Throughliner-icon.png` is 4.5MB, roughly 40% of the working tree, and deleting it reclaims nothing: the blob stays in history, and this project refuses history rewrites because its records are full of commit hashes. Placement only.
+
+**Files.**
+- `.gitignore` — the drafts folder added.
+- `CLAUDE.md`, `SPEC.md`, `README.md`, `QUEUE.md`, `CYCLES.md`, `TOOLS.md` — every `resources/` path repaired to `workshop/resources/`, derived from a grep for the literal string rather than from the design discussion.
+- the moves themselves, by `git mv` so history follows the file.
+
+Observable: a grep for `resources/` in a tracked file outside `workshop/` returns nothing, and the root's tracked entries are the list above and no others.
+
+**The bot gets its own folder inside the workshop — your direction, 2026-08-29, answering half of [unreferenced-brand-files-and-brief]:** `throughlinerprojectboticon.svg` is the bot's live Discord avatar, so `workshop/bot/` holds everything that is the bot — `discord_post.py`, `nerds-welcome.md` and the avatar — healthily separate from the project and the posts it handles. Your words on its status: it is a folder, and it is not being popped out. Moving the file changes nothing live; Discord holds its own copy of the avatar.
+
+**One consequence the build must surface as a `[user]` step:** the permission rule added 2026-08-29 names the script's path literally — `Bash(py resources/discord_post.py *)` in `.claude/settings.local.json` — and CYCLES.md's step commands name it too. The CYCLES.md repairs are the build's; the settings line only the user can edit, so the build stops and hands that one over when the move lands.
+
+**`FABLE-BRIEF.md` is deleted — your call, 2026-08-29: it has done its job.** The build removes it with `git rm`, so history keeps it and the delete is revertible. It comes off the moves list.
+
+**The badge becomes the repo's face — settled 2026-08-29 with [unreferenced-brand-files-and-brief].** Your account of `throughliner-icon-badge.png`: used on Discord only so far, possibly created to meet its size limits. The build embeds it at the top of `README.md` as the project's logo — it stops being unreferenced by being used, it serves the product-forward goal directly, and at 188K it is embeddable where the 4.5MB original is not. The original still moves to `workshop/`; history keeps it either way.
+Runs alone
+Blocked by: [workshop-migration-setup-run]
+
+#### Migrate this project's rezip, push and release prose into ritual definitions [host-rituals-migration]
+Filed 2026-08-28 with the keep of [ritual-definitions-and-offers], from your framing that the release and rezip rituals are subparts of cycles. Host-only. **Designed 2026-08-29 at processing; both original blockers had built and are dropped.**
+
+**The move:** the rezip's numbered steps and the release's numbered steps leave `resources/release-ritual.md` and become two ritual definitions in `CYCLES.md` — firing words "rezip" and "release", each with its `Writes:` field (the rezip declares `plugin/rezip-archive/`). The weekly-release cycle's step 3 points at the release definition instead of at the old document, so the steps live once. Nothing about how the user fires either changes.
+
+**What stays, each for a recorded reason.** `release-ritual.md` survives as the reference companion holding the recovery procedures and the marketplace-collision guard — what-if material, not steps of a turn; its step lists are replaced by pointers to the definitions. CLAUDE.md's push section is untouched: push fires on a standing condition Claude must notice unprompted, not on a word, so it does not fit the ritual shape — the record already settled that a rule that must fire unprompted cannot be fetched.
+
+**Files:** `CYCLES.md` (two definitions with `Writes:` fields), `resources/release-ritual.md` (step lists out, pointers in, recovery and guard kept), `CLAUDE.md` (the fetched-doc section repointed at the definitions).
+Observable: a grep finds the rezip and release step lists in `CYCLES.md` and not in `release-ritual.md`, and CLAUDE.md's pointer resolves to the definitions.
+Rule gate: run — an amendment relocating existing rules; nothing new admitted, no slot spent.
+
+**Held on the zip fix, and the blocker is real:** [zip-entries-use-backslash-separators] rewrites the zip step in the same document, two items editing one file must not interleave, and the migrated definition should carry the new Python zip step rather than the PowerShell one it replaces.
+Blocked by: [zip-entries-use-backslash-separators]
+**Ordering, written on both items per the known-ordering rule (2026-08-29):** [ritual-declares-writable-paths] shipped 2026-08-29, so the definitions this migration writes carry the writable-paths field from the start.
+
 ## Unprocessed
-
-#### Last session advises processing [repo-inventory-table] next [forward-advisory]
-Filed at the 2026-08-29 build close, replacing the spent note from the previous close — that one advised building [bot-cannot-create-forum-topics] next, which this run did.
-
-**Why planning rather than another build.** The cleared region now holds only the five `[user]` items, every one of which needs the user present, so a /next run would walk straight into work it cannot do alone. Unprocessed has grown to 58 entries, twelve of them filed by this run's three audits.
-
-**Why that item first among the new ones.** It is the inventory of the repository root and `resources/` — the answer to "I have no idea what half these files are for" — and it is the one capture whose form the audit deliberately departed from, so it needs a disposition before the three fate-questions filed beside it can be ordered sensibly.
-
-**The overlap scan, run and reported either way.** Three of the twelve findings bear directly on work already in the region: [done-audit-records-a-repealed-approval-step] and [done-mail-triage-missing-prompt-arm] both change close docs, and [inbox-doc-narrates-a-superseded-refusal] changes a shipped doc — none of them contradicts or invalidates a cleared item, because the cleared region is all `[user]` work touching no method docs at all. So nothing blocks; the reason to plan first is volume, not collision.
-
-**One thing a planning session should reach for early.** [discord-script-permission-rule] is a `[user]` item filed this run, and until it is done every outbound post costs a round trip through a terminal — which is what stopped the how-to re-homing today, rather than the work itself.
 
 #### Show-first approval moments produce their text twice [approval-flow-token-doubling-simplification]
 Captured by you (2026-08-01) while reviewing your Claude Code feature request anthropics/claude-code#77134. Rescoped at your direction 2026-08-13 from a larger item about approval-time doubling generally.
@@ -292,6 +473,7 @@ Not before: 2026-09-22
 
 #### [user] Discord post draft: subprojects [discord-post-subprojects]
 Drafted 2026-08-25 at the planning close under the close-sweep design; approved as a candidate by you, with your addition of the start-big benefit. Waits on [subprojects-pop-out] shipping; verify against the shipped build before posting (one-a-day pacing repealed 2026-08-28). FAQ potential noted for posting time, per the announcement-time FAQ rule.
+**Verified 2026-08-29 against the installed build's setup procedure — all five claims hold**: the parent-spec read, the confirm-with-you step, the mail to the parent, upward-only dependencies, no scripted way back in. **Destination is #tips by the two-kinds tie-break** — it reports a change and walks through the how, and where both tests pass the tip test wins. **Posting waits for the next session on your decision's practical ground**: the send-permission rule ([discord-script-permission-rule]) was added 2026-08-29 and takes effect only in a fresh session, so this becomes the first terminal-free post rather than one more walkthrough. A re-verify at post time is not owed twice — the claims were checked today against the same installed build.
 Not before: 2026-08-29
 **Draft (under 2,000 characters):**
 > **Subprojects: start big, split later.** When one part of your project outgrows the rest — the software inside a business plan, the contracts inside a venture — you can now pop that subfolder out into its own full Throughliner project. Run setup inside the subfolder: it reads the parent project's spec, works out which part this is, checks with you, and tells the parent it's moved out. From then on it's an ordinary project with its own clear queue.
@@ -302,6 +484,7 @@ Not before: 2026-08-29
 
 #### [user] Discord post draft: multi-person sessions [discord-post-multi-person]
 Drafted 2026-08-25 at the planning close under the close-sweep design; approved as a candidate by you, with your additions: name Chagora — your new app by its-coughfee, designed to work with Throughliner but not dependent on it — and credit zebbern. Both names are published GitHub identities, which is what the scrub rule permits. Explanatory register. Waits on [multi-user-identity-layer] shipping; verify against the shipped build before posting (one-a-day pacing repealed 2026-08-28).
+**Date passed 2026-08-30; posting waits for the next session on your agreement, same ground as [discord-post-subprojects]:** the send-permission rule takes effect only in a fresh session, so it posts terminal-free there, after the subprojects post. Claims are verified against the installed build at posting — unlike its sibling, this one has not been verified yet. Pacing between the two is the posting session's call.
 Not before: 2026-08-30
 **Draft (under 2,000 characters):**
 > **Several people, one session — and everyone's ideas stay theirs.** Throughliner now understands a session with more than one person in it. Anyone present can drop ideas into the queue; the decisions — what gets kept, built, or published — stay with the one person holding the reins. Credit follows whoever's message raised an idea, under the same fairness rules as ever: agreeing to a suggestion doesn't make it yours, and Claude's own proposals stay Claude's.
@@ -422,32 +605,9 @@ Note for processing: this waits on the law-prose article existing, which was not
 **Wired 2026-08-28:** the blocker is now filed as [law-prose-article] — real committed work, publicly promised in the user's 2026-08-26 beta announcement ("a website article coming") — and this capture bows out until it resolves, returning by itself when the article item is processed or built.
 Blocked by: [law-prose-article]
 
-#### Migrate this project's rezip, push and release prose into ritual definitions [host-rituals-migration]
-Filed 2026-08-28 with the keep of [ritual-definitions-and-offers], from your framing that the release and rezip rituals are subparts of cycles. Host-only: move the step lists in `resources/release-ritual.md` (and CLAUDE.md's push section, if it fits the shape) into ritual definitions in `CYCLES.md`, with the weekly-release cycle naming the release ritual as its turn's steps rather than restating them. Not designed yet — what stays prose (the recovery procedures, the marketplace-collision guard) and what becomes definition is the keep-step question.
-Blocked by: [ritual-definitions-and-offers], [rezip-archive-mirrors-nerds-channel]
-The second blocker is ordering, not just concept: that item is rewriting the same ritual text right now, and two items editing `resources/release-ritual.md` must not interleave.
-**Ordering, written on both items per the known-ordering rule (2026-08-29):** [ritual-declares-writable-paths] builds before or alongside this, so the definitions this migration writes carry the writable-paths field from the start rather than being revisited. Not a blocker either way — the two are independently buildable.
-
-#### Demo-session guide for the legal-case YouTube video [legal-demo-video-guide]
-**Your idea, 2026-08-28, processed at raising.** One of the first YouTube videos: an essentially unscripted demo where you set up a fresh legal-case-shaped project with Throughliner on camera, phrasing your questions as though you don't know what Claude will suggest, and steering toward a structure similar to one you already proved — a family-law source-of-truth template and method in your legal project (located 2026-08-28; the path and matter names are deliberately not recorded here, per the scrub rule on identifying paths). You never show or use the template; the guide's job is knowing the destination so your naive-sounding questions reliably arrive there. Your virality read: a legal case is a very weird project type to run inside Claude Code, which is exactly why it travels.
-
-How it gets made: hand-work with you in a dedicated session — the drafting reads the legal project's sensitive files, so it is done deliberately with you present, not inside a build run. Output lands in `YouTube/` (gitignored once [youtube-folder-gitignored] ships), which keeps the guide and any matter-adjacent notes out of this public repository. This capture holds the intent; the dedicated session does the work, and the close there records it.
-Blocked by: [youtube-folder-gitignored]
-The hold is real: the guide must not be written into a tracked folder, so the ignore line lands first.
-
 #### Pop the YouTube folder out into its own project [youtube-subproject-popout]
 Your direction, 2026-08-28: the `YouTube/` subfolder starts life inside this project and pops out as its own full Throughliner project later — your timeframe, "maybe in a month or something", written as the date below and adjustable on your word. The pop-out is the shipped subprojects flow: /setup run inside the subfolder reads this project's product truth, confirms which part it covers with you, and tells the parent it moved out. Until then the folder is gitignored working space ([youtube-folder-gitignored]).
 Not before: 2026-09-28
-
-#### Lesson video: deterministic versus probabilistic output, taught through Throughliner's tool-finding [determinism-lesson-video]
-**Your idea, 2026-08-28, filed at your direction; the arc and the heuristic are yours.** A different video type from the legal-case demo — a lesson, not a case study, though it carries case-study elements rather than being example-free (your framing).
-
-The arc: first show what Throughliner does when it finds tools for you — accomplishing things it is not necessary to use AI for. Then identify what is different about those tasks: beyond not needing the AI directly, their output is **deterministic**. The teachable heuristic, in your words: *a good way to recognise when an output is deterministic is when you can imagine a tool that might accomplish it.* The payoff is double — you stop spending valuable AI generating things a different way every time (probabilistically), and you start identifying and suggesting CLI tools yourself, even when Claude Code hasn't.
-
-Grounding on the shelf: the method's own CLI-tool rule and capability check ("name the tool that would do the work") are the shipped behaviour the lesson demonstrates. Designs with the other video capture, [legal-demo-video-guide], in the YouTube folder's own sessions. (The intro-video capture that used to be named here was deleted 2026-08-29 — the user is exploring that concept outside the queue.)
-
-#### Reusable priming prompt for demo recording sessions [recording-priming-prompt]
-Filed 2026-08-28 from the site project's mail (archived same day), the idea Alex's — raised in that project's planning session and sent here as the side that owns it. A prompt given to Claude before any case-study recording session: this session is a demo, and it must not put revealing information on screen. Her reason, carried from the mail: demoing a real personal project exposes more than the method being shown — the structure of the work, what is being tracked — and preventing it at the source is far cheaper than blurring it in the edit afterwards. Reusable by construction, since every case-study recording wants it; the [legal-demo-video-guide] session is its first consumer, so the two design together in the YouTube folder's sessions.
 
 #### [user] Tip: your projects can send each other mail [tip-recycle-cross-project-inbox]
 **Recycle from the #announcements post of 2026-08-12, "Your projects can now talk to each other"** (message id 1537247086179786772). Found by the announcement-history sweep of 2026-08-28, which mined the channel's full history — the early posts predate the sent register, so nothing had looked at them for tip material.
@@ -496,6 +656,8 @@ The angle that makes it a tip rather than a changelog: file order records *when 
 Filed by the announcement-history sweep of 2026-08-28 so its coverage is checkable rather than only its output. Not work — a record of what the sweep looked at. Delete it once read, or keep it as the sweep's own coverage note.
 
 **Settled 2026-08-29.** It is a finding, not work: nothing changes in any file because of it, so under the three-way triage its home is this session's record rather than the queue. **The close carries the coverage record below into that entry and then deletes this item** — deleting it now would rely on a later write that has not happened yet.
+
+**Re-confirmed at the second 2026-08-29 planning session, which is executing it.** The close that was meant to carry this out missed it — caught only because the ladder re-presented the item, which is the queue doing its job. Checked against the same day's ruling that audit findings always belong in the queue: that ruling protects findings nobody has weighed yet, and this one has been weighed to completion, so the settled fate stands. This session's close copies the coverage list below into its record and deletes the item.
 
 **Its one live finding is fully handled and has left this item.** The 2026-08-22 post's claim is not merely falsified — reading `#announcements` through the bot proved the post is **live** (`1540531465115410553`), while `INBOX/sent.md` had recorded it as "approved, not yet posted" since the day it was written. That wrong status is why no repeal-grep ever fired on it. The register line is corrected, the false sentence on [comparison-article-post-needs-rewrite] is corrected, and the public correction runs through [announcement-back-catalogue-rehomed].
 
@@ -573,20 +735,6 @@ Filed 2026-08-29 at the authoring of the [tips-posting] cycle, which was created
 **The load-bearing unknown:** nothing today marks a capture as a cycle's material. The [tips-posting] definition names its pool in prose, which a person can read and a ranking pass cannot. Settling this means deciding whether the capture carries a field, or the definition names something mechanical the pass can match. Do not build the prose-matching version.
 
 **Meanwhile the eighteen are not lost and not cleared** — they stay captures, which is what the pipeline already calls them, and the cycle's first turn draws from them.
-
-#### Repo cleanup: foreground the product, and treat everything peripheral [repo-cleanup-product-forward]
-**Raised by you, 2026-08-29.** Your framing: you have no idea what half the files littering the repository are for, many may have outstayed their welcome, others need better organising or gitignoring — and you want the repository more product-forward, foregrounding what Throughliner is, with anything peripheral to the product itself treated by delete, reorganise, or gitignore.
-
-Filed at the moment you raised it so the reference from [post-drafts-leave-the-queue] resolves; processed in the same session, and split there into three pieces on your agreement. [repo-debris-proven-fixes] took what was already provable; [repo-inventory-audit] answers what each file is; this item keeps the presentation question, which is the one that needs your taste rather than a finding.
-
-**The question this owns: what a visitor to the repository sees first.** The root currently holds seventeen tracked files with no separation between the product and the workshop — `README.md`, `INSTALL.md`, `LICENSE` and `SPEC.md` alongside `CLAUDE.md` (82KB), `QUEUE.md` (141KB), `ANNOUNCEMENT-IDEAS.md` (153KB), `FABLE-BRIEF.md`, three image files and the dot-files. Foregrounding the product means deciding which of those stay in view and which move into a folder.
-
-**One fact that changes what is worth doing, found at processing.** `Throughliner-icon.png` is 4.7MB, roughly 40% of the working tree, and **deleting it reclaims nothing that matters**: the blob stays in git history, and this project refuses history rewrites because its records are full of commit hashes. So the icon is a presentation decision only — where it sits, not how big the repository is. There is already a 191KB badge version beside it.
-
-**Held on the audit rather than designed now.** What to foreground cannot be settled before knowing what each file is, which is exactly what [repo-inventory-audit] produces. Deciding twice is the failure this avoids.
-
-**Two items wait behind this**, so the chain is stated rather than discovered: [post-drafts-leave-the-queue] needs a destination that only this can give, and it is held on this item as this is held on the audit. A chain of three resolves; it is slow rather than stuck, and shortening it means settling the drafts destination independently, which is yours to call.
-Blocked by: [repo-inventory-audit]
 
 #### Post drafts leave the queue, keeping their reasoning behind [post-drafts-leave-the-queue]
 **Raised by you, 2026-08-29.** Your position, and the narrowing is yours: the captures themselves are not in dispute — what does not belong in the queue is the full post text. A finished draft is a deliverable rather than work-reasoning, and the method's own view-in-doc rule already says doc-resident text is pointed at rather than pasted.
@@ -925,23 +1073,6 @@ From the repository-inventory audit of 2026-08-29, not yet reviewed.
 
 Cheapest fix if it is simply spent: one line in `.gitignore` beside the siblings that are already there, and remove the folder.
 
-#### Two tracked brand images and a brief nothing in the repository points at [unreferenced-brand-files-and-brief]
-From the repository-inventory audit of 2026-08-29, not yet reviewed. Three entries with the same shape: tracked, real, and unreachable by any reference this pass can trace.
-
-```
-throughliner-icon-badge.png       188K, tracked, nothing references it
-throughlinerprojectboticon.svg     12K, tracked, nothing references it
-FABLE-BRIEF.md                      8K, referenced by one queue item only
-```
-
-**The images are the case where a grep is the wrong instrument, and the inventory says so rather than implying they are dead.** An icon's real use is outward — a Discord bot avatar, a badge on a page, a marketplace listing — and none of that lives in this repository, so zero references is the expected reading for a file doing its job. The `.svg` in particular is named for the bot, which does have an avatar and a route for setting one.
-
-**`FABLE-BRIEF.md` is the different case.** It is prose written for a model, and the one thing pointing at it is a queue item rather than any live procedure — so whether a session is ever meant to read it is genuinely open. Planning sessions run on Fable, which is what makes it worth asking rather than assuming spent.
-
-**What would settle each, since none of it is guessable from inside the repository:** for the images, where each is actually used, or whether it was superseded by the other. For the brief, whether it is still something a session should read, in which case something should point at it.
-
-Nothing was deleted, and none of the three is asserted to be debris.
-
 #### [user] Allow the posting script in this project's settings, so sends stop needing the terminal [discord-script-permission-rule]
 **Captured by you, 2026-08-29**, when the auto-mode classifier blocked every outbound post during [howto-posts-bot-authorship]'s walk-through and you asked to pick it up later.
 
@@ -962,4 +1093,94 @@ Observable: a send through `resources/discord_post.py` completes without a class
 **What this does NOT change, stated so the grant is not read as wider than it is.** Every post still needs your explicit yes to the exact text before it goes — that is Throughliner's own rule about anything leaving the machine, and it was never what the classifier was doing. The rule also names one script and nothing else.
 
 **Why it is worth doing rather than living with the terminal route.** Re-homing the six how-to posts is about twelve commands, and the announcements back catalogue is twenty-odd more. Each one currently costs a round trip through you copying a command into a terminal window.
+
+#### [user] Post the 1.21.1-test1 entry to the nerds channel, with its archived zip [test-rezip-entry-1-21-1-test1]
+**Your direction, 2026-08-29**, when you asked why the previous rezip had not been posted — it should have been, and the close missed the check. Folded to the next session on your instruction, with the zip back-filled first, which is done.
+
+**Ready now, and both halves of the readiness test are confirmed rather than assumed:** a full planning session ran on 1.21.1-test1 (2026-08-29, confirmed from that session's own start block) and a full build run ran on it (2026-08-29). The archive holds its zip and readme, rebuilt from commit `4efdcff` and verified by content stamp `8c874952044d` — identical to the stamp proved equal when the build was installed, so the attached bytes are the tested bytes.
+
+**Walkthrough.**
+1. Draft the entry from `plugin/rezip-archive/throughliner-v1.21.1-test1.md`, whose text the archive and the channel post are required to share. Look for: the label, the `Commit:` line and the version matching the readme exactly.
+2. The bot posts it to 💡test-rezips-for-nerds with the archived zip attached, on your explicit yes to the exact text:
+   `py resources/discord_post.py send --channel test-rezips-for-nerds --body <draft> --attach-archived-zip 1.21.1-test1 --prune-to 15 --rebump-welcome resources/nerds-welcome.md`
+   Look for: `Posted to #test-rezips-for-nerds — message id`, then a line saying the welcome was re-bumped.
+3. Write the register line in `INBOX/sent.md` in that same turn, naming the channel and reading the claim off the posted text.
+4. **Posting this entry unlocks editing the one before it** — the v1.21.0 post — to add a testing-outcomes summary and your rating out of 5. That entry is your own post rather than the bot's, so under the first-iteration note the backfill is yours to paste once.
+
+Observable: the entry appears in the channel under the bot's name with the zip attached, and `INBOX/sent.md` carries its line.
+
+**Blocked in practice, not in principle:** every send in the 2026-08-29 session was refused by the auto-mode classifier, so this needs [discord-script-permission-rule] done first or it goes through your terminal again.
+
+#### Nothing proves the test-rezips readiness check ran at a close, so it can be skipped invisibly [rezip-entry-check-has-no-artifact]
+Found live 2026-08-29: the close of a 23-item run did not run the check, and nobody would have known if the user had not asked why the previous rezip was unposted.
+
+**The check as it stands.** `CLAUDE.md` says that at a close, read the `LOG/` records dated after the installed build's install date and see whether at least one full /plan and one full /next have run on it; where both have, the new entry is ready to draft.
+
+**Why it was missed rather than refused.** The close works through `done.md` and its flavor sub-doc, and this check lives in `CLAUDE.md` outside that sequence. A close can complete every step its own procedure names and never touch it. That is not a discipline failure to be told off for — it is a step with no site.
+
+**And it leaves no trace either way**, which is the part that makes it recur. A clean run and a run that never happened look identical afterwards. This project has solved that shape three times already — the rule-gate disposition, the forward-advisory disposition, the FAQ disposition — each by requiring a recorded line in the session record rather than by hoping.
+
+**Changes.** `CLAUDE.md` — the test-rezips check gains a required line in the close's session record, in the disposition shape the neighbouring obligations already use:
+
+```
+Rezip entry: ready — <version>, one /plan and one /next since <date>
+Rezip entry: not yet — <version>, <which half is missing>
+Rezip entry: none — no rezip since the last entry was posted
+```
+
+Observable: a close whose commit follows a rezip carries one of those three lines in its session record, and a grep for `Rezip entry:` across `LOG/` finds one per such close.
+
+**Weigh at processing whether it belongs in `done.md` instead.** It is host-only — consumers have no channel — which is the argument for leaving it in `CLAUDE.md` where the other host-only close obligations live. The counter-argument is that a step in `CLAUDE.md` is exactly what just got skipped. Both readings are real and this item does not settle them.
+
+#### Third steering layer is live in this project, and the compliance checklist says there are two [doubled-rules-table-misses-the-brevity-style]
+Found live 2026-08-29 while rebuilding an old build from its commit — `plugin/throughliner/output-styles/` was in it, which a retirement was supposed to have emptied.
+
+**The retirement is real and this is not it.** `concise-throughliner.md` — auto-applied at system-prompt priority — was deleted 2026-08-14. What ships today is a different file, `brevity.md`, named **Throughliner Brevity**, offered at /setup and enabled per project with the user's consent. SPEC describes it correctly.
+
+**But the compliance checklist reasons as though nothing shipped.** Its doubled-rules section says "**Two layers now, not three, and the change is recent**", lists (G) the user's global CLAUDE.md and (M) the method's own always-loaded rules, and builds a twelve-row table on that pair — concluding that eight rows are unattributable and that three M-only rows are "M working alone".
+
+**In this project the third layer is switched on.** `.claude/settings.local.json` carries `"outputStyle": "Throughliner Brevity"`, and that style asserts the method's communication shape at system-prompt level — leading with the decision, one item at a time, plain English for non-coders. So several of the table's M-only rows are not M working alone here, and the table currently overstates what this project's narration tests.
+
+**Why it matters beyond tidiness.** That section exists precisely to stop this project's own good behaviour being read as evidence the shipped rules work. A table that undercounts the layers does the opposite of its job — it makes the evidence look cleaner than it is. The 2026-08-29 compliance audit used this section and inherited the error.
+
+**Changes.** `resources/method-compliance-audit-checklist.md` — the doubled-rules section restated for three layers, with the brevity style's rows marked, and the deletion of `concise-throughliner.md` kept as the history it is rather than as the current state. Whether the style's rows are marked per-project (it is opt-in, so a consumer may not have it) is the judgement the rewrite has to make.
+Observable: the section names three layers, the table has a column for the shipped style, and a grep for "Two layers now, not three" returns nothing.
+
+#### Project types nobody expects to run in Throughliner — a listicle video [project-types-listicle-video]
+**Raised by you, 2026-08-29**, while reshaping [legal-demo-video-guide], and kept as work of its own on your decision rather than as a variant of that item.
+
+One video running through several unexpected project types, each getting the length of a bullet rather than a whole video. A legal matter is one of them. The reason it works is the same one that makes the legal case worth filming at all: these are not what anyone expects a coding tool to be pointed at.
+
+Undesigned: which project types, how many, how long each gets, and whether the material comes from projects you have actually run or from invented examples. Designs alongside [legal-demo-video-guide] and [determinism-lesson-video], which share the same YouTube-folder sessions.
+
+#### Planned writing never lives in the queue — a rule the co-writing flavour must carry [planned-writing-lives-outside-the-queue]
+**Your ruling, 2026-08-29**, given while overruling a misrouting of the repository inventory: captures ABOUT writing pieces belong in the queue, and the larger writing or writing plans they point to do not. Your words at the time: the posts need their own home, and then captures that reference them — and this needs a larger rule as part of the overall development of co-writing as a work flavour.
+
+**The specific instance is already settled elsewhere:** [post-drafts-leave-the-queue] moves the three post drafts' text out, and its destination — a gitignored Discord-posts folder — was fixed on [repo-cleanup-product-forward] the same day. What this capture holds is the general rule, which reaches the article items too ([competition-comparison-article] carries its draft substance inline) and any future writing work.
+
+**Where it lands is the open question, and it belongs to [co-writing-flavour]'s design turn** rather than being decided here: the flavour design should include where planned writing lives, so the rule and the flavour ship as one thing rather than two rules on one subject. Filed by /rescan; raise it when [co-writing-flavour] is processed.
+Blocked by: [co-writing-flavour]
+
+#### Sidebar cannot edit `.claude/settings.local.json` — a TOOLS.md fact [sidebar-cannot-edit-settings-json]
+Filed by /rescan, 2026-08-29. Learned live while walking [discord-script-permission-rule]: the user could not edit the settings file in the desktop side panel and had to open it through File Explorer in Notepad. Any future walkthrough handing over a settings edit should name the Notepad route from the start rather than assuming the sidebar can do it.
+
+Folds into [tools-md-owes-three-facts] at processing — that capture already collects environment facts owed to `TOOLS.md`, and this is one more of the same shape.
+
+#### First port-facing changelog now has a real consumer waiting — verify the next release publishes it [first-port-changelog-has-a-consumer]
+Filed 2026-08-29 by the goal session that assessed the Egnatia-OC OpenCode port and sent its assessment pack (register line in `INBOX/sent.md`). The generator and its release-ritual step shipped in 819f7f1, but no release has run since, so no changelog has ever been published — and the pack's CYCLES.md tells his port's weekly [upstream-catch-up] cycle to look for one on each release, described as coming soon. Two things to check at the next weekly release turn: that the publish step actually attaches the changelog, and that its output over the range his pin trails (743aa63..release) reads usefully for the one tracking port known to exist — he is its first real reader, and the fallback his cycle runs until then is a raw diff. Worth telling him when the first one is up.
+
+#### Ports-forum posts can now cite a live tracking port, and two of its findings are upstream material [ports-forum-gains-a-live-example]
+Filed 2026-08-29 by the goal session that assessed the Egnatia-OC OpenCode port (throughliner-opencode on GitHub — a pristine-vendor tracking port, 34/34 files byte-identical to 743aa63). Bears on [ports-forum]: posts 3 and 4 (pulling changes in; declaring your flavour) can now point at a real port doing both, subject to his say-so on being named. Two of the assessment's findings are also candidates for upstream's own docs rather than only his queue: the zip-separator defect already filed as [zip-entries-use-backslash-separators] matters more now a Linux-side porter demonstrably consumes our artifacts, and his ANALYSIS.md's mapping table (Claude Code hook protocol → another harness's events) is exactly the worked example `docs/ports.md` says the mapping judgment needs — worth weighing whether ports.md should link out to ports' own analyses or stay mapping-agnostic. The full assessment survives in this session's LOG record; the pack itself was extracted and not kept.
+
+#### Scope-lock refuses the harness's plan-mode plan file [scope-lock-blocks-harness-plan-file]
+Found live 2026-08-29 in the OpenCode-port goal session. Plan mode is a harness feature: it designates one file under `~/.claude/plans/` as the only file the session may edit, and ExitPlanMode reads the plan from it. `pre_tool_use.py`'s planning branch refused the Write — the path is outside the standing list and the scratchpad test — so the session had to write the plan to the scratchpad and copy it across with a shell `cp`, which is a workaround the hook cannot see. The hook predates plan-mode plan files. Candidate: permit the harness's plans directory the way the scratchpad is permitted — it sits outside the repo, so nothing the scope-lock protects lives there. Filed under the rule that any observation of the plugin's behaviour is a testing outcome.
+
+#### Queue lint narrates after every Bash command, not only after queue edits [queue-lint-narrates-on-every-bash]
+Found live 2026-08-29 in the OpenCode-port goal session: the advisory line "5 flag(s), all of them already present in the last commit and none introduced by this change" arrived after every Bash command in the session — `git show`, `ls`, hash computations — none of which touched QUEUE.md. The lint's job is flagging format drift after a QUEUE.md edit; a line repeated after unrelated commands is noise that trains the reader to skim, which is the cry-wolf shape this project has repealed measures for. Check `post_tool_use.py`'s trigger: it appears to run its narration on Bash regardless of whether the command could have changed the queue. Candidate: emit only when the flagged set changed, or only on tools and commands that touched QUEUE.md. Filed under the rule that any observation of the plugin's behaviour is a testing outcome.
+
+#### First announced-claims sweep turn is due — the cycle has never run [announced-claims-sweep]
+Filed 2026-08-29 at a close's cycles check: the cycle's observable is the date of the most recent `LOG/` entry under its slug, and none exists. The definition was declared earlier the same day, so the honest reading is "first turn owed" rather than "a week behind"; /plan may reasonably decide the first turn rides the next weekly release, which is the rhythm the cadence was matched to. The turn itself: re-read every retained claim in `INBOX/sent.md` for retiring channels and both forums against the installed plugin, file one capture per falsified claim, check forum topic ordering, and record the turn under this slug.
+
+#### Ongoing research: how to support someone into self-hosting Throughliner, whatever their capacity [self-hosting-onboarding-research]
+**Raised by you, 2026-08-30**, at the close of the OpenCode-port goal session, when you asked that its artifacts be preserved "for reference and deriving findings for new ports" and framed the outcome sought: we know better how to support someone to become self-hosting on Throughliner, in whatever capacity that is. The standing subject: what a person needs — a porter on another harness, a consumer adopting the method, anyone in between — to reach the point where their project develops itself with the method. The first data point is on file: the OpenCode assessment pack (`resources/research/opencode-port-assessment-pack-2026-08-29.md`), whose reusable parts are the assessment lenses, findings-delivered-as-a-queue, the bootstrap gate before self-hosting, a per-port catch-up cycle, and the hand-delivered seed. What accrues here: how the Egnatia-OC injection actually goes (his bootstrap results and first /plan are the live experiment), the next port's pack, and what [setup-self-hosting-seed] and the ports-forum posts teach about the non-port capacities. For processing: decide whether this stays a standing research line the record accretes under, or spawns specific work items as findings arrive — it is deliberately not a build.
 

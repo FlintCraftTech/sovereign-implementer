@@ -1,4 +1,4 @@
-# [HASH] — The capability-claim rule reaches what an outside surface permits, not just what a tool can do
+# 819f7f1 — The capability-claim rule reaches what an outside surface permits, not just what a tool can do
 
 A `[user]` walkthrough halted mid-drive on two assumptions about Discord nobody had checked, and both were load-bearing. The rule built the previous day covers a sentence asserting what a *tool* can do; a step asserting what an outside *surface* permits is the identical failure at a site that rule did not reach — and worse there, because a walkthrough is handed to a non-coder to perform with nobody to ask.
 

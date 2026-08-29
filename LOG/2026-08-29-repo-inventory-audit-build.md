@@ -1,4 +1,4 @@
-# [HASH] — Every root and `resources/` entry now has a line saying what it is and what reads it
+# 819f7f1 — Every root and `resources/` entry now has a line saying what it is and what reads it
 
 The item came from the user saying she has no idea what half the files in the repository are for. An inventory that explains each one is the answer to that; deciding their fates is separate work, and this pass deleted nothing and proposed no fate.
 

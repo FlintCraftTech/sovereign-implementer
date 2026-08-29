@@ -1,4 +1,4 @@
-# [HASH] — The Cowork month is recorded where a session looks for the project's origin
+# 819f7f1 — The Cowork month is recorded where a session looks for the project's origin
 
 The method was developed inside Cowork for about a month before this repository existed, which is what reconciles the user's "about four months old" with a first commit of 2026-06-01. That fact lived in one article's walk-through record and nowhere else — a poor home, since a session wanting the origin story reads `CLAUDE.md`'s plugin-history section, which began at the rebuild and said nothing about what came before.
 

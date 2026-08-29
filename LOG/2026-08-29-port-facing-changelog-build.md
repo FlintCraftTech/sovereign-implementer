@@ -1,4 +1,4 @@
-# [HASH] — A port can survey what changed in the shipped package since the version it ported from
+# 819f7f1 — A port can survey what changed in the shipped package since the version it ported from
 
 The question behind this was whether a port's own sessions can read this repository's changelogs and apply what changed. They can, conditional on what the changelog carries: a human release note names no file, no rule and no wording, while this project's session records already carry exactly the right shape. Only a port-facing view of them per release was missing.
 

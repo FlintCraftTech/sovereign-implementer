@@ -1,4 +1,4 @@
-# [HASH] — `resources/captures/` is gone, and the one file only it held is safe
+# 819f7f1 — `resources/captures/` is gone, and the one file only it held is safe
 
 The folder was created to hold a session transcript too large to embed in a queue entry, so it held *attachments to* captures rather than captures — which is what made the name misleading. Its contents moved into `resources/testing/` on 2026-08-02, where re-read-later evidence belongs under the rule that `resources/` holds two things only, and the 2026-08-09 emergency revert resurrected the whole folder as a duplicate.
 

@@ -1,4 +1,4 @@
-# [HASH] — A draft the user edits is handed over as a file, not as chat text
+# 819f7f1 — A draft the user edits is handed over as a file, not as chat text
 
 Co-authoring kept being shaped as Claude work the user writes into, and the painstaking part is explaining a change to Claude when it is much easier to go in and edit the text yourself. That is the user's framing and it is the whole reason for the rule.
 

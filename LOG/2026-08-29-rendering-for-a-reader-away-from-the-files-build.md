@@ -1,4 +1,4 @@
-# [HASH] — Pointing stays the default, and a reader who cannot open the file can say so
+# 819f7f1 — Pointing stays the default, and a reader who cannot open the file can say so
 
 The render rule was unconditional and deliberately so, on the reasoning that a reader away from the file is served by the plain-English summary opening each item's discussion. That reasoning assumes the reader *could* open the file if they wanted to. On remote control there is no filesystem to open, so the pointer resolves to nothing — fine for one queue item, not fine for a fourteen-part deliverable being approved item by item.
 

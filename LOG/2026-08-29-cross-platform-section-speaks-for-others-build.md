@@ -1,4 +1,4 @@
-# [HASH] — The cross-platform section stops speaking for everyone who ports
+# 819f7f1 — The cross-platform section stops speaking for everyone who ports
 
 The section said the Codex port was shelved, that the method now evolves solely on the Claude side, and that there is no live port relationship to maintain. The first is a fact about the user's own decision; the rest spoke for everyone, and a fresh session read that paragraph to decide whether ports mattered at all — at a moment when two other people are porting Throughliner to other harnesses.
 

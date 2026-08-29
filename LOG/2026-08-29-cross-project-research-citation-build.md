@@ -1,4 +1,4 @@
-# [HASH] — A finding another project owns is copied in, and the work resting on it is flagged as a snapshot
+# 819f7f1 — A finding another project owns is copied in, and the work resting on it is flagged as a snapshot
 
 A consumer project reported that the method files and indexes research per project and has no shape for a finding one project owns and another's work depends on. Both available answers were poor: an absolute path that breaks silently, or a copy with no link to the original.
 

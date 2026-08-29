@@ -1,4 +1,4 @@
-# [HASH] — Retired artifacts are named in a shipped list, so an orphan explains itself
+# 819f7f1 — Retired artifacts are named in a shipped list, so an orphan explains itself
 
 A consumer project ran a migration that generated `BUILD-VIEW.md` at its root, the generated view was retired four days later, and their version top-up then reported nothing to do with the 15KB orphan still sitting there. A retirement removes the code that writes an artifact; it never removes the artifact from projects that already ran it.
 

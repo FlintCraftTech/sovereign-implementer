@@ -1,4 +1,4 @@
-# [HASH] — The scope-lock lets the rezip write its own archive
+# 819f7f1 — The scope-lock lets the rezip write its own archive
 
 The archive step was denied on its first ever run. A rezip runs after a close, so no build working file exists and the scope-lock classifies the session as planning — and `plugin/rezip-archive/` was not on the planning session's standing list. There was no chat shape in which the step could run at all, which is the same failure the `plugin.json` carve-out already answers one path over.
 

@@ -1,4 +1,4 @@
-# [HASH] — The posting script can create forum topics, and can address an existing one by name
+# 819f7f1 — The posting script can create forum topics, and can address an existing one by name
 
 A forum channel holds threads rather than messages, so posting to its `/messages` route returned HTTP 400 code 50008 — found by trying, on 2026-08-29, while attempting to post the showcase guidelines. Creating a topic is a different call that carries a title, and the script had no parameter for one. `send` gained `--title`, which routes to `POST /channels/{id}/threads` with the body as the topic's opening message.
 

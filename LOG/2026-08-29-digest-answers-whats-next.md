@@ -1,4 +1,4 @@
-# [HASH] — The queue digest answers "what is next" without printing everything
+# 819f7f1 — The queue digest answers "what is next" without printing everything
 
 Re-deriving the ladder's rung and its top item by hand cost about 350 tokens a pick, most of it Claude emitting the script rather than running it; re-running the whole digest instead — the route the procedure sanctioned — produces around 3,600. The sanctioned route was the expensive one, and the cost recurs at every pick because the queue changes underneath the answer.
 

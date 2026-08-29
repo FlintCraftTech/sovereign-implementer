@@ -1,4 +1,4 @@
-# [HASH] — The outbound register cannot be overwritten or deleted through Claude's tools
+# 819f7f1 — The outbound register cannot be overwritten or deleted through Claude's tools
 
 `INBOX/sent.md` is the index of everything this project has sent or posted, and it is what the repeal check greps for claims already announced. Its folder is gitignored on every path, so unlike every other project document it has no history, no backup, and one accidental deletion ends it.
 

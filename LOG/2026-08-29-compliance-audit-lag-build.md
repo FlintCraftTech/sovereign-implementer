@@ -1,4 +1,4 @@
-# [HASH] — Compliance sweep over the delta scope: five findings, and one refused on the axis
+# 819f7f1 — Compliance sweep over the delta scope: five findings, and one refused on the axis
 
 The board's audit-lag check was re-run on the day and its list taken, rather than the snapshot the item carried — which the item itself warned about, since that snapshot was computed mid-run against files the run was still editing. The live delta: `CLAUDE.md`, the four done-family docs, `feedback-and-inbox.md`, `next-audit.md` and `next.md`.
 

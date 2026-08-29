@@ -1,4 +1,4 @@
-# [HASH] — The two port flavours get names: tracking and independent
+# 819f7f1 — The two port flavours get names: tracking and independent
 
 Two flavours of port were already recognised and neither had a name, so nobody could say what a given port promised — including this project. A user choosing between ports could not tell whether the one they installed would follow the method or had gone its own way; a porter had no way to signal it; and this project could not tell which ports its changelog was even for.
 

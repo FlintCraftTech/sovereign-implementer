@@ -1,4 +1,4 @@
-# [HASH] — The planning checkpoint carries both numbers again
+# 819f7f1 — The planning checkpoint carries both numbers again
 
 The user asked for a ready count to be displayed and the other number disappeared; her words at this run's processing were that she meant both. The record proves it rather than resting on memory: the 2026-08-27 entry quotes the wording that produced the current rule, and that wording is two numbers.
 

@@ -1,4 +1,4 @@
-# [HASH] — A kept item names the files its observation reaches, not only the files it changes
+# 819f7f1 — A kept item names the files its observation reaches, not only the files it changes
 
 A /next run derives its file list from what an item says it changes, which in practice means the Changes line. An observation routinely reaches others — the suite that has to pass, the sibling doc an acceptance check greps — and twice in one run those went missing, so the run stopped mid-flight to ask for a scope addition it should never have needed.
 

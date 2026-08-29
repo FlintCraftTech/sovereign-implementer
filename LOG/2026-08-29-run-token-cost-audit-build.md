@@ -1,4 +1,4 @@
-# [HASH] — Navigation is 22% of a run's tool calls, measured on two real runs
+# 819f7f1 — Navigation is 22% of a run's tool calls, measured on two real runs
 
 The MCP-server brief proposed purpose-built tools replacing read-find-parse-write with one structured call, and its own first step was to audit a real run. This is that step. Two runs were measured separately on the user's direction, because a build run and a planning run are characteristically different — and, as she noted at this run's off-ramp, they run on different models, so the figures are not interchangeable.
 

@@ -1,4 +1,4 @@
-# [HASH] — The look-back stops claiming compaction is undetectable, and warns when the files disagree with the conversation
+# 819f7f1 — The look-back stops claiming compaction is undetectable, and warns when the files disagree with the conversation
 
 `rescan.md` said that where a conversation has been summarised the memory of it is gone, "and that is undetectable from the inside". The user's observation falsified it: a run leaves structurally recognisable traces, and a session that can still see them has not had them summarised away. The stronger version, which is what makes it mechanical rather than introspective, cross-checks the conversation against durable artifacts on disk — the build working file lists exactly which items were ticked, and thirty listed against six visible is two counts disagreeing rather than a judgement about memory.
 
