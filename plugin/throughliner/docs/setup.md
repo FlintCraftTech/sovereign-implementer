@@ -473,9 +473,16 @@ FAQ/faq.md    <-  ${CLAUDE_PLUGIN_ROOT}/templates/faq-template.md
 FAQ/index.md  <-  ${CLAUDE_PLUGIN_ROOT}/templates/faq-index-template.md
 ```
 
-**resources/research/ folder** — create it empty. It's the home for research notes
-(`resources/research/<topic>.md`). Creating it at setup means research notes have a
-place from day one rather than the folder being conjured on first use.
+**workshop/ folder, with `workshop/resources/research/` inside it** — create them
+empty. `workshop/` is where the project's working material lives — what it works
+with rather than what it ships — so someone landing on the repository sees the
+product and the method's own documents first, and everything they merely refer to
+sits in one folder that can be skipped. `workshop/resources/research/` is the home
+for research notes (`workshop/resources/research/<topic>.md`), and
+`workshop/resources/testing/` is the home for re-read-later testing evidence,
+created when there is something to put in it. Creating the research folder at setup
+means research notes have a place from day one rather than the folder being
+conjured on first use.
 
 **INBOX/ folder** — create it empty, with an `INBOX/archive/` inside it. It's this
 project's mailbox: another project you run can drop a message file in here, and

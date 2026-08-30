@@ -522,6 +522,53 @@ def test_do_not_build_still_fires():
     shutil.rmtree(root, ignore_errors=True)
 
 
+# --- placement contradictions: a capture bearing on cleared work --------------
+
+def test_capture_naming_a_cleared_item_is_flagged():
+    """The recorded instance: newly filed work invalidating cleared work.
+
+    Nothing else looks for this, and it was caught once only because one
+    session happened to be holding both entries in view.
+    """
+    root = project(
+        processed="#### Do the thing [alpha]\nRationale for alpha.\n" + BLOCK,
+        unprocessed=(
+            "#### Something learned later [beta]\n"
+            "This turns out to bear on [alpha], which cannot be built as "
+            "written.\n"
+        ),
+    )
+    _, out = run(root)
+    check(
+        "a capture naming a cleared item is flagged",
+        "[beta] is a capture whose prose names [alpha]" in out,
+        out,
+    )
+    shutil.rmtree(root, ignore_errors=True)
+
+
+def test_capture_naming_another_capture_is_not_flagged():
+    """The flag is about work about to be BUILT, so only cleared work counts.
+
+    Captures cross-reference each other constantly; firing on that would make
+    the flag noise on the first run and learned past by the second.
+    """
+    root = project(
+        processed="#### Do the thing [alpha]\nRationale for alpha.\n" + BLOCK,
+        unprocessed=(
+            "#### Something learned later [beta]\nThis bears on [gamma].\n"
+            "\n#### Something else [gamma]\nRationale for gamma.\n"
+        ),
+    )
+    _, out = run(root)
+    check(
+        "a capture naming another capture is not flagged",
+        "is a capture whose prose names" not in out,
+        out,
+    )
+    shutil.rmtree(root, ignore_errors=True)
+
+
 # --- the retired cleared-item-with-no-build-block report ---------------------
 #
 # Retired 2026-08-27 ([builds-read-the-queue-again]). It existed because a run
@@ -719,7 +766,7 @@ def test_incoming_citations_are_computed_not_guessed():
 
 def _with_research(root, name, body):
     """Drop a research file into a fixture project."""
-    folder = os.path.join(root, "resources", "research")
+    folder = os.path.join(root, "workshop", "resources", "research")
     os.makedirs(folder, exist_ok=True)
     with open(os.path.join(folder, name), "w", encoding="utf-8") as f:
         f.write(body)
@@ -947,6 +994,8 @@ if __name__ == "__main__":
     test_absent_blocker_is_not_a_loop()
     test_built_into_is_not_a_do_not_build_phrase()
     test_do_not_build_still_fires()
+    test_capture_naming_a_cleared_item_is_flagged()
+    test_capture_naming_another_capture_is_not_flagged()
     test_no_build_block_report_survives()
     test_no_git_degrades_quietly()
     test_age_prints_in_this_repository()

@@ -269,7 +269,24 @@ def test_session_start_state_lines_lead_the_payload():
           0 <= state <= 2048, "state line at " + str(state))
     flags = ctx.find("UNCLEARED RED FLAG(S)")
     if flags != -1:
-        check("SessionStart: red flags lead the payload", flags == 0, "at " + str(flags))
+        # Only ONE thing may precede the red-flag notice: the format-migration
+        # halt. Both claim primacy and the halt wins, because it says the
+        # session's whole picture of the project may be stale — including the
+        # queue the flag was read from. Written as an exception rather than by
+        # relaxing the check to "somewhere near the front", so that anything
+        # ELSE arriving above the flag still fails here.
+        #
+        # The collision is real rather than theoretical: it appeared the first
+        # time this project simultaneously carried an uncleared flag and fell
+        # behind the format epoch, and until then the check had never fired at
+        # all.
+        halt = ctx.find("PROJECT FORMAT OUT OF DATE")
+        allowed = 0 if halt == -1 else 1
+        preceding = sum(1 for pos in (halt,) if 0 <= pos < flags)
+        check("SessionStart: nothing but the migration halt precedes the "
+              "red-flag notice",
+              flags == 0 or preceding == allowed,
+              "flags at %s, halt at %s" % (flags, halt))
     else:
         print("  skip SessionStart: no uncleared red flags in this project right now")
 
@@ -341,7 +358,7 @@ def test_pre_tool_use_in_scope_is_silent():
 
 
 def test_pre_tool_use_retired_terms_is_writable():
-    """resources/retired-terms.md is writable with a build running.
+    """workshop/resources/retired-terms.md is writable with a build running.
 
     The method requires a session that retires a term to append it here, and
     retirement is discovered DURING a build — so this path can never be in a
@@ -349,7 +366,7 @@ def test_pre_tool_use_retired_terms_is_writable():
     obligation is satisfiable only in an undocumented window at the close.
     """
     d = _scoped_project("- allowed.md")
-    target = os.path.join(d, "resources", "retired-terms.md")
+    target = os.path.join(d, "workshop", "resources", "retired-terms.md")
     rc, out, err = drive("pre_tool_use.py",
                          {"hook_event_name": "PreToolUse", "cwd": d,
                           "session_id": TEST_SESSION_ID,

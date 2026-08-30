@@ -318,7 +318,7 @@ work reaches the cleared region.
 definition is in skill-nonspecific-rules.md's Scope section); the `Files:` list
 below is its mechanical approximation: pre_tool_use allows edits only
 to listed files (plus the method docs, the user's memory dir,
-`resources/research/`, the session scratchpad, and any project's `INBOX/`) and
+`workshop/resources/research/`, the session scratchpad, and any project's `INBOX/`) and
 denies the rest, as a backstop. **The two layers are not the same thing** — a build
 can stay inside every listed file and still do more than the work describes. The
 described work is the test; the `Files:` list is the guardrail.
@@ -481,7 +481,7 @@ only describe what is already built.
 gives below: a bare positional line attaches to whichever tick it happens to sit
 under, and a later tick written above it silently takes it. The LOG-entry
 `Rule gate:` format is unchanged and stays slugless — that line describes the
-session, not one item, and `resources/rule_signals.py` reads it as it is.
+session, not one item, and `workshop/resources/rule_signals.py` reads it as it is.
 
 **The tick is the accumulation point.** `Progress:`, `Index entry candidates:`
 and `Changes:` all grow one item at a time, at the tick and never later, so the

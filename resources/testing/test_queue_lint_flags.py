@@ -116,6 +116,46 @@ def test_valid_red_flag_states_are_not_flagged():
               f"got: {warnings}")
 
 
+def test_mid_line_marker_is_flagged():
+    """The live instance: a marker at the end of a prose sentence.
+
+    Every reader of these three fields anchors to the start of a line, so a
+    mid-line marker is invisible to all of them and nothing errors.
+    """
+    lint = load_lint()
+    for marker in ("Red flag · State: uncleared", "Blocked by: [alpha]",
+                   "Not before: 2026-09-01", "Cycle: [tips-posting]"):
+        bad = CLEAN.replace(
+            "Rationale for beta.",
+            f"Rationale for beta, and it records public claims. {marker}")
+        warnings = [w for w in lint(bad) if "mid-line" in w]
+        check(f"a mid-line '{marker.split(':')[0]}:' is flagged", warnings,
+              f"got: {lint(bad)}")
+
+
+def test_marker_on_its_own_line_is_not_flagged():
+    """The other half — the canonical shape, and the tolerated emphasis."""
+    lint = load_lint()
+    for written in ("Red flag · State: uncleared", "**Blocked by:** [alpha]",
+                    "Not before: 2026-09-01", "Cycle: [tips-posting]"):
+        ok = CLEAN.replace("Rationale for beta.",
+                           f"Rationale for beta.\n{written}")
+        warnings = [w for w in lint(ok) if "mid-line" in w]
+        check(f"'{written}' on its own line is not flagged", not warnings,
+              f"got: {warnings}")
+
+
+def test_marker_quoted_in_a_fence_is_not_flagged():
+    """A fenced block legitimately SHOWS the shape; quoting is not writing."""
+    lint = load_lint()
+    ok = CLEAN.replace(
+        "Rationale for beta.",
+        "Rationale for beta.\n\n```\nBlocked by: [slug]   # the line format\n```")
+    warnings = [w for w in lint(ok) if "mid-line" in w]
+    check("a marker quoted inside a fence is not flagged", not warnings,
+          f"got: {warnings}")
+
+
 def test_orphaned_prose_is_flagged():
     lint = load_lint()
     bad = CLEAN.replace("## Processed\n",
@@ -481,6 +521,9 @@ if __name__ == "__main__":
     test_missing_section_heading_is_flagged()
     test_invalid_red_flag_state_is_flagged()
     test_valid_red_flag_states_are_not_flagged()
+    test_mid_line_marker_is_flagged()
+    test_marker_on_its_own_line_is_not_flagged()
+    test_marker_quoted_in_a_fence_is_not_flagged()
     test_orphaned_prose_is_flagged()
     test_date_held_item_needs_no_blocker()
     test_held_item_with_neither_is_flagged()

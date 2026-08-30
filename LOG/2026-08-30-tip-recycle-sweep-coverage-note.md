@@ -1,4 +1,4 @@
-# [HASH] — plan — the announcement-sweep coverage note carried into the record and its item deleted, one close late
+# 077b8b9 — plan — the announcement-sweep coverage note carried into the record and its item deleted, one close late
 
 Settled 2026-08-29 as a finding whose home is the session record; the close that was meant to carry it missed it, caught only because the ladder re-presented the item — the queue doing its job. Re-confirmed against the same-day ruling that audit findings belong in the queue: that ruling protects findings nobody has weighed, and this one was weighed to completion. This entry is the carry; the item is deleted in the same move.
 

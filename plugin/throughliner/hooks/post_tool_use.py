@@ -639,7 +639,10 @@ RULE_GATE_LINE = re.compile(r"^\*{0,2}Rule gate:?\*{0,2}\s", re.IGNORECASE)
 
 # The rule gate's own trigger-path set, as enumerated in the host CLAUDE.md.
 # Literal substrings, matched against an item's whole block: an item whose
-# work touches any of these is authoring or amending a method rule.
+# work touches any of these is authoring or amending a method rule. The
+# `resources/` entries are written unprefixed deliberately — as substrings they
+# match the `workshop/resources/` form these files moved to as well as the old
+# root path, so a project mid-migration is covered from both sides.
 GATE_TRIGGER_PATHS = (
     "plugin/throughliner/docs/",
     "resources/self-authoring-rules.md",
@@ -749,6 +752,57 @@ def _check_cleared_names_queue(annotated, blocks, warnings):
 # records to match a vocabulary they predate.
 
 
+# The three field markers whose readers are ALL anchored to the start of a
+# line — the queue digest's flag scan, the session opening's dependency facts,
+# this lint, and the queue mover. A marker written mid-line is therefore
+# invisible to every one of them, and it fails silently: nothing errors, the
+# field simply does not exist as far as the tools are concerned.
+#
+# The instance: an item's red flag sat at the end of a prose sentence and the
+# digest never reported it, so the ordering ladder's "an uncleared red flag
+# outranks everything" rung fired by luck rather than by machinery. A vanished
+# `Blocked by:` or `Not before:` is worse still — it releases held work early.
+#
+# Flagging at the WRITING end is the deliberate choice. The tolerate-at-the-
+# reading-end move has already been taken twice in this family (widening the
+# patterns for a bolded `Rule gate:`), and it leaves the deviation itself
+# invisible. One canonical shape, checked where it is written.
+MID_LINE_MARKERS = ("Red flag · State:", "Blocked by:", "Not before:",
+                    "Cycle:")
+
+
+def _check_mid_line_markers(annotated, warnings):
+    """Flag a field marker that is not at the start of its line."""
+    in_fence = False
+    for i, line, h2, is_heading in annotated:
+        if line.startswith("```"):
+            in_fence = not in_fence
+            continue
+        # A fenced block is where the markers are legitimately QUOTED — the
+        # section preamble shows the line format, and an item may show one as
+        # an example. Quoting a shape is not writing a field.
+        if in_fence or is_heading:
+            continue
+        if h2 not in ("Processed", "Unprocessed"):
+            continue
+        for marker in MID_LINE_MARKERS:
+            pos = line.find(marker)
+            if pos <= 0:
+                continue
+            # `**Blocked by:` is the ordinary Markdown instinct and every
+            # reader tolerates the emphasis, so it is not a deviation.
+            if line[:pos].strip("*") == "":
+                continue
+            warnings.append(
+                f"line {i + 1}: '{marker}' appears mid-line rather than at the "
+                "start of its own line. Every tool that reads this field — the "
+                "queue digest, the session opening, this lint, the queue mover "
+                "— anchors to the start of a line, so as written the field is "
+                "invisible to all of them and fails silently. Put it on its own "
+                "line."
+            )
+
+
 def lint(content: str) -> list[str]:
     annotated = _annotate(content)
     blocks = _workline_blocks(annotated)
@@ -757,6 +811,7 @@ def lint(content: str) -> list[str]:
     _check_heading_articles(blocks, warnings)
     _check_sections(annotated, warnings)
     _check_red_flag_states(annotated, warnings)
+    _check_mid_line_markers(annotated, warnings)
     _check_readiness_marker(annotated, blocks, warnings)
     _check_blocked_by(annotated, blocks, warnings)
     _check_orphaned_prose(annotated, warnings)

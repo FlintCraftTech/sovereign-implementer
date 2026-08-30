@@ -67,9 +67,8 @@ Follow done.md's **LOG entry files** section, using its **Audit** body fields:
 ```
 Files touched       the target artifacts READ — the audit edited nothing
 Routed to Captures  findings captured, or "none"
-Approval outcomes   what happened at bulk approval — findings dropped or
-                    reworded, each with the user's reason; or "all findings
-                    approved as-is"
+Findings routing    how many were filed as captures, and any dropped on
+                    Claude's own re-reading before filing, with the reason
 ```
 
 **An audit item that itself carries a `Red flag · State:` marker:** its flag was

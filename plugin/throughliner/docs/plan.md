@@ -29,7 +29,7 @@ gets built first — through discussion, not silently.
   skill-nonspecific-rules.md's approval-time outputs.
 - **A planning session is scope-locked to a standing list, and a write outside it
   is denied.** Writable: QUEUE.md, SPEC.md, CYCLES.md, `LOG/`, `FAQ/`,
-  `resources/research/`, the scratchpad and the memory directory. Everything
+  `workshop/resources/research/`, the scratchpad and the memory directory. Everything
   else is work — including a template, whose edit reaches every future
   consumer — and work is
   queued rather than done here, which is what this doc's opening already
@@ -692,6 +692,15 @@ not counted toward the session's floor. It returns by itself once every named
 entry has been processed or built — the digest prints each named blocker's
 resolved state on the capture's own line, so this reads a computed field too.
 
+**Pass over any Unprocessed entry whose `Cycle:` names a definition in the
+project's cycles doc** [SILENT], on the same terms. The field says which cycle
+owns the entry as its material, so that cycle's turns draw from it and the
+ranking does not: it is not ranked, not presented and not counted toward the
+session's floor. A `Cycle:` naming a definition that is not in the doc ranks
+normally, so deleting a cycle releases its material by itself — the same
+self-lifting shape as the two arms above, and the digest prints the field, so
+this reads a computed field too.
+
 **The fallback ladder — internal, and applied rather than offered.** When nothing
 meaningfully unblocks anything else, work down it:
 
@@ -1007,7 +1016,7 @@ thing, or is one overturning the other?
 stays prose.
 
 **An item that passes both limbs carries its instructions in its own prose,
-written here.** Five things, one line each, in the item's text where the run
+written here.** Six things, one line each, in the item's text where the run
 reads them:
 
 ```
@@ -1016,7 +1025,17 @@ which files the work READS but does not change   # where any do
 the observation that shows the change landed
 the files that observation REACHES, named among the files that change
 any option already refused, and why it lost      # one line each, where any
+what the design RESTS ON, and when each was      # the external facts, one
+  last verified                                    line each, where any
 ```
+
+**The rests-on line names the external facts the design assumes — a tool's
+capability, what an outside surface permits, a version, a finding filed
+elsewhere — with the date each was last checked.** An assumption written into an
+item reads exactly like a verified one, and goes stale silently; dated on the
+item, a premise that has aged is visible where the work is, rather than only
+when something fails against it. Most kept items grow by about a line, which is
+the cost, paid at every keep.
 
 **Write them for a reader with less of the project in view than you have, and
 possibly less capability.** The session that builds this did not sit through the
@@ -1058,7 +1077,7 @@ usually finished, and rejecting it whole would discard that.
 
 **The second limb also asks whether this is work at all.** Ask what changes inside
 which files and get "nothing" back, and the item is a **finding**, not work — its
-home is `resources/` or the LOG under the three-way triage, not Processed. Route it
+home is `workshop/resources/` or the LOG under the three-way triage, not Processed. Route it
 there and delete the queue item.
 
 **And where an item asserts how a mechanism behaves, read the mechanism before
@@ -1115,6 +1134,15 @@ cadence — declared by the user or derived from the record, and the definition
 says which — and **the observable that marks a completed turn**. The openings
 and closes then compute due-ness from that observable and file a capture when a
 turn is due; nothing stores a position.
+
+**An observable read from the project's own `LOG/` must be distinguishable from
+the records planning itself writes.** A planning run writes one record per item
+it processes, named by that item's slug — including the record for authoring the
+cycle — so an observable reading "the most recent record under this cycle's slug"
+counts the authoring record as a completed turn and reports the cycle as run
+before it has ever run once. The cheap form, written into the definition: each
+turn's record opens by saying that it records a completed turn, and the
+observable reads only those records.
 
 **And where the user asks for a named step list with no schedule, author it here
 as a ritual** — into the same cycles doc, carrying the artifact, the steps,

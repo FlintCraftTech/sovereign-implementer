@@ -268,6 +268,116 @@ def whoami(token):
     return request(token, "GET", "/users/@me")
 
 
+# The permission bits worth naming when the question is "who can change things
+# here". The full set runs to fifty-odd flags, most of them voice and stage
+# permissions this server does not use; a listing that prints all of them is
+# one nobody reads. The raw bitfield is printed alongside, so nothing is
+# hidden — a flag not named here is still visible as a number.
+PERMISSION_BITS = (
+    ("ADMINISTRATOR", 1 << 3),
+    ("MANAGE_CHANNELS", 1 << 4),
+    ("MANAGE_GUILD", 1 << 5),
+    ("VIEW_CHANNEL", 1 << 10),
+    ("SEND_MESSAGES", 1 << 11),
+    ("MANAGE_MESSAGES", 1 << 13),
+    ("ATTACH_FILES", 1 << 15),
+    ("MENTION_EVERYONE", 1 << 17),
+    ("MANAGE_ROLES", 1 << 28),
+    ("MANAGE_WEBHOOKS", 1 << 29),
+    ("MANAGE_THREADS", 1 << 34),
+    ("CREATE_PUBLIC_THREADS", 1 << 35),
+    ("SEND_MESSAGES_IN_THREADS", 1 << 38),
+)
+
+
+def decode_permissions(value):
+    """Name the notable bits set in a Discord permission bitfield."""
+    try:
+        bits = int(value or 0)
+    except (TypeError, ValueError):
+        return []
+    return [name for name, bit in PERMISSION_BITS if bits & bit]
+
+
+def permissions(token):
+    """Every guild's roles and every channel's permission overwrites.
+
+    A pure read: no send, no edit, nothing on the server changes. It exists
+    because a permission question was otherwise unanswerable from here — the
+    bot could post and prune but could not report who is allowed to do what,
+    so a capability claim about a channel could only be tested by acting on it.
+
+    What it CANNOT tell you, stated because a listing invites over-reading: a
+    member's effective permissions are their roles combined with these
+    overwrites and with channel ownership, which this does not compute. It
+    reports what is granted and denied, and the reader does the combining.
+    """
+    out = []
+    for guild in request(token, "GET", "/users/@me/guilds") or []:
+        entry = {"guild": guild.get("name", guild["id"]), "roles": [],
+                 "channels": []}
+        roles = request(token, "GET", "/guilds/%s/roles" % guild["id"]) or []
+        by_id = {}
+        for role in roles:
+            by_id[role["id"]] = role.get("name", role["id"])
+            entry["roles"].append({
+                "name": role.get("name", role["id"]),
+                "id": role["id"],
+                "raw": role.get("permissions", "0"),
+                "named": decode_permissions(role.get("permissions")),
+            })
+        channels = request(
+            token, "GET", "/guilds/%s/channels" % guild["id"]) or []
+        for channel in channels:
+            overwrites = []
+            for over in channel.get("permission_overwrites") or []:
+                # type 0 is a role, type 1 a single member. A member overwrite
+                # is reported by id only: resolving it would mean naming a
+                # person in a file this project commits.
+                if over.get("type") == 0:
+                    who = by_id.get(over["id"], "role %s" % over["id"])
+                else:
+                    who = "a member (id %s)" % over["id"]
+                overwrites.append({
+                    "who": who,
+                    "allow": decode_permissions(over.get("allow")),
+                    "deny": decode_permissions(over.get("deny")),
+                })
+            entry["channels"].append({
+                "name": channel.get("name", channel["id"]),
+                "id": channel["id"],
+                "type": channel.get("type"),
+                "overwrites": overwrites,
+            })
+        out.append(entry)
+    return out
+
+
+def threads(token):
+    """Every open forum topic the bot can see, grouped by its parent forum.
+
+    `active_threads()` has worked since forum-topic creation was added, and
+    nothing exposed it on the command line — so a session needing the list
+    wrote a throwaway `python -c` against the module, which is the shape this
+    project's tooling rules push work away from. Two standing pieces of work
+    need exactly this list: the announced-claims sweep reads each forum's topic
+    order every turn, and the how-to re-homing reads where a topic sits after
+    each post.
+    """
+    parents = {}
+    for guild in request(token, "GET", "/users/@me/guilds") or []:
+        for channel in request(
+                token, "GET", "/guilds/%s/channels" % guild["id"]) or []:
+            parents[channel["id"]] = channel.get("name", channel["id"])
+    grouped = {}
+    for thread in active_threads(token):
+        parent = parents.get(thread.get("parent_id"),
+                             "unknown parent %s" % thread.get("parent_id"))
+        grouped.setdefault(parent, []).append(
+            (thread["id"], thread.get("name", "")))
+    return grouped
+
+
 # --- the operations ---------------------------------------------------------
 
 def read_text(path):
@@ -667,6 +777,15 @@ def main(argv=None):
 
     sub.add_parser("whoami", help="report the bot's own account")
 
+    sub.add_parser(
+        "permissions",
+        help="read-only: the guild's roles and each channel's permission "
+             "overwrites. Changes nothing on the server.")
+
+    sub.add_parser(
+        "threads",
+        help="read-only: every open forum topic, with its id, grouped by forum")
+
     args = parser.parse_args(argv)
 
     try:
@@ -742,6 +861,43 @@ def main(argv=None):
                 print()
             if found:
                 print("%d item(s) since %s." % (len(found), args.since))
+
+        elif args.command == "permissions":
+            for guild in permissions(token):
+                print("=== %s ===" % guild["guild"])
+                print("-- roles --")
+                for role in guild["roles"]:
+                    print("  %s (id %s)  raw=%s"
+                          % (role["name"], role["id"], role["raw"]))
+                    print("    %s" % (", ".join(role["named"]) or "(none of "
+                                      "the notable bits)"))
+                print("-- channel overwrites --")
+                for channel in guild["channels"]:
+                    if not channel["overwrites"]:
+                        continue
+                    print("  #%s (type %s, id %s)"
+                          % (channel["name"], channel["type"], channel["id"]))
+                    for over in channel["overwrites"]:
+                        print("    %s" % over["who"])
+                        print("      allow: %s"
+                              % (", ".join(over["allow"]) or "-"))
+                        print("      deny:  %s"
+                              % (", ".join(over["deny"]) or "-"))
+                print("A channel with no overwrites inherits its roles' "
+                      "permissions unchanged and is not listed above.")
+                print("This reports what is granted and denied. It does not "
+                      "compute any member's effective permissions, which "
+                      "combine their roles with these overwrites.")
+
+        elif args.command == "threads":
+            grouped = threads(token)
+            if not grouped:
+                print("No open forum topics visible to the bot. Archived "
+                      "topics are not listed.")
+            for parent in sorted(grouped):
+                print("=== #%s ===" % parent)
+                for thread_id, name in grouped[parent]:
+                    print("  %s  %s" % (thread_id, name))
 
         elif args.command == "whoami":
             me = whoami(token)

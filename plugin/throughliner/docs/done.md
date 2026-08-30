@@ -107,9 +107,6 @@ red-flag lifecycle, the wind-down re-scan. Combine what they turn up into one
 **The wind-down re-scan's numbered set is its own message**, being something the
 user must act on.
 
-**Run the scrub checklist before writing a LOG entry** (skill-nonspecific-rules.md,
-Scrub before writing).
-
 ## Staleness sweep  [SILENT] when clean; [BRIEF] when flagging
 
 The build and audit close-outs point here. Quick check of the remaining work items
@@ -367,7 +364,7 @@ move: if the closing session discovers a needed verification that isn't already 
 tracks it in a dedicated section, and **no LOG-only prose stands in for the queue
 line** — an unrun check recorded only in a log entry never surfaces again.
 
-## Triage any waiting mail  [SILENT] when the mailbox is empty; [BRIEF] when it isn't
+## Triage any waiting mail  [SILENT] when the mailbox is empty; [BRIEF] when mail is triaged with nothing to send; [PROMPT] where a reply is drafted
 
 Read anything still sitting in this project's `INBOX/`, route it through the
 three-way triage, and move each file to `INBOX/archive/`. Full mechanics —

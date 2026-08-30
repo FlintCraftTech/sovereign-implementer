@@ -194,7 +194,7 @@ contested decision.
 — `Rule gate: <slug> — run, …` — for the same reason and in the same pass. The
 line the close then writes into the session's LOG entry stays slugless: it
 describes the session rather than one item, which is the form
-`resources/rule_signals.py` reads.
+`workshop/resources/rule_signals.py` reads.
 
 **A built slug with no depth line is read as short**, and noted at the close as
 a discipline slip rather than passing silently: the field is required, so a
@@ -218,9 +218,7 @@ one — the existing entry is the record, not a duplicate.
 
 **Close each `[user]` item on one of the three outcomes — done, deferred, or not
 reached — read off the run's own trail** (done.md's outcome block, and next.md's
-walk-through branch, carry the definitions). **`deferred` requires the user's own
-word**; an item the run never presented is `not reached`, and the next session
-presents it fresh.
+walk-through branch, carry the definitions).
 
 If a built item carried a red flag, note in this entry that it carried one and
 that it was cleared — the carry-through, since the substantive clearing record was

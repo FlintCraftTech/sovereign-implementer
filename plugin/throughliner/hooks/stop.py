@@ -21,7 +21,7 @@ report is not a judgment about meaning — it is a named artifact that is absent
 This is the check-the-world rule the method already applies to `[user]` items,
 turned on Claude's own claims.
 
-WHY `Stop` AND NOT `PreToolUse`. `resources/research/hook-enforced-doc-reading.md`
+WHY `Stop` AND NOT `PreToolUse`. `workshop/resources/research/hook-enforced-doc-reading.md`
 establishes that PreToolUse can read the transcript and deny. That is the wrong
 surface here: a false report is text with NO tool call attached, so a hook gated
 on tool calls never fires on it. `Stop` fires when Claude finishes responding and

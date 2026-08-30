@@ -188,7 +188,7 @@ E2E = [
     (os.path.join("LOG", "2026-08-15-entry.md"), "pass", "a log entry passes"),
     # Load-bearing: the always-loaded rules require a research finding to be
     # filed as part of using it, so denying this path would break a shipped duty.
-    (os.path.join("resources", "research", "a-finding.md"), "pass",
+    (os.path.join("workshop", "resources", "research", "a-finding.md"), "pass",
      "research is writable in a planning session"),
     (os.path.join("FAQ", "faq.md"), "pass",
      "the FAQ is writable — the close is required to dispose of it"),

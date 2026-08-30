@@ -15,7 +15,8 @@ PreToolUse hook — enforces three rules:
 1. During a build, the session's own build working file
    (_build-<session-id>.md) has a Files: section governing which files are
    editable (method docs — QUEUE.md, LOG/, that working file — plus the user's
-   memory dir, resources/research/, the session scratchpad dir, TOOLS.md, and
+   memory dir, workshop/resources/research/, the session scratchpad dir,
+   TOOLS.md, and
    any project's INBOX/ are always editable). Tri-state:
    no Files: section = no enforcement;
    section present but empty = method docs only; entries listed = only
@@ -508,9 +509,9 @@ def _is_memory_dir(filepath: str) -> bool:
 
 
 def _is_research_dir(filepath: str, cwd: str) -> bool:
-    """Check if a path is under the project's resources/research/ folder.
+    """Check if a path is under the project's workshop/resources/research/ folder.
 
-    Research notes are filed under resources/research/<topic>.md the moment a
+    Research notes are filed under workshop/resources/research/<topic>.md the moment a
     finding is produced (skill-nonspecific-rules.md Research > Filing), and that
     filing is open to every session type — build, test, or audit. The
     scope-lock must not block it, so this folder is always editable, mirroring
@@ -518,12 +519,13 @@ def _is_research_dir(filepath: str, cwd: str) -> bool:
     root, so it holds wherever the project lives.
     """
     norm = _normalise(filepath)
-    research_dir = _normalise(os.path.join(cwd, "resources", "research"))
+    research_dir = _normalise(
+        os.path.join(cwd, "workshop", "resources", "research"))
     return norm.startswith(research_dir + os.sep) or norm == research_dir
 
 
 def _is_retired_terms_file(filepath: str, cwd: str) -> bool:
-    """Check if a path is the project's resources/retired-terms.md.
+    """Check if a path is the project's workshop/resources/retired-terms.md.
 
     Exempt for a structural reason, not a convenient one. The method requires a
     session that retires a term to append it to this file. Retirement is
@@ -554,7 +556,7 @@ def _is_retired_terms_file(filepath: str, cwd: str) -> bool:
     instance of this problem.
     """
     return _normalise(filepath) == _normalise(
-        os.path.join(cwd, "resources", "retired-terms.md"))
+        os.path.join(cwd, "workshop", "resources", "retired-terms.md"))
 
 
 def _is_tools_file(filepath: str, cwd: str) -> bool:
@@ -718,7 +720,7 @@ def _is_plan_quiet_path(filepath: str, cwd: str) -> bool:
 
     This is the planning session's STANDING list — QUEUE.md, SPEC.md,
     CYCLES.md, LOG/ and
-    FAQ/, plus the memory directory, `resources/research/`, the scratchpad and
+    FAQ/, plus the memory directory, `workshop/resources/research/`, the scratchpad and
     any INBOX (checked by their own helpers at the call site). Everything else
     is DENIED.
 
@@ -737,7 +739,7 @@ def _is_plan_quiet_path(filepath: str, cwd: str) -> bool:
     the method on 2026-08-14 must not come back: a fixed list needs no per-session
     file to hold it.
 
-    `resources/research/` is on the list because it must be. plan.md's own ground
+    `workshop/resources/research/` is on the list because it must be. plan.md's own ground
     rules resolve research in-session, and the always-loaded rules REQUIRE a
     finding to be filed as part of using it — so denying that path would break a
     shipped duty rather than merely inconvenience a session.
@@ -796,7 +798,7 @@ def _is_plan_quiet_path(filepath: str, cwd: str) -> bool:
         return True
     if rel.startswith(os.path.normcase("LOG") + "/"):
         return True
-    # FAQ/ is on the list for the same reason resources/research/ is: the close
+    # FAQ/ is on the list for the same reason workshop/resources/research/ is: the close
     # REQUIRES an FAQ disposition, so denying the path would break a mandated
     # step rather than merely inconvenience a session. Recovered from the
     # pre-reversion version of this gate, which carried it and said so; the

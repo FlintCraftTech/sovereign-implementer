@@ -1,4 +1,4 @@
-# [HASH] — plan — the audit close's Approval outcomes field becomes Findings routing
+# 077b8b9 — plan — the audit close's Approval outcomes field becomes Findings routing
 
 The field's only truthful value asserted an approval the audit procedure repealed — eviction debt, the step retired and its artifact left. Replace won over delete because the procedure still allows one thing worth recording: a finding dropped on Claude's own re-reading before filing, with its reason. The ripple was traced by grep at processing: the wording lives in one place, the one other "bulk approval" hit is the general inversions block (correct, excluded), and no announced claim is touched.
 

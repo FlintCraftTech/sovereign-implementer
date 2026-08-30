@@ -1,4 +1,4 @@
-# [HASH] — plan — the repo cleanup designed: root pared to product and method docs, workshop absorbs the rest, bot gets its own folder
+# 077b8b9 — plan — the repo cleanup designed: root pared to product and method docs, workshop absorbs the rest, bot gets its own folder
 
 Designed with the inventory in front of us, so the audit hold dropped. The user's principle governs every call: only what is part of Throughliner stays tracked and in view, because someone shopping online for a method should see the method. Moved rather than gitignored, on Claude's recommendation and her agreement, because much of the material is machinery a close depends on — ignored files live on one machine with no history. Settled along the way: the bot gets `workshop/bot/` (script, welcome, its Discord avatar — the `.svg` she identified as the bot's live avatar), the badge png becomes the README's logo (it stops being unreferenced by being used), `FABLE-BRIEF.md` and `reader-test-workflow.js` are deleted on her word, and the `.pytest_cache` fossil is removed. One `[user]` consequence flagged for the build: the permission rule and CYCLES.md name the bot script's current path.
 

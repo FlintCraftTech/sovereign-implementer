@@ -308,7 +308,8 @@ TABLE_HEAD = ["| month | n | min | median | mean | max |",
 
 def report(root):
     lines = ["# Written-shape length growth", "",
-             "**Measured**, by `resources/measure_written_shape_length.py`. "
+             "**Measured**, by the plugin's "
+             "`scripts/measure_written_shape_length.py`. "
              "Every figure is a word count against a date. No threshold is "
              "stated here and none may be read off the middle of these "
              "distributions — this is the corpus the measurement exists to "

@@ -370,6 +370,16 @@ Per-post manual copying stays available whenever Alex prefers it. The bot's envi
 
 **At a close, check whether at least one full /plan session AND one full /next session have run on the installed build since its rezip.** Read that from the `LOG/` records dated after the install date the session opening reports. Both run → the new entry is ready to draft. **An entry describes a build that has been exercised, not a fresh one, which is why the readiness test is sessions rather than time — there is no timing to this.**
 
+**The close's session record carries one of these lines, whichever the check found:**
+
+```
+Rezip entry: ready — <version>, one /plan and one /next since <date>
+Rezip entry: not yet — <version>, <which half is missing>
+Rezip entry: none — no rezip since the last entry was posted
+```
+
+Without it a clean run and a run that never happened look identical afterwards, which is how a 23-item close skipped this entirely and nobody would have known had the user not asked why the previous rezip was unposted. The check had no site — it lives here, outside the sequence `done.md` and its flavor sub-doc work through — and no artifact, and the line is the missing artifact. Same required-artifact shape as the rule-gate, forward-advisory and FAQ dispositions beside it, carrying the same honest limit: a line can be written dishonestly and nothing checks that. What it buys is that a **missing** line is visible.
+
 **The entry's lifecycle is two steps.**
 
 ```
@@ -426,6 +436,8 @@ No Editor or Working mode field. Both were retired on 2026-08-09 — the desktop
 ## Current state
 
 **Status:** Target v1.20.0. Repo on GitHub, method docs set up (/setup complete).
+
+**Priority, the user's word 2026-08-29: ports are the current number-one priority.** Dated so its age is visible when the focus moves on — one sentence to update on her word. It was previously carried only by where the port items sat in the queue, and a single planning session buried them under a dozen newer cleared entries the day after she said it, so placement is not the carrier. SPEC was refused as a home (ports being supported is product truth; a current focus is not), and so was the memory project (it ranks projects against each other, while this must reach a fresh session opening this one).
 
 ## Method docs
 

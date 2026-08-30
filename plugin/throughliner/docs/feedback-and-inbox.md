@@ -130,7 +130,7 @@ outcome of the triage's own: work to do becomes a capture in Unprocessed — and
 a message bearing on this project's own product or design routes as a capture
 even where the sender frames it as informational or as handling its own side; a
 finding goes to the LOG, which is for what calls for no change here; evidence
-to re-read goes under `resources/`, **and a
+to re-read goes under `workshop/resources/`, **and a
 message that asks a question is owed a reply** — note the debt at triage, and
 draft the reply once the question has an answer: at that moment in a planning
 chat, at the close for a run. A defect report is owed nothing by default. The
@@ -264,10 +264,7 @@ sending project is the user's own.
 
 **The return path is safe to write because the recipient's `INBOX/` is
 gitignored, which the send already confirms** — see the gitignore check below,
-which refuses to send where it is not. This supersedes an earlier refusal in
-this doc, which held that writing a path into another project's repository
-risked committing it: that reasoning predates the check, and with the check in
-place the file is never committed.
+which refuses to send where it is not.
 
 Both, because they fail differently. The filename is readable without opening
 anything, which is what makes a mailbox triageable — and it is the half any

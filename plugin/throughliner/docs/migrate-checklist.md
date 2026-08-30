@@ -2,12 +2,12 @@
 name: migrate-checklist
 docset: current
 note: >
-  Loaded on demand when a project's QUEUE.md is in an old format and needs
-  converting to the two-section model. A guided manual pass in an ordinary
-  session, usually during /setup.
+  Loaded on demand when a project's documents are on an older format than the
+  plugin expects. A guided manual pass in an ordinary session, usually during
+  /setup.
 ---
 
-# QUEUE.md migration checklist — old format → two-section
+# Format migration checklist — older format → current
 
 **This doc carries no response-shape tags** (the bracketed `[BRIEF]`-style
 markers other procedure docs use); the prose in each step carries the behaviour
@@ -19,10 +19,12 @@ item, drafting the converted queue and **getting the user's approval before
 writing, because a project being migrated may have been adopted moments ago and
 may not be a committed git repo — so there may be nothing to recover.**
 
-**When this applies.** A project's `QUEUE.md` format is the one project doc that
-reliably falls behind as the method evolves. LOG is already per-entry + index,
-CLAUDE.md is topped up by session_start, and SPEC is format-agnostic — so they need
-little or nothing.
+**When this applies.** A project's `QUEUE.md` format is the project doc that most
+reliably falls behind as the method evolves, and most of what follows converts it.
+LOG is already per-entry + index, CLAUDE.md is topped up by session_start, and
+SPEC is format-agnostic — so they need little or nothing. **An epoch section may
+also move a folder rather than convert a document**, where the method has changed
+where something lives; each section says what it does.
 
 ```
 recorded epoch below FORMAT_EPOCH  ->  convert with this checklist, running
@@ -176,6 +178,50 @@ below the readiness line.
 
 Cleared `[user]` and `[freeform]` items are counted separately, on the same
 line, as items that need no block — neither is built from one.
+
+## Epoch 5 — `workshop/`, and `resources/` moves inside it
+
+**This epoch moves a folder rather than converting the queue**, so nothing in
+QUEUE.md changes here and none of the drafting-and-approval flow above applies to
+it. It is still a migration step, because the project's research notes and testing
+evidence sit at a path the scope-lock, the queue digest and the always-loaded
+rules no longer name.
+
+`workshop/` is where a project's working material lives — what the project works
+with rather than what it ships. Keeping it in one folder is what lets someone
+landing on the repository see the product and the method's own documents first.
+
+```
+project has resources/ at its root  ->  create workshop/ and MOVE the whole
+                                        resources/ folder inside it, so its
+                                        contents keep their relative paths:
+                                        resources/research/x.md
+                                          becomes
+                                        workshop/resources/research/x.md
+project has no resources/ folder    ->  create workshop/ with an empty
+                                        workshop/resources/research/ inside it
+project already has workshop/       ->  nothing to do
+```
+
+**Move, never copy.** Two copies of a research finding is the failure this
+folder exists to avoid — a later session reads the stale one and cannot tell.
+
+**Use a real move that git can follow** (`git mv` in a tracked project), so the
+files keep their history rather than arriving as new files with none.
+
+**Anything else the project keeps but does not publish may go in `workshop/` too**
+— post drafts, article drafts, reference material. That is the user's call, item
+by item, and nothing is moved there without asking. Only `resources/` moves
+automatically, because the method's own tools name that path.
+
+**Check it landed:** `workshop/resources/` exists, no `resources/` folder remains
+at the project root, and a research note the queue cites still opens from the
+path the digest reports.
+
+**Then re-point what named the old path.** A project's own `CLAUDE.md`, and any
+queue item or session record that gives a `resources/…` path as an instruction to
+follow, now name a folder that has moved. Fix the instructions; leave the records
+alone — a record written before the move correctly says where the file was then.
 
 ## Section preambles — run this at every epoch
 

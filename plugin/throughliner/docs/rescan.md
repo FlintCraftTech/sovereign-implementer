@@ -24,7 +24,7 @@ reveals work still to do          ->  a capture in QUEUE.md Unprocessed
 what already HAPPENED             ->  appended to THIS chat's LOG entry, as a
     — including work done after       marked tail
     the close
-evidence a future chat must       ->  a durable file under resources/
+evidence a future chat must       ->  a durable file under workshop/resources/
     re-read word for word
 ```
 

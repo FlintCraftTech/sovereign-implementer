@@ -92,6 +92,9 @@ loading procedure docs from a docset that had already been retired. Bumping to
    bytecode never gets snapshotted into the installed host (disposable — Python
    regenerates them as needed):
    `Get-ChildItem "plugin\throughliner" -Recurse -Directory -Filter __pycache__ | Remove-Item -Recurse -Force`.
+   **This is belt-and-braces for the install only.** It cannot keep bytecode out
+   of the zip, because step 3's suites import the hooks and regenerate the
+   folders it just deleted; the zip is protected by its own exclusion at step 7.
    (The install itself uses no zip — the local marketplace sources the plugin from
    the `plugin/throughliner` folder, and the CLI snapshots that folder directly.
    The zip step 7 archives is for the channel and for the release to package, not
@@ -161,13 +164,47 @@ loading procedure docs from a docset that had already been retired. Bumping to
    the bytes are known good. Build the zip from `plugin/throughliner/` and write it
    plus a readme into `plugin/rezip-archive/`:
 
+   Build it with Python's `zipfile`, through the Bash tool, substituting the
+   version into both the filename and nothing else:
+
    ```bash
-   Compress-Archive -Path "plugin\throughliner" -DestinationPath "plugin\rezip-archive\throughliner-v<VERSION>.zip"
+   py - <<'PY'
+   import os, zipfile
+   VERSION = "<VERSION>"
+   src = "plugin/throughliner"
+   dest = f"plugin/rezip-archive/throughliner-v{VERSION}.zip"
+   with zipfile.ZipFile(dest, "w", zipfile.ZIP_DEFLATED) as z:
+       for root, dirs, files in os.walk(src):
+           dirs[:] = [d for d in dirs if d != "__pycache__"]
+           for name in files:
+               full = os.path.join(root, name)
+               # Entry names are relative to plugin/, so every path starts
+               # `throughliner/`, and forward slashes are written explicitly:
+               # the zip format specifies them, and a backslash entry unzips
+               # on macOS and Linux as one flat file literally named
+               # `throughliner\skills\next.md` rather than as a folder tree.
+               arc = os.path.relpath(full, "plugin").replace(os.sep, "/")
+               z.write(full, arc)
+   print(dest)
+   PY
    ```
 
+   **Python and not `Compress-Archive`.** PowerShell 5.1's cmdlet writes the
+   platform separator into the entry names, so every zip this project has ever
+   shipped — the archived ones and the one attached to each GitHub Release —
+   stores backslashes the format does not allow. Windows tools tolerate them,
+   which is why nothing here ever saw it. Python writes conformant paths, is
+   what everything else in this project runs on, and removes a PowerShell
+   dependency from the ritual.
+
+   **The `__pycache__` exclusion lives here, at zip time, and that ordering is
+   the fix rather than a duplication.** Step 2's sweep runs before the test
+   suites in step 3, and those suites import the hooks and regenerate exactly
+   the folders the sweep deleted — so bytecode reached the zip anyway, observed
+   live. Excluding at the moment of writing cannot be outrun by a later step.
+
    (Zip the folder, not its contents — internal paths must start with
-   `throughliner/`. The `__pycache__` sweep in step 2 already ran, so nothing
-   compiled is caught in it; verify by listing the zip's entries.)
+   `throughliner/`. Verify by listing the zip's entries.)
 
    The readme sits beside it as `throughliner-v<VERSION>.md` and carries **exactly
    what the channel post for this build says** — its label, its `Commit:` line, and
@@ -381,9 +418,16 @@ outright here.
 8. Repackage — **copy, do not build**:
    `cp plugin/rezip-archive/throughliner-v<PICKED_VERSION>.zip plugin/throughliner.zip`
    The archived zip already has the right internal paths (`throughliner/…`) and
-   already passed the `__pycache__` check when it was built. Verify anyway: list the
-   zip's entries and confirm none contain `__pycache__` — if any do, stop and fix
-   before pushing.
+   already passed the separator and `__pycache__` checks when it was built.
+   Verify anyway — list the entries and confirm every path uses forward slashes
+   and none contains `__pycache__`:
+
+   ```bash
+   py -c "import zipfile;n=zipfile.ZipFile('plugin/throughliner.zip').namelist();print(sum('\\\\' in x for x in n),'backslash;',sum('__pycache__' in x for x in n),'pycache;',len(n),'entries')"
+   ```
+
+   Both counts must be zero. A zip predating the Python zip step will fail the
+   first — stop and rebuild it from its `Commit:` line rather than shipping it.
 9. Stage every dirty path in `plugin/throughliner/` (run
    `git status --porcelain plugin/throughliner/` and stage each listed path — catches
    any sweep edits from the consistency sweep), plus the zip in `plugin/`,

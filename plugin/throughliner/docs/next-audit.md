@@ -52,9 +52,14 @@ Accumulate observations in the build working file Changes with precise reference
 
 ## Compile findings  [SILENT]
 
-Group observations into discrete findings — **one finding per actionable change.**
-Phrase each as *observed + why it matters*, the shape a capture takes, since
-that's where they'll land.
+Group observations into discrete findings — **one finding per discrete
+observation.** Phrase each as *observed + why it matters*, the shape a capture
+takes, since that's where they'll land.
+
+**Whether a finding is worth acting on is not decided here.** That is settled at
+/plan, with the user present. A filter running in a silent step before the work
+reaches them can only drop things and never surface them, and deciding what
+counts as a finding within the audit's parameters is already discretion enough.
 
 ## File the findings to Unprocessed  [SILENT]
 

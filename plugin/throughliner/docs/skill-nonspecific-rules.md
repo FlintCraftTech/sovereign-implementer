@@ -126,6 +126,9 @@ The work cycle. Every piece of work travels the same loop.
       a deterministic result set under approved
       criteria                                    # bulk approval; contested
                                                   # items then go one at a time
+      a claim or example set PRODUCED BY a        # contested by number. This
+      walkthrough step                            # governs a set a step
+                                                  # produces, not the items
   NOT an inversion: [user] walk-through items     # driven live, always sequential
   NOT an inversion: an audit's findings           # filed straight to Unprocessed,
                                                   # nothing waits for approval
@@ -476,7 +479,8 @@ steps and conversation outside skills.
 
 **Offer readily — the bar is low, since the user can decline.**
 
-**Trigger: what would answer this?** Where the answer is something outside what
+**Trigger: what would answer this — and is the approach itself valid for the
+situation?** Where the answer is something outside what
 you can read — a current version, whether a feature exists, what a config option
 does — offer the search. Where it is a choice the user owns, ask them. Take the
 answer from one of those two routes rather than from your own confidence, which
@@ -515,7 +519,7 @@ content you can read — captions, an article, a transcript — and read it befo
 pointing at it. Where neither of you can name the missing part, no lookup helps
 and the answer is a different explanation.
 
-**Before offering a search, read `resources/research/index.md` and open any entry
+**Before offering a search, read `workshop/resources/research/index.md` and open any entry
 whose subject covers the question, then say what it already answers.** The index
 is one line per finding, so this is nearly free. It reaches a finding whose index
 line describes the subject; a finding filed under a subject line that does not
@@ -544,22 +548,54 @@ This rule has a second firing site: the moment work is about to be tagged
 reveals work to do                    ->  capture in QUEUE.md Unprocessed
 a finding, or a clean pass            ->  the observing chat's LOG entry
     (no verbatim re-read needed)          # a PASS is a finding, not work
-evidence a future chat must           ->  a durable file under resources/
-    re-read WORD-FOR-WORD
+    # NEVER an [audit] run's output, which goes to Unprocessed whatever it
+    # proposes: findings are filed for the user to weigh, and nobody
+    # processes a session record, so a finding parked there is one the
+    # user never meets
+evidence a future chat must           ->  a durable file under
+    re-read WORD-FOR-WORD                     workshop/resources/
 ```
 
-`resources/` holds two things only: research findings at
-`resources/research/<topic>.md`, and re-read-later testing evidence under
-`resources/testing/`. The default answer to "should this be a durable file?" is
-**no** unless the verbatim-re-read test is met.
+**`workshop/` is where a project's working material lives** — what the project
+works with rather than what it ships. `workshop/resources/` holds two things
+only: research findings at `workshop/resources/research/<topic>.md`, and
+re-read-later testing evidence under `workshop/resources/testing/`. The default
+answer to "should this be a durable file?" is **no** unless the
+verbatim-re-read test is met.
 
 **File research findings as part of using them**, not only when asked. Threshold:
 a finding that informed a decision, or that would have to be redone if lost.
 Name the file in chat when it lands, so the filing is visible and checkable, and
-**write its line in `resources/research/index.md` in the same move** — one line
+**write its line in `workshop/resources/research/index.md` in the same move** — one line
 carrying the subject it settles and enough of the finding to decide whether to
 open it, ending in the filename. A file added without a line is invisible to
 every later chat, so the folder grows a write path with no matching read path.
+
+**Every research finding filed carries an assessment of its own frame, written
+into the finding's own file** — five criteria, one line each, or "not
+applicable" with the reason. Research answers the questions it was asked without
+anything asking whether the approach fits the situation at all, and a finding
+that was never valid reads exactly like one that was:
+
+```
+TIME RANGE     does it cover the range the product addresses — and where the
+               range was never stated, say so, because that is a gap in SPEC
+               rather than in the research
+PEOPLE         does it apply to the people involved: users, decision-makers,
+               whoever the product actually serves
+FRESHNESS      is the subject amended on a cycle, or fresh enough that it
+               does not matter
+RISK IF WRONG  what follows from being wrong about any of the above, and what
+               that warrants: a red-flag capture, a cycle offer to re-check,
+               or the user's explicit say-so
+ALTERNATIVES   were other approaches researched and ruled out, or merely never
+               considered — naming which
+```
+
+An assessment left out is a visible hole in the file rather than a silent one,
+which is the whole of what this buys. The higher question at the offer moment
+improves the odds that a mismatched approach is caught before the work, and does
+not close it.
 
 **A research finding that is superseded gains a `Superseded by:` line at the top
 of its file, written at the moment it is superseded** — which is the moment
@@ -845,7 +881,13 @@ real and equally bad; neither warning may be louder than the other. (How a
   rough walkthrough flagged for refinement at the decision step.** The one thing that
   keeps work out of a `[user]` item is genuine uncertainty that it is user-work
   at all, and that routes to Unprocessed as an ordinary capture, still tracked.
-  Two further requirements on the same walkthrough:
+  Further requirements on the same walkthrough:
+  - where a step has the user run a terminal command, supplying as typed
+    commands whatever must be true for it to work — the `cd` with its actual
+    path first among them — or stating plainly that the command works from
+    anywhere. A fresh terminal opens somewhere the user did not choose, so its
+    location is never assumed, and a precondition written as a description
+    ("with the terminal in your project folder") reads as already done;
   - where it involves more than one stored text — a pinned message, a forum
     post, a register line — naming where each one lives, since a step saying
     "update the text" is unfollowable once there are two of them;
@@ -925,6 +967,8 @@ the RECORD — a capture, a queue item, a LOG entry, a SPEC edit
 a DELIVERABLE written to disk — a report, a summary, a document for a reader
     its length matches what the task needs. Out comes a filler section, a
     summary of what the document already said, boilerplate.
+    Its text never lives inside a queue entry: the entry points at the file
+    where the deliverable lives, and carries the reasoning about it.
 ```
 
 **Every written shape is bounded, and this is the one statement of it — every
@@ -1031,7 +1075,7 @@ thing IS:**
 ```
 a principle that governs how work is done  ->  SPEC note, or CLAUDE.md rule
     ("always consider X when designing")
-a durable finding                          ->  resources/research, or LOG
+a durable finding                          ->  workshop/resources/research, or LOG
 a forward recommendation                   ->  the advisory (transient)
 ```
 
@@ -1241,7 +1285,7 @@ CLAUDE.md vs memory =  "this project" vs "all projects"
 
 ```
 a plan of work to be DONE       ->  queue items
-a record or finding to be READ  ->  a LOG entry, or a resources/ file
+a record or finding to be READ  ->  a LOG entry, or a workshop/resources/ file
 ```
 
 - **Leave planning work to /plan.** The boundary is **filing vs

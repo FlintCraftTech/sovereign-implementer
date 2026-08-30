@@ -56,10 +56,11 @@ graph TD
     P --> L["LOG/ — what happened, session by session"]
     P --> F["FAQ/ — how the workflow works"]
     P --> I["INBOX/ — mail from your other projects"]
+    P --> W["workshop/ — what the project works with,<br/>not what it ships"]
     P -.->|installed alongside| T["Throughliner — five commands,<br/>plus hooks that run in the background"]
 ```
 
-`LOG/` and `resources/` are historical records — they keep the vocabulary and the state of the day each entry was written, so an old one may describe things that have since changed. SPEC.md and this README describe the present.
+`LOG/` and `workshop/resources/` are historical records — they keep the vocabulary and the state of the day each entry was written, so an old one may describe things that have since changed. SPEC.md and this README describe the present.
 
 ## What it does
 
@@ -88,6 +89,8 @@ And they check Claude's own reports. Claude writes to your queue first and tells
 When something goes wrong, Claude works out which of three things it was and sends it to the right place: your **app** stays as work in your own queue; a problem with **the method** goes to the plugin's author at flintcraft.tech/report — or, if you happen to have the plugin's own project on your machine and have told Throughliner about it, straight into that project's mailbox instead, which keeps it off the public web; a problem with **Claude Code itself** goes to a GitHub issue on `anthropics/claude-code`. Both outward reports are scrubbed of your project's details, and nothing is ever sent without you seeing the exact text first.
 
 If you run more than one project on the method, they can **message each other** — durable, offline, approval-gated mail, where Claude Code's own session messaging reaches only sessions open right now. Each project gets an `INBOX/` folder, and anything waiting in yours is mentioned at the start of a session — no carrying notes between chats by hand. Mail is opened at the start of a planning session and at the start of a build run, so a message that affects something about to be built can still change what runs. A message going out to another project is always shown to you for approval first, because it carries this project's content somewhere else. Sending places the message in the other project's mailbox and nothing confirms it was read — that limit is stated rather than glossed over, and Claude checks the other project has a mailbox at all before writing. The first folder path you give for a project is remembered, inside the `INBOX/` folder that git ignores, so continuing a conversation doesn't mean digging the path out again.
+
+Every project also gets a **`workshop/` folder** — the place for what the project works with rather than what it ships. Research findings and re-read-later testing evidence live in `workshop/resources/`, alongside anything else you keep but don't publish: post drafts, article drafts, reference material. The point is what someone landing on your repository sees first — your product and your project's own documents stay in view, and everything they merely refer to sits in one folder that can be skipped.
 
 Where a step has you editing something Claude drafted, the draft is handed over as a file you edit yourself rather than as chat text you describe changes to — Claude reads it back when you say so, asks whether there's more, and repeats until you're done.
 

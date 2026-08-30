@@ -73,10 +73,16 @@ Declared rather than derived — the definition says which, and this one is the
 user's. The record could not have supplied it: one tip had gone out at the time
 this was written.
 
-**Material.** The tip candidates in QUEUE.md's Unprocessed section — filed at
-rezips as features land, recycled from old announcements, or noticed any other
-way. A turn draws from that pool rather than inventing a subject. New or updated
-features first; recycled and historical tips on slow news days.
+**Material.** Every capture in QUEUE.md's Unprocessed section carrying the line
+`Cycle: [tips-posting]` — the field is what claims it, so the planning ladder
+passes over it rather than presenting it as a pending decision, and a turn draws
+from that pool rather than inventing a subject. Candidates are filed at rezips as
+features land, recycled from old announcements, or noticed any other way, and
+**the filing writes the field**, so a new candidate arrives claimed. New or
+updated features first; recycled and historical tips on slow news days.
+
+Deleting this definition releases the whole pool by itself: a `Cycle:` naming a
+cycle that no longer exists ranks normally again, with nothing to unwind.
 
 **Steps of one turn.**
 1. Pick a candidate. Prefer one whose capture carries a release's version line,
@@ -118,7 +124,11 @@ their old posts rather than recycling them — 📣announcements above all.
 **Cadence:** weekly, declared by the user 2026-08-29, matching the release
 cycle.
 
-**Observable:** the date of the most recent `LOG/` entry under this cycle's slug.
+**Observable:** the date of the most recent `LOG/` entry under this cycle's slug
+**whose opening line says it records a completed turn of this cycle**. Each
+turn's record must open with that sentence, and a record that does not carry it
+is not a turn — which is what keeps the planning records written under this same
+slug, including the one that authored this definition, out of the count.
 
 Declared rather than derived, and the reason is the derivation the user chose:
 a release is the thing most likely to falsify a public claim, so the sweep runs
@@ -140,7 +150,9 @@ announcement was falsified on 2026-08-27 and nothing fired for a week.
    that post's id.
 4. Where every claim still holds, say so in one line. A sweep that ran and found
    nothing must be distinguishable from one that never ran.
-5. Record the turn in `LOG/` under this cycle's slug.
+5. Record the turn in `LOG/` under this cycle's slug, **opening the record with
+   a line saying it records a completed turn of this cycle** — that sentence is
+   what the observable counts.
 
 **Two limits, stated because this cycle is easy to over-read.** Its observable is
 written by the same session that runs the turn, so it records that a sweep

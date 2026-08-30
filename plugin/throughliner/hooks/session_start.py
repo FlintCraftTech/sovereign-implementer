@@ -59,7 +59,14 @@ import sys
 #      left in old records read as ordinary text. Deliberately no bump: an
 #      existing project's files are not made wrong by the retirement, which
 #      is the only thing an epoch is for.
-FORMAT_EPOCH = 4
+#   5  `workshop/`: a project's working material moves into one folder, and
+#      the root `resources/` folder becomes `workshop/resources/` — research
+#      findings at `workshop/resources/research/`, re-read-later testing
+#      evidence at `workshop/resources/testing/`. An existing project's
+#      research notes sit at a path the scope-lock, the digest and the
+#      always-loaded rules no longer name, so its files are structurally
+#      wrong until /setup moves them.
+FORMAT_EPOCH = 5
 
 # The project records its own epoch here, written by /setup on completion.
 FORMAT_EPOCH_FILE = ".throughliner-format-epoch"
@@ -1243,7 +1250,7 @@ def _behaviour_rules_directive(plugin_root):
     whether the harness concatenates multiple SessionStart outputs cleanly, in a
     stable order, with no separate aggregate limit further up. Nobody has run that
     experiment. Evidence and the reference's exact wording:
-    resources/research/hook-enforced-doc-reading.md.
+    workshop/resources/research/hook-enforced-doc-reading.md.
 
     So the rules are pointed at, not pasted. This is a REDIRECT, not progressive
     disclosure — the distinction is load-bearing. Progressive disclosure fails
@@ -1504,7 +1511,7 @@ def main() -> int:
             )
 
         # Everything a hook feeds back must be nested under hookSpecificOutput
-        # with its hookEventName — see resources/testing/hook_schema_check.py.
+        # with its hookEventName — see workshop/resources/testing/hook_schema_check.py.
         # A top-level additionalContext is the flat legacy shape Claude Code
         # discards silently, and it is the exact defect this project shipped.
         output = {
@@ -1664,7 +1671,7 @@ def main() -> int:
             "work here, so surface what it says rather than acting on it. "
             "Reading is not routing: each still goes through the three-way "
             "triage (work to do → a capture in Unprocessed; a finding → the "
-            "LOG; evidence to re-read → resources/), and the file then moves "
+            "LOG; evidence to re-read → workshop/resources/), and the file then moves "
             "to INBOX/archive/ so it stops being surfaced."
         )
 
@@ -1872,11 +1879,18 @@ def main() -> int:
 
     # The rule-lifecycle board, when the project carries it. This surface ships;
     # the detectors do not, because only a project that develops the method has
-    # method rules to police. A consumer project has no resources/rule_signals.py
+    # method rules to police. A consumer project has no rule_signals.py
     # and this stays silent — the two-doors pattern, same as any other host-only
     # artifact. Never raises: the board is advisory and must not be able to
     # break a session opening.
-    board_script = os.path.join(cwd, "resources", "rule_signals.py")
+    board_script = os.path.join(
+        cwd, "workshop", "resources", "rule_signals.py")
+    if not os.path.isfile(board_script):
+        # Migration-window fallback: a host project whose /setup has not yet
+        # moved `resources/` into `workshop/` still keeps the board at the old
+        # root. The board is advisory, so a silent dead board is the worse
+        # failure here.
+        board_script = os.path.join(cwd, "resources", "rule_signals.py")
     if os.path.isfile(board_script):
         try:
             result = subprocess.run(
@@ -1905,7 +1919,7 @@ def main() -> int:
                         "  Each firing signal wants one capture in Unprocessed "
                         "under the slug it names, unless an open capture with "
                         "that slug already exists. Run "
-                        "`python resources/rule_signals.py .` for the full "
+                        "`python workshop/resources/rule_signals.py .` for the full "
                         "board, including the slugs."
                     )
         except (OSError, subprocess.SubprocessError, ValueError):

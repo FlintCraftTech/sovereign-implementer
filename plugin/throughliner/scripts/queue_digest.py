@@ -63,6 +63,13 @@ SLUG_REF_RE = re.compile(r"\[([a-z0-9][a-z0-9-]*)\]")
 # passed, so the lift is a fact on the line rather than a date the reader has
 # to compare against today by hand.
 NOT_BEFORE_RE = re.compile(r"^Not before:\s*(\S+)\s*$", re.IGNORECASE)
+# `Cycle: [slug]` — the capture is a named cycle's material rather than a
+# pending decision, so that cycle's turns draw from it and the planning ladder
+# passes over it. Printed as a bare fact: whether the named definition exists
+# is what decides the pass-over, and a cycle deleted from the doc releases its
+# material by itself.
+CYCLE_RE = re.compile(r"^Cycle:\s*\[?([a-z0-9][a-z0-9-]*)\]?\s*$",
+                      re.IGNORECASE)
 FLAG_RE = re.compile(r"^Red flag\s*·\s*State:\s*(\w+)", re.IGNORECASE)
 FLAVOR_RE = re.compile(r"^\[(audit|user|freeform)\]\s*", re.IGNORECASE)
 # "Runs alone" — the item is ready, but /next must not build it alongside other
@@ -108,9 +115,24 @@ FILES_LINE_RE = re.compile(r"^\**Files\b[^:]*:\**\s*(.*)$", re.IGNORECASE)
 # closes it: a superseded research file gains a `Superseded by:` line at its
 # top, written at the moment someone already has the file open to re-validate
 # it, and this check reads that line back.
-RESEARCH_CITE_RE = re.compile(r"resources/research/([a-z0-9][a-z0-9._-]*\.md)")
+RESEARCH_CITE_RE = re.compile(
+    r"(?:workshop/)?resources/research/([a-z0-9][a-z0-9._-]*\.md)")
 SUPERSEDED_RE = re.compile(r"^\**Superseded by:?\**\s*(.+)$",
                            re.IGNORECASE | re.MULTILINE)
+
+
+def _research_path(root, name):
+    """Where a cited research finding lives, new home first.
+
+    Findings live under `workshop/resources/research/`. A project that has not
+    yet run the migration still has them at the old root `resources/research/`,
+    and an item written before the move still cites the old path — so both are
+    tried and the citation keeps resolving either way.
+    """
+    new = os.path.join(root, "workshop", "resources", "research", name)
+    if os.path.exists(new):
+        return new
+    return os.path.join(root, "resources", "research", name)
 
 # A finding another project owns, copied in rather than pointed at. The copy
 # carries a `Copied from:` line naming the owning project — never a path, since
@@ -204,6 +226,7 @@ def parse(path):
                 "blocked_by": [],
                 "not_before": None,
                 "flag": None,
+                "cycle": None,
                 "runs_alone": False,
                 # Lowercased prose, for the placement-contradiction checks. Not
                 # printed — the digest stays one line per item.
@@ -233,6 +256,9 @@ def parse(path):
             not_before = NOT_BEFORE_RE.match(stripped)
             if not_before:
                 current["not_before"] = not_before.group(1).strip()
+            cycle = CYCLE_RE.match(stripped)
+            if cycle:
+                current["cycle"] = cycle.group(1).lower()
             flag = FLAG_RE.match(stripped)
             if flag:
                 current["flag"] = flag.group(1).lower()
@@ -339,7 +365,7 @@ def _superseded_research(item, root):
             if name in seen:
                 continue
             seen.add(name)
-            path = os.path.join(root, "resources", "research", name)
+            path = _research_path(root, name)
             try:
                 with open(path, "r", encoding="utf-8") as f:
                     # The line sits at the top of the file, so reading the
@@ -380,7 +406,7 @@ def _snapshot_research(item, root):
             if name in seen:
                 continue
             seen.add(name)
-            path = os.path.join(root, "resources", "research", name)
+            path = _research_path(root, name)
             try:
                 with open(path, "r", encoding="utf-8") as f:
                     head = f.read(4000)
@@ -586,14 +612,14 @@ def contradictions(items, root=""):
 
         for name, by in _superseded_research(item, root):
             found.append(
-                f"[{slug}] is scoped against resources/research/{name}, which "
+                f"[{slug}] is scoped against workshop/resources/research/{name}, which "
                 f"is marked superseded by {by} — re-read the item's premise "
                 "before building it"
             )
 
         for name, owner in _snapshot_research(item, root):
             found.append(
-                f"[{slug}] rests on a SNAPSHOT: resources/research/{name} is a "
+                f"[{slug}] rests on a SNAPSHOT: workshop/resources/research/{name} is a "
                 f"copy of a finding owned by {owner}. That is a permanent "
                 "label and not a staleness check — nothing here reads the "
                 "other project, so whether the original has moved on is "
@@ -635,7 +661,37 @@ def contradictions(items, root=""):
                 "itself — nothing in the loop can ever be released"
             )
 
+        # Newly filed work can invalidate work already cleared to run, and
+        # nothing else looks. The recorded instance: filing a capture about a
+        # bot limitation revealed that a cleared item could not be built as
+        # written, and it was caught only because one session happened to hold
+        # both in view — the condition a fresh short session never has.
+        #
+        # The crossing is arithmetic on data already computed: the capture's
+        # cited slugs, and which items sit in the cleared region.
+        for cited in _cites_cleared(item, items):
+            found.append(
+                f"[{slug}] is a capture whose prose names [{cited}], which is "
+                "cleared to run — re-read that item's premise before a run "
+                "builds it"
+            )
+
     return found
+
+
+def _cites_cleared(item, items):
+    """Slugs this Unprocessed capture names that sit in the cleared region."""
+    if item["section"] != "Unprocessed":
+        return []
+    cleared = {i["slug"] for i in items
+               if i["section"] == "Processed" and i["cleared"] and i["slug"]}
+    seen, hits = set(), []
+    for line in item["prose"]:
+        for ref in SLUG_REF_RE.findall(line):
+            if ref in cleared and ref != item["slug"] and ref not in seen:
+                seen.add(ref)
+                hits.append(ref)
+    return hits
 
 
 def _blocker_loop(item, items):
@@ -851,6 +907,8 @@ def render(items, root="", queue_path="QUEUE.md"):
                 line += f"  | Blocked by: {shown}"
             if item["not_before"]:
                 line += f"  | Not before: {item['not_before']} -> {not_before_state(item['not_before'])}"
+            if item["cycle"]:
+                line += f"  | Cycle: [{item['cycle']}]"
             if item["flag"]:
                 line += f"  | Red flag: {item['flag']}"
             # Only citations that resolve to a LOG entry are printed. A citation
@@ -925,6 +983,12 @@ def render(items, root="", queue_path="QUEUE.md"):
         "Placement flags match a fixed set of known phrases, so a clean result "
         "means none of the phrases this check knows were found — not that no "
         "contradiction exists. Partial coverage, not a clean bill."
+    )
+    out.append(
+        "Capture-bears-on-cleared flags reach a capture that NAMES the cleared "
+        "item's slug. A capture that invalidates cleared work without naming it "
+        "is not reached, and nothing here can tell whether a named one actually "
+        "invalidates anything — read it as a prompt to look, not as a verdict."
     )
     out.append(
         "Superseded-research flags cover only items that NAME the research file "
