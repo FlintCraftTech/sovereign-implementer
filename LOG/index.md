@@ -2,7 +2,39 @@
 
 One-line summaries of each session. Newest first.
 
-- [HASH] — goal session — the Egnatia-OC OpenCode port assessed (34/34 vendored files verified byte-identical to 743aa63, pin four commits behind, fail-open scope-lock red-flagged) and the findings sent as an injectable five-file self-hosting pack — 13 captures, a bootstrap checklist, an upstream catch-up cycle naming the changelog as coming soon; five captures filed here → 2026-08-29-opencode-port-assessment.md
+- [HASH] — chat-level record for the 2026-08-30 planning session: ~28 entries processed across two days, cleared region 5→30, two on-the-spot research files, three rule gates run with the user present, 27 sessions archived, one issue comment posted → 2026-08-30-chat-plan.md
+- [HASH] — plan — the test-rezips readiness check gains its required `Rezip entry:` line in CLAUDE.md; the shipped-doc alternative refused since consumers can never fire it → 2026-08-30-rezip-entry-check-has-no-artifact.md
+- [HASH] — plan — [test-rezip-entry-1-21-1-test1] cleared into next session's frictionless posting batch; only the classifier ever held it → 2026-08-30-test-rezip-entry-1-21-1-test1.md
+- [HASH] — plan — the pytest-cache finding disproven twice by inspection (pre-rebuild fossil; self-ignoring) and deleted; removal rides the cleanup → 2026-08-30-pytest-cache-at-the-root.md
+- [HASH] — plan — done.md's duplicate scrub reminder evicted, the entry-writing copy surviving → 2026-08-30-done-md-states-the-scrub-rule-twice.md
+- [HASH] — plan — the INBOX doc's superseded-refusal sentence evicted to the record; two pre-cleared sentences bind the build as exclusions → 2026-08-30-inbox-doc-narrates-a-superseded-refusal.md
+- [HASH] — plan — done-build's restated walk-through outcome definitions come out, the citation staying; next.md's copy excluded as a sibling → 2026-08-30-done-build-restates-cited-outcomes.md
+- [HASH] — plan — the shared mail-triage step gains its [PROMPT] arm where a reply is drafted → 2026-08-30-done-mail-triage-missing-prompt-arm.md
+- [HASH] — plan — done-audit's Approval outcomes field becomes Findings routing; ripple grep found one site, no announced claim touched → 2026-08-30-done-audit-records-a-repealed-approval-step.md
+- [HASH] — plan — SPEC's ports paragraph gains the names tracking and independent, closing the build-filed sentence → 2026-08-30-spec-owes-port-flavour-names.md
+- [HASH] — plan — the three run-cost findings relocated to `run-cost-measurements-2026-08-28.md` with the first validity assessment; the re-read design question survives as [build-working-file-records-touches] → 2026-08-30-navigation-share-measured-at-22-percent.md
+- [HASH] — plan — the ports priority gets a dated CLAUDE.md Current-state line; SPEC and the memory project refused as homes → 2026-08-30-ports-priority-unrecorded.md
+- [HASH] — plan — the digest gains a capture-cites-cleared-work flag in the contradictions block; the no-clean-pass provision binds the build → 2026-08-30-newly-filed-work-invalidates-cleared-work.md
+- [HASH] — plan — terminal walkthrough steps must supply the commands before the run, the cd first — from the user's screenshot instance in another project → 2026-08-30-terminal-steps-include-preconditions.md
+- [HASH] — plan — research gains a five-criterion validity assessment filed into every finding, from the user's two instances (mis-scoped legal research; MCP never ruled out) → 2026-08-30-research-validity-criteria.md
+- [HASH] — plan — kept items gain a rests-on line: the decision-step enumeration goes five to six, SPEC clause written ahead of the build → 2026-08-30-rests-on-line-at-decision-step.md
+- [HASH] — plan — active_threads() gets a `threads` subcommand; exposure, not capability → 2026-08-30-discord-script-lists-forum-topics.md
+- [HASH] — plan — the bot gains a read-only `permissions` command and [discord-permissions-review] is filed beside it per the tool-then-audit rule → 2026-08-30-bot-cannot-read-permissions.md
+- [HASH] — plan — cycle material marked by a `Cycle:` field, a third pass-over arm reads it, all seventeen tip captures claimed by this session → 2026-08-30-cycle-material-captures-still-ranked.md
+- [HASH] — plan — the mid-line marker lint kept, widened to Blocked by and Not before after the check showed identical exposure → 2026-08-30-red-flag-marker-silent-shape-failure.md
+- [HASH] — plan — the method-defect watch deleted at the gate's first question: its evidence proves the noticing happens without a rule → 2026-08-30-method-defect-watch.md
+- [HASH] — plan — the first claims-sweep turn becomes an [audit] held until after Wednesday's release → 2026-08-30-announced-claims-sweep.md
+- [HASH] — plan — cycle observables must be distinguishable from planning's own records; method fix only on the user's dogfooding rule, no local hotfix → 2026-08-30-cycle-observable-slug-collision.md
+- [HASH] — plan — the owed TOOLS.md facts written directly (the capture's unwritable-list premise was stale), the sidebar fact folded in → 2026-08-30-tools-md-owes-three-facts.md
+- [HASH] — plan — co-writing settles as a walkthrough convention plus two amendments (produced-set inversion; no deliverable text in a queue entry), no new flavour → 2026-08-30-co-writing-flavour.md
+- [HASH] — plan — the rezip and release step lists become ritual definitions; push and the recovery prose stay, held on the zip fix → 2026-08-30-host-rituals-migration.md
+- [HASH] — plan — the two zip defects merged: the ritual's zip step rebuilds in Python's zipfile, excluding bytecode → 2026-08-30-zip-entries-use-backslash-separators.md
+- [HASH] — plan — the announcement-sweep coverage note carried into its entry and deleted, one close late; the ladder's re-presentation is what caught the miss → 2026-08-30-tip-recycle-sweep-coverage-note.md
+- [HASH] — plan — audit findings always route to the queue and the actionable filter comes out — the user's ruling from a live misroute → 2026-08-30-audit-findings-always-queue.md
+- [HASH] — plan — the repo cleanup designed: root pared to product and method docs, workshop absorbs the machinery, bot folder, badge to README, two deletions on the user's word → 2026-08-30-repo-cleanup-product-forward.md
+- [HASH] — plan — workshop/ becomes a method folder with resources/ inside, migrated by /setup; three-item chain set by the user → 2026-08-30-workshop-becomes-a-method-folder.md
+- [HASH] — plan — the legal-case video reshaped to a scripted hypothetical stopping at an approved script; the unscripted demo refused as too hard → 2026-08-30-legal-demo-video-guide.md
+- fb5deef — goal session — the Egnatia-OC OpenCode port assessed (34/34 vendored files verified byte-identical to 743aa63, pin four commits behind, fail-open scope-lock red-flagged) and the findings sent as an injectable five-file self-hosting pack — 13 captures, a bootstrap checklist, an upstream catch-up cycle naming the changelog as coming soon; five captures filed here → 2026-08-29-opencode-port-assessment.md
 - 819f7f1 — chat-level record for the 2026-08-29 build run: 20 builds and 3 audits shipped, 12 audit findings filed, the run's one scope growth named, every outbound post blocked by the auto-mode classifier, one walk-through deferred and four not reached → 2026-08-29-chat-build.md
 - 819f7f1 — build — `resources/discord_post.py` gains forum-topic creation (`send --title`) and thread-name resolution; the 50008 failure and the no-new-route finding recorded in the docstring; confirmed live later the same session → 2026-08-29-bot-cannot-create-forum-topics-build.md
 - 819f7f1 — build — `CLAUDE.md`'s cross-platform section rewritten: ports stated as supported and both flavours welcome, the Codex shelving attributed to the user with her reason, the speaks-for-everyone claim removed → 2026-08-29-cross-platform-section-speaks-for-others-build.md

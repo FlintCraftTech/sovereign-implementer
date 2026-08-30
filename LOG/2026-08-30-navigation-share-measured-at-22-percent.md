@@ -1,0 +1,6 @@
+# [HASH] — plan — the three run-cost findings relocated to a research file, with a validity assessment; one design question survives as a capture
+
+All three audit findings — navigation at 22% in both runs, scoping-beat-transport, and the build-run re-read asymmetry — are measurements future decisions will cite, so their home is `resources/research/run-cost-measurements-2026-08-28.md`, numbers carried verbatim, indexed, and carrying the first validity assessment written under the just-decided [research-validity-criteria] rule (in force from its decision). The alternatives line in that assessment is the honest one for the MCP debate: scoping was measured and won on this evidence; transport was not ruled out, and the plugin-MCP mechanics stay explicitly unverified. The one genuine piece of work inside the findings — recording in the build working file what each item touched, so later items read that instead of re-reading — survives as [build-working-file-records-touches].
+
+**Queue changes:** [navigation-share-measured-at-22-percent], [scoping-beats-transport-on-measured-evidence] and [build-runs-reread-files] deleted, relocated; [build-working-file-records-touches] filed.
+**Work processed:** deleted — the three, relocated.

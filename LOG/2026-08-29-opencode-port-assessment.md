@@ -1,4 +1,4 @@
-# [HASH] — Goal session: the Egnatia-OC OpenCode port assessed, and the findings sent as an injectable self-hosting queue
+# fb5deef — Goal session: the Egnatia-OC OpenCode port assessed, and the findings sent as an injectable self-hosting queue
 
 The user brought the throughliner-opencode repository (Egnatia-OC on GitHub) — a community port of Throughliner to OpenCode — and asked for a comprehensive assessment delivered in an unusual form: not a review document but a folder his own port can run on itself, so he develops it using the method. The session ran as approved-plan goal work under a freeform scope file, read-only against his code (no clone, nothing executed).
 

@@ -43,6 +43,41 @@ capability is absent.
 - Posting is gated by the standing approval rule: nothing leaves the machine
   without the user seeing the exact text and saying yes.
 
+## Discord server facts (learned live 2026-08-29)
+
+- **The posting role for the showcase forum is `Throughliner expert`, granted by
+  DMing the user.** Any walkthrough telling someone to post there has to say so.
+- **The showcase forum is for ports of Throughliner AND for projects built with
+  it** — the user's own definition, given when the bot could see no messages in
+  the channel and could not tell what it was for.
+- **The bot's known limits as of 2026-08-29:** it cannot create a forum topic
+  outside the flow [bot-cannot-create-forum-topics] built, cannot read roles or
+  channel permissions, has no pin command, and cannot delete or edit anyone
+  else's messages.
+
+## Desktop app (learned live 2026-08-29 and 2026-08-30)
+
+- **Archiving AND deleting a session both leave its transcript on disk** —
+  tested live 2026-08-30, one of each on this project: the `.jsonl` under
+  `~/.claude/projects/<project>/` survived both, file count unchanged. So the
+  method's transcript-reading evidence is safe either way. The difference is
+  in-app: an archived session can be reopened from the Archived list; a
+  deleted one is gone from the app. Best practice: archive to shorten a
+  project's sidebar list (the workaround for issue #83699); delete only what
+  you'd never reopen. Limit: this tested immediate behaviour — a later
+  background cleanup was not ruled out.
+- **The side panel cannot edit `.claude/settings.local.json`.** The user had to
+  open it through File Explorer in Notepad. A walkthrough handing over a
+  settings edit names the Notepad route from the start (right-click → Open
+  with → Notepad) rather than assuming the sidebar can do it.
+
+## Google Drive connection (learned live 2026-08-29)
+
+- **It reads a Drive-hosted `.pptx` and returns its text.** Proved by reading
+  `Throughliner.pptx` (an uploaded PowerPoint, not a native Slides file)
+  through `read_file_content` after `get_file_metadata` confirmed the type. The
+  next session wanting a deck's contents should not assume it cannot.
+
 ## Web endpoints (learned live 2026-08-28)
 
 - **LinkedIn refuses the anonymous web fetcher** — HTTP 999 with no body. The

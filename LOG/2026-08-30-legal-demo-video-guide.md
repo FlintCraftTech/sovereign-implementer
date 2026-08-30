@@ -1,0 +1,6 @@
+# [HASH] — plan — the legal-case video reshaped from unscripted demo to scripted hypothetical, stopping at an approved script
+
+The unscripted demo was refused in the user's words — "This is too hard" — and its whole apparatus went with it: the steering guide written from her real case files, the naive-question device, the reading of sensitive files. What replaced it is her design: she describes the project's structure with identifiers already removed, the video presents it as a hypothetical, and nothing of her legal project is ever opened from this project. A script is also reviewable cold before recording, which the demo never could be. The item stops at the approved script — recording and publishing file separately — because the script is the half Claude contributes to and the half carrying the privacy work. Her virality read survives unchanged: a legal case is a very weird thing to run in Claude Code, which is why it travels. The listicle idea raised as a replacement mid-reshaping was kept as separate work at her direction ([project-types-listicle-video]).
+
+**Queue changes:** [legal-demo-video-guide] rewritten in place, tagged `[user]`, walkthrough authored, hold dropped (the gitignore it waited on was verified shipped), moved to Processed cleared. [project-types-listicle-video] filed as a capture.
+**Work processed:** kept — [legal-demo-video-guide].
