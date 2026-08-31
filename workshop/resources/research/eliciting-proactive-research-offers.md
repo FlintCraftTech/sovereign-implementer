@@ -42,6 +42,10 @@ costliest un-noticed class is; this one is about the noticing itself.
   start — rule presence did not produce rule firing; an outside reader's
   challenge did ([research-misrouted-to-queue-live-instance]).
 
+## A further instance, from the session that commissioned this file (appended 2026-08-31)
+
+In the 2026-08-30 planning session researching exactly this failure shape, two research efforts were processed into Processed as cleared build items — against two shipped rules both loaded in that session (plan.md's resolve-now list names research first among what planning does on the spot, and its decision step says a research item wearing a build's shape must not pass the check). The same session had followed the pattern correctly hours earlier (the determinism example bank, researched and filed within the hour of being asked). The user caught it from outside ("research is not queued work — it's always done on the spot"); both items were pulled and the research run on the spot the same day. First-hand confirmation of this file's core claim: rule presence does not produce rule firing, and the miss was invisible from inside until an outside reader challenged it. (Relocated from the deleted queue capture [research-misrouted-to-queue-live-instance], 2026-08-31.)
+
 ## The finding
 
 Exhortation is the weak lever and site-binding is the strong one, on both
