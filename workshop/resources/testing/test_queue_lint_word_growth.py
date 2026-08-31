@@ -21,7 +21,7 @@ import importlib.util
 import os
 import sys
 
-ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 HOOK = os.path.join(ROOT, "plugin", "throughliner", "hooks", "post_tool_use.py")
 
 _spec = importlib.util.spec_from_file_location("post_tool_use", HOOK)

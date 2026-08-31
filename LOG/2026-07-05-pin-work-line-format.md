@@ -1,8 +1,0 @@
-# 413527e — plugin-behaviour.md — Captures Line-format bullet: pinned that a work line renders as a `#### ` heading (description = heading line, `[slug]` at its end, rationale + provenance in the block beneath, red-flag `Red flag · State: …` marker line in that block), named as the exact shape all three hooks parse; reconciled the "single line" wording. [pin-work-line-format].md
-
-The recut hooks encode one literal shape for a work line, but that shape was written down nowhere as the canonical definition. All three hooks key on it: a `#### ` heading whose line ends in a `[slug]`, under `## Processed`/`## Unprocessed`, with a provenance label in the block beneath, and — for a red flag — a `Red flag · State: …` marker line in that block. The Line-format bullet listed the four parts but never said the description line *renders as a `#### ` heading* — the one detail every hook parses. A scaffold or queue rewrite that emitted bold lines or bullets would read fine to a person yet silently break all three hooks: no lint flag, no red-flag hit, no error. This batch pins the rendering explicitly so the two still-to-come batches that emit work lines ([templates-spec-recut], [fresh-queue-clean-break]) are authored against a stated shape, not an inferred one. The pinned wording was cross-checked against the live regexes (post_tool_use's WORKLINE_HEADING / SLUG_AT_END / PROVENANCE / RED_FLAG_MARKER / WORK_SECTIONS / VALID_FLAG_STATES and session_start's _open_red_flags) — doc and code agree on every point.
-
-**Files touched:**
-- plugin/si-plugin/docs/plugin-behaviour.md — rewrote the Captures "Line format" bullet to pin the `#### ` heading rendering; reconciled the preceding "single line" wording.
-
-**Routed to Captures:** none

@@ -107,6 +107,40 @@ Check what the doc causes Claude to *say to the user* against the communication 
 
 This lens catches **disguised rationale**: decision history written in the syntax of a rule — a dated "reinstated by the user's decision of…", a "was tried and retired on measured grounds", an alternative's defeat narrated inside the operative statement. The SPEC output-style paragraph found and rewritten on 2026-08-22 is the founding instance: it survived every earlier audit because the earlier lenses looked for rationale *clauses* riding rules, and this was history wearing a whole paragraph's worth of rule syntax. No "because" is required for a sentence to fail this lens — history is rationale whatever conjunction it travels under.
 
+## Lens 5 — underived numbers
+
+**Grep the corpus for digits, then read each hit that functions as a limit or threshold** — a cap, a count, a depth, a cadence. A hit passes only where its derivation is stated in the same or an adjacent sentence: a proportion of the thing governed, a figure from named research, or an externally imposed constraint.
+
+Out of scope, because they state facts rather than limits: dates, version numbers, message ids, and worked examples.
+
+**The limit-or-threshold call is this lens's one reading step**, stated as such so a turn is not mistaken for a mechanical pass. Each failure files one capture quoting the sentence and naming the file.
+
+## Lens 6 — negatives
+
+**Grep for sentence-leading prohibition forms** — "Never", "Do not", "Don't", "No &lt;x&gt; may" — and read each hit for whether the action wanted is stated anywhere in the same provision. A prohibition whose positive action sits beside it passes; one standing alone files a capture quoting it.
+
+**Stated coverage limit:** sentence-leading forms only. Mid-sentence prohibitions — around 151 at the 2026-08-21 count, most of them legitimate — go unread, so a turn says what it covered rather than implying the corpus is clean.
+
+## Lens 7 — contradictions
+
+One lens, two steps.
+
+**Parent–child.** For every subordinated unit — a nested bullet, an amendment naming its parent — read it against the parent's opening words. File a capture where the child is quietly wider or narrower than the rule it amends, or where it reads as a complete freestanding sentence. This is the gate's subordination test applied after the fact.
+
+**In-document.** Within each file, read provisions sharing a subject, found by grepping the file for repeated key nouns. File a capture where two of them command different things for the same case.
+
+**Stated limit:** the second step reaches provisions that share vocabulary. Two contradicting rules phrased with no common noun stay unread — the same limit the retrieve ladder documents for searches.
+
+## Lens 8 — duplication
+
+Covers what the mechanical near-duplicate matcher cannot see: **two passages doing one job at the same level.**
+
+**Across levels.** For each rule in the always-loaded files, ask which lower-level doc owns the same ground — the parent-axis method the 2026-08-22 style-dedup audits used — and file a capture where both state the rule rather than one stating and the other pointing.
+
+**Within one file.** The merge rule's own test applies: two accounts of the same thing under different headings file as a merge candidate.
+
+**Stated limit:** the lens compares rules naming the same mechanism. A duplication paraphrased past shared vocabulary stays unread — the same residual the contradictions lens states.
+
 ## The doubled communication rules — what this project's own narration cannot test
 
 **Read this before treating anything about this project's narration as evidence the method works.** Three layers assert the method's communication rules in every session here, and only one of them is the method. Where a rule is doubled, no session can tell which layer it followed — so a rule that is weak, badly worded, or missing from `skill-nonspecific-rules.md` still produces correct behaviour in this project, supplied by a layer consumers do not have. The defect then ships and this project never sees it.

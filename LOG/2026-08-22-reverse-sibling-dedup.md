@@ -1,6 +1,0 @@
-# d7ea8a0 — The sibling-dedup instance found in LOG, and its reversal already scheduled — capture filed and deleted the same session
-
-On the user's instruction — docs are never deduplicated against siblings, only parents and above; a pass a week ago did it and must be reversed — the instance was dug out in-session rather than packaged into the item: the 2026-08-15 pass (`b4de5bf`) compared done-build.md and done-audit.md against each other, hoisting their byte-identical routing-step record block into done.md and deleting their shared justification paragraph. Two findings settled the fate: the record-block half is already scheduled for reversal — [done-md-carries-other-flavours-material], cleared this session, moves that block back into the sub-docs, and its prose now names this as the reversal; the justification half evicted against the always-loaded rule, a grandparent, which the axis rule permits. The capture was deleted as covered, its content carried into the cleared item. The parent-axis rule itself was already on record ([audit-axis-is-parent-not-sibling], 2026-08-15), so this was enforcement, not a new question.
-
-**Queue changes:** capture filed and deleted as covered; [done-md-carries-other-flavours-material]'s prose gained the reversal paragraph.
-**Work processed:** deleted — [reverse-sibling-dedup] (covered by a cleared item).

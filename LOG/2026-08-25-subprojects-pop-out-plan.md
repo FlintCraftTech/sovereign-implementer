@@ -1,6 +1,0 @@
-# 324005c — Designed and kept: subprojects — pop-out at setup, mailbox mediation, one-way blocking on examined grounds, no stored list
-
-The user's design, extended in discussion. Retrieve found the prior visit (July's nested-projects build; multi-spec stays retired). Mediation is the mailbox, so cross-project queue writes cease to exist rather than being made safe, and Understudy stays out of the path. One-way blocking was re-examined at the user's own invitation ("is the one way thing a good idea? I only suggested it instinctively") and kept on three grounds: loops become structurally impossible, the child never reads outward and stays an ordinary project, and nothing real is forbidden — a downward wait uses the existing outside-the-project pattern, so one direction gets machinery and the other the ordinary treatment. The stored subprojects list dissolved: subfolders are re-detected each session. Upward blocks are checked by reading the child's log index at the parent's revisit — the one circumscribed cross-read. SPEC gained a subprojects paragraph at the keep. Rule gate run — disposition on the item.
-
-**Queue changes:** [subprojects-pop-out] designed and cleared into Processed.
-**Work processed:** kept — [subprojects-pop-out].

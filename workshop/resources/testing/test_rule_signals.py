@@ -23,8 +23,8 @@ for _stream in (sys.stderr, sys.stdout):
     except (AttributeError, ValueError, OSError):
         pass
 
-ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-SCRIPT = os.path.join(ROOT, "resources", "rule_signals.py")
+ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+SCRIPT = os.path.join(ROOT, "workshop", "resources", "rule_signals.py")
 
 _spec = importlib.util.spec_from_file_location("rule_signals", SCRIPT)
 signals = importlib.util.module_from_spec(_spec)

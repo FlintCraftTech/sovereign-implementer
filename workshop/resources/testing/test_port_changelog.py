@@ -30,7 +30,7 @@ for _stream in (sys.stderr, sys.stdout):
     except (AttributeError, ValueError, OSError):
         pass
 
-ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 SCRIPT = os.path.join(ROOT, "plugin", "throughliner", "scripts",
                       "port_changelog.py")
 

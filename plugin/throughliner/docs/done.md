@@ -70,24 +70,10 @@ Detect a completed `[user]` item from what the session can already see. The
 detection rules and the close itself are in done-plan.md, which handles a
 completed item and a planning session together, since the two can coincide.
 
-**Record each `[user]` item the session touched under one of three outcomes —
-done, deferred, or not reached — and read the outcome off the session's own
-trail, never off what the item's presence in the queue suggests.**
-
-```
-done         walked to its end, or the user said they did it, or its
-             walkthrough named an observable check and that check passed
-deferred     the USER said to leave it — their word, never inferred
-not reached  never presented, or presented with no answer given
-```
-
-**Write `deferred` only where the user's own word is on the trail.** An item the
-session never put in front of them was not deferred by anyone, and a record
-saying it was tells the next session a decision was made when none was.
-
-**`not reached` tells the next session to present the item fresh**, with no
-deferral to honour and nothing to resume from — which is the whole reason it is
-a separate value rather than folded into either of the others.
+**Record each `[user]` item the session touched under an outcome, and read that
+outcome off the session's own trail, never off what the item's presence in the
+queue suggests.** The values, and the arm for an outcome none of them fits, are
+next.md's walk-through outcomes provision — stated there once and cited here.
 
 The sub-doc runs the close-out. When it reaches its Commit step, run the commit
 core below, then return to the sub-doc for the recommendation.

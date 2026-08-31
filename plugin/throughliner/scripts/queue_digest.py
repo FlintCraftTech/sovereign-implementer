@@ -224,6 +224,11 @@ def parse(path):
                 "slug": slug,
                 # A LIST — one or more blockers, all of which must resolve.
                 "blocked_by": [],
+                # The `Blocked by:` lines as written. Kept because an item can
+                # carry the line and still yield no blockers — an unbracketed
+                # slug matches no `[slug]` — and the two states are otherwise
+                # indistinguishable from `blocked_by` alone.
+                "blocked_raw": [],
                 "not_before": None,
                 "flag": None,
                 "cycle": None,
@@ -250,6 +255,7 @@ def parse(path):
 
         if current is not None:
             if BLOCKED_RE.match(stripped):
+                current["blocked_raw"].append(stripped)
                 for ref in SLUG_REF_RE.findall(stripped):
                     if ref not in current["blocked_by"]:
                         current["blocked_by"].append(ref)
@@ -654,6 +660,22 @@ def contradictions(items, root=""):
                             f"{shown}"
                         )
                         break
+
+        # A hold nothing can read is a permanent hold. An item below the line
+        # is never built, and the below-the-line revisit works by reading what
+        # each held item NAMES — so an item whose `Blocked by:` line names
+        # nothing resolvable has no arm of the revisit at all: not lifted, not
+        # surfaced, not flagged. The longest it sits the more it reads as
+        # deliberate deferral rather than a typo. Reported here as a
+        # contradiction between the item's placement and its own text, which is
+        # the block that already exists for exactly that.
+        for raw in item["blocked_raw"]:
+            if not SLUG_REF_RE.search(raw):
+                found.append(
+                    f"[{slug}] carries a Blocked by: line naming no slug in "
+                    f"brackets, so nothing reads it as held: {raw} — the "
+                    "blocker's name goes in square brackets"
+                )
 
         if _blocker_loop(item, items):
             found.append(

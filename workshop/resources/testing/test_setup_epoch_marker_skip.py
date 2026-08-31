@@ -20,7 +20,7 @@ for _stream in (sys.stderr, sys.stdout):
         pass
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-ROOT = os.path.dirname(os.path.dirname(HERE))
+ROOT = os.path.dirname(os.path.dirname(os.path.dirname(HERE)))
 SETUP = os.path.join(ROOT, "plugin", "throughliner", "docs", "setup.md")
 
 failures = []

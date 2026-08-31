@@ -1,5 +1,0 @@
-# 2625fa0 — Deleted: the plan-writes-CLAUDE.md proposal loses to the current model, with the why recorded
-
-The user's proposal — lift the planning bar so /plan writes method rule text at the keep-step — was deleted on Claude's recommendation with the user's approval. Why it lost, recorded so it is not re-proposed: the gate's power to refuse lives at /plan under either model, so moving the write buys only transcription; the disposition paragraphs written at the keep-step are already the rule text in near-final form, as this very session's dispositions showed; the disposition-travel repair means the current model works as designed, making this a choice between two working models rather than a fix; and it would move the plan-does-not-build boundary the user has defended twice ("I don't know why this is even a question. Plan does not build."). The half already refused on the parent item stays refused: barring the build from CLAUDE.md without lifting the planning bar would make the method's rules unwritable.
-
-**Work processed:** deleted — [plan-as-rule-author].

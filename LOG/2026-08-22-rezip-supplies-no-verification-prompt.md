@@ -1,6 +1,0 @@
-# d7ea8a0 — The rezip liveness step gets fixed text, and the same-chat payload becomes its primary proof
-
-Kept with the open question answered by the item's own evidence: fixed text over template, because fresh composition is the recorded failure and the compaction-caveat precedent exists because inviting improvement is what broke it. [rezip-liveness-same-chat] merged in — the user's -test15 observation that the restarted app re-fires the session-start payload into the rezip chat itself — so the step's primary proof is that payload read in place, with the fixed fresh-session prompt as fallback, kept rather than deleted on one observed instance. The rewritten step also carries the where-to-paste state description, the how-to-read-the-answer guide, the sent.md false-positive warning, and the worked -test13/-test14 example. Third of the four same-day unspecified-artifact family processed, each getting a required-artifact or fixed-text form. Full disposition and build block on the item.
-
-**Queue changes:** [rezip-liveness-same-chat] deleted as merged in; host item kept into Processed, cleared to run.
-**Work processed:** kept — [rezip-supplies-no-verification-prompt]; deleted — [rezip-liveness-same-chat] (merged).

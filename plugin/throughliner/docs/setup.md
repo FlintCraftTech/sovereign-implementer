@@ -534,10 +534,19 @@ out of the repository.
 mechanically like the rest of the scaffold. Without a repository there is nothing
 for the close-out to commit to.
 
-**Keep-private option**  [BRIEF, PROMPT]. Offer once, as part of scaffolding, to
-add the project's Throughliner documents to `.gitignore` so they stay out of the
-repository entirely — **and offer the three separately, so any combination of them
-is reachable:**
+**Keep-private option**  [BRIEF, PROMPT]. Offer once, as part of scaffolding.
+**There are two named configurations, and the private one is what setup
+proposes** — the same acceptance-default shape the brevity-style offer uses:
+describe it, say why it is preferable, and let the user accept it or choose the
+alternative.
+
+```
+PRIVATE (proposed)  the project's Throughliner documents go in `.gitignore` and
+                    stay out of the repository entirely
+TRACKED             they are committed with the rest of the project
+```
+
+**The choice is per document, so any combination is reachable:**
 
 ```
 SPEC.md    what the project is
@@ -556,17 +565,19 @@ its reasoning and its session history, which is the most personal material the
 method produces; keeping them out of the repository is the only complete
 protection if it is ever published.
 
-**State the cost as the three things that change, not as "you lose undo".** It is
-larger than that, and the moment of choosing is the one moment it can be said.
-Each applies to whichever documents the user keeps out:
+**State what the private configuration keeps, and what it still changes.** Both
+in the same short exchange, at the one moment the choice is being made:
 
 ```
-1. Claude normally writes to these first and reports what landed, because a
-   revert costs nothing. Untracked, it cannot — so text going into them is
-   SHOWN before it is written instead.
-2. A deleted queue item is genuinely gone. Git is not keeping a copy.
-3. The close cannot read its own work back from the file's history, so it
-   records the session from what it remembers.
+KEPT     Claude still writes to these first and reports what landed. Before
+         each change the plugin saves a copy of the previous version into a
+         local folder that is itself kept out of the repository, so an
+         unwanted change — a deleted queue item included — can be put back.
+CHANGED  the close cannot read its own work back from the file's history, so
+         it records the session from what it remembers.
+LIMIT    those saved copies live on this machine and carry no history, so a
+         lost disk loses them. Say this rather than describing the net as an
+         equal replacement for git.
 ```
 
 They also do not travel with a clone.
@@ -577,13 +588,13 @@ can also arrive from an ignore file the user wrote themselves, or from a choice
 made weeks ago in a project nobody has looked at since.
 
 ```
-user names some or all  ->  add exactly those paths to `.gitignore`, say in one
-                            line which went in and which stayed tracked
-user says none          ->  state plainly what results: these documents are
-                            tracked in this folder's history and readable
-                            nowhere else until the project has an online home,
-                            which is set up whenever they ask. Not asked again
-                            at any later setup run.
+user accepts, or names   ->  add exactly those paths to `.gitignore`, say in one
+  some                       line which went in and which stayed tracked
+user chooses tracked     ->  state plainly what results: these documents are
+                             tracked in this folder's history and readable
+                             nowhere else until the project has an online home,
+                             which is set up whenever they ask. Not asked again
+                             at any later setup run.
 ```
 
 **Write the visibility answer as a standing line in the project's own
@@ -596,8 +607,10 @@ interview. **The offer may set up the repository and may never represent the
 contents as screened** — not publishing these documents is the only complete
 protection.
 
-**Change no default.** Nothing is ignored unless the user asks for it, whichever
-documents they name.
+**The private configuration is the proposal, so a user who says nothing about it
+ends up private.** Acceptance is the default here and nowhere else in scaffolding:
+the material is the most personal the method produces, and the recoverability the
+tracked configuration used to be needed for is now supplied by the plugin.
 
 **This adds no sixth interview question.** It is part of scaffolding, where the
 files are being created, and it is answerable without knowing anything about the
@@ -750,6 +763,22 @@ where a discussion needs one.
 
 Once discovery reaches a buildable understanding (or the user says "build from what
 we have"), write the docs, then close in a sentence or two and **stop and wait**.
+
+**Write a personal fact into SPEC or any scaffolded document only where the user
+supplied it in the interview's own answers.** A name above all. The machine
+carries plenty that looks like the user — the git `user.name`, the folder path,
+the account the session runs under — and none of it is an answer they gave. Where
+a personal fact would improve a document and nobody supplied it, leave it out;
+where it is genuinely needed, ask for it as a question like any other.
+
+The instance this comes from: a first-time user was never asked his name, and
+SPEC.md — the file every session reads first — recorded a shortened form he does
+not use and had given to nobody. It surfaced only because a message about to go
+out under his own name was signed with it. Nothing checked it, and a fact nobody
+sourced reads exactly like one the user supplied. The shortened form may in fact
+be a colleague's, which makes it the very thing the scrub checklist exists to
+keep out of a committed document: a personal name belonging to someone not in the
+room.
 
 ```
 1.  fill SPEC.md from the interview answers

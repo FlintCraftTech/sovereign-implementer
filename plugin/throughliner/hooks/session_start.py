@@ -1794,13 +1794,15 @@ def main() -> int:
     ignored = _untracked_core_docs(cwd)
     if ignored:
         context_parts.append(
-            "[Throughliner] Not tracked by git: %s. This is a choice the method "
-            "offers at setup, so nothing is wrong — but three things work "
-            "differently and are easy to miss.\n"
-            "  1. Claude normally writes to these and then tells you what "
-            "landed, because git would let you undo it. It cannot here, so text "
-            "going into them is SHOWN to you first instead.\n"
-            "  2. A deleted queue item is gone. Git is not keeping a copy.\n"
+            "[Throughliner] Not tracked by git: %s. This is the configuration "
+            "the method proposes at setup, so nothing is wrong — and undo still "
+            "works, by a different route.\n"
+            "  1. Claude writes to these and then tells you what landed, as "
+            "usual. Before each change a copy of the previous version is saved "
+            "under .throughliner/snapshots/, so an unwanted change — a deleted "
+            "queue item included — can be put back from there.\n"
+            "  2. Those copies are on this machine only and carry no history, "
+            "so a lost disk loses them. Git is not keeping a copy.\n"
             "  3. The close cannot read back its own work from the file's "
             "history, so it records from what it remembers of the session."
             % ", ".join(ignored)
@@ -2022,7 +2024,24 @@ def main() -> int:
         context_parts.append("")
         context_parts.append(
             "Ready. "
-            "Run /plan to manage the queue, or /next to start the top work item."
+            "Run /throughliner:plan to manage the queue, or /throughliner:next "
+            "to start the top work item.\n"
+            # The qualified form, unconditionally. The plugin's skills are
+            # namespaced, so on some installs the bare `/plan` resolves to
+            # nothing and Claude Code answers "isn't available in this
+            # environment" — at the session's very first message, before any
+            # rule has been read, and from the harness rather than from a turn
+            # Claude is composing. There is no turn in which a behavioural rule
+            # could fire, which is why this lives in the hook: it is the one
+            # thing that speaks before anything else and that nobody has to have
+            # read.
+            #
+            # Printed whether or not the bare form works here, because whether
+            # it works is a harness fact nobody has measured and the qualified
+            # form is correct in every project either way. Sidesteps the
+            # unverified question rather than waiting on it.
+            "(The bare /plan and /next work on some installs and not others — "
+            "the longer names always work.)"
         )
 
     # Working files left by OTHER sessions. Surfaced, never deleted — the file

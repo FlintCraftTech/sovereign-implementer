@@ -1,7 +1,0 @@
-# 2625fa0 — Kept and cleared: cycles — a definitions doc, due-ness computed from observables, suggested where work is recurring-shaped
-
-The user's concept, designed in-session. No new skill, on her call. Definitions live in a dedicated doc created the first time a cycle is asked for; a project with no cycles pays nothing, since the doc's presence is the fetch trigger (the same distribution shape as feedback-and-inbox.md — always-loaded placement was considered at her suggestion and correctly declined on the distribution test). Position is never stored: each definition names the observable marking a completed turn, and checks at /plan's opening, /next's pre-flight and /done's wind-down compute due-ness and file one capture per due step, satisfied while one is open — the rule_signals pattern, chosen against a positions board because the board and merge-cycle failures plus the nothing-is-stored rule all point the same way. Cadence may be declared or derived, said which. Added on her instruction before close: Claude proactively suggests a cycle at the keep-step where work is recurring-shaped, once, in the item's own message, creation staying her call. SPEC's cycles paragraph written in-session, ahead of the build.
-
-Rule gate: run — new fetched-doc mechanism plus one clause per site and the suggest-clause; nothing joins the always-loaded set; nothing displaced, stated rather than hidden.
-
-**Work processed:** kept — [cycles-definitions-and-due-checks].

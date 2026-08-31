@@ -829,6 +829,21 @@ plain-English summary of what the item says, inline, before any analysis.** The
 summary serves the user who isn't reading the file; the pointer to the file
 stays alongside for whoever is.
 
+**What the summary turn carries.** Two requirements, both about what the reader
+can resolve without the scrollback:
+
+```
+NAMES ITS SUBJECTS OUTRIGHT   every subject is named, never pointed at by a
+                              referring expression only this conversation can
+                              resolve — "the failure above", "that approach",
+                              "the same problem". A reader is not holding the
+                              messages before this one.
+NAMES WHO RAISED IT           where the item came from anyone other than the
+                              project's owner — another project, a tester, a
+                              report — say whose it is. Their own work needs
+                              no attribution back to them.
+```
+
 ```
 first item        ->  the processing pass OPENS checkpoint-shaped: the order
                       narration, a pointer to the first item, and "start with
@@ -904,9 +919,40 @@ ask requests agreement to that — with the move stated as what follows on the
 yes.** Two parts, one turn:
 
 ```
-"<what would actually change, in plain words>.
- Would you agree with that? If so I'll move it into Processed, cleared to run."
+"**<what would actually change, in plain words>.**
+ Do <the recommendation>? If so I'll move it into Processed, cleared to run."
 ```
+
+**What the recommendation turn carries, wherever it appears — a turn of its own
+or merged into the interview's close:**
+
+```
+CARRIES        what would change, and the ask. Nothing else.
+ON REQUEST     reasoning, findings, the alternatives weighed and why each lost.
+AN OPTION      offered where the question is genuinely open, and accounting
+               for what the user has already said this session — an option
+               their stated situation rules out is not an option.
+```
+
+**Bold the recommendation's first sentence**, so the recommendation is findable
+without reading the turn to locate it.
+
+**Write the ask as one fixed formula every time — "Do <the recommendation>?", or
+as near as grammar allows.** A varied ask makes the reader work out what is being
+asked before they can answer it; a constant one is recognised rather than parsed.
+
+**The turn covers ONE decidable part, and the test is whether the user could
+plausibly agree to one part and reject another.** Where they could, that is that
+many decisions, each getting its own recommend-and-wait turn. A composite may be
+summarised in one message for orientation, but the ask at its end covers exactly
+the first part, never the set. This is the operative statement of what counts as
+one item for `[SEQUENCE]`.
+
+**The ask names the act and never assigns authorship.** An ask framed "shall I
+write this in as your hypothesis?" records the user as author of the reasoning
+whatever they answer, since even "as you recommend" is a yes to that framing. Who
+authored which part is settled by the provenance rules' containment test and
+written into the item as mixed where it is mixed.
 
 **The question asks about the recommendation, never about the mechanics.** An ask
 that reads "move it into Processed, cleared to run?" asks about the filing, so a
@@ -1135,6 +1181,17 @@ says which — and **the observable that marks a completed turn**. The openings
 and closes then compute due-ness from that observable and file a capture when a
 turn is due; nothing stores a position.
 
+**A definition's steps, criteria and observable pass the same test a kept item's
+instructions do** — the buildability check's design-decision clause, applied at
+authoring: no open class, no decision scheduled into the turn, stated concretely
+enough that two sessions given the text produce the same turn.
+
+It needs saying here because the check that catches this on a queue item runs at
+the decision step, while a definition is written straight into the cycles doc by
+the same pen — so a criteria paragraph reading "whatever would fail the
+discipline" passed unchecked, delegating the criteria-selection decision to the
+audit's own turn.
+
 **An observable read from the project's own `LOG/` must be distinguishable from
 the records planning itself writes.** A planning run writes one record per item
 it processes, named by that item's slug — including the record for authoring the
@@ -1234,6 +1291,15 @@ The disposition waits for its own agree / defer / something-else turn.
 
 The checkpoint's "continue" answers *which item comes next*, never a disposition
 of that item.
+
+**Content belonging to a not-yet-presented entry is carried to that entry's own
+turn and written then.** While processing one item it is natural to write the
+settled answer into a neighbouring entry that has not come up yet. Once that
+content is already written somewhere else, the only honest thing left to offer
+at its turn is a confirmation — so the recommend-and-wait turn has nowhere to
+stand, and the fold conditions above become easiest to skip at exactly the moment
+they matter. The recorded instance: a project's user caught it themselves, their
+words being *"you didn't make a recommendation."*
 
 ```
 into Processed ->  CAN fold. The item is written and then reported, and the
@@ -1460,6 +1526,23 @@ message order:
        Specimen: `20 ready to build · 9 left to process`
     5. nothing else. No menu of routes, no disposition tally.
 ```
+
+**The pointer states the item's filed date when — and only when — the order in
+play ranks by age.** That is the long-and-old rung and the alternating rung.
+Under any other rung the pointer says nothing about age, because age is not why
+this item came up and stating it would suggest otherwise.
+
+```
+ordering by age    ->  the pointer carries the date, read from the digest's
+                       First seen field
+any other rung     ->  no age in the pointer
+```
+
+Read the date rather than working it out: the digest computes First seen, and a
+date derived any other way is the unfounded time statement the rules forbid.
+
+**Four parts, and no fifth.** The existing shape above is untouched; the date
+rides part 2's pointer.
 
 **Both numbers are forward-looking, which is why both are here.** How much is
 left to process tells the user whether to carry on now; how much is ready to

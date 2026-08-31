@@ -1,6 +1,0 @@
-# 077b8b9 — plan — the two zip defects merged: the ritual's zip step rebuilds in Python's zipfile, excluding bytecode
-
-A merge under the two-accounts-of-one-artifact test: the backslash-separators finding and the bytecode-sweep-ordering finding are both about what ends up inside the zip the ritual builds, and one change closes both — Python's `zipfile` writes conformant forward-slash paths and excludes `__pycache__` at zip time, ending the sweep-ordering fragility permanently instead of re-ordering around it. Post-processing entries lost as the more fragile half-measure. The merged-in item's open check was run and found unanswerable, recorded so it is not re-run: the installed cache holds bytecode folders, but hooks run from that cache and regenerate them, so what the snapshot carried cannot be told — provable harm is confined to the zips. The unverified non-Windows-tester question travels unchanged; the fix does not depend on it.
-
-**Queue changes:** [zip-entries-use-backslash-separators] rewritten as the merge host and cleared; [pycache-sweep-runs-before-the-suites] deleted, its facts carried across. Ordering with [host-rituals-migration] written on both.
-**Work processed:** kept — [zip-entries-use-backslash-separators]; deleted — [pycache-sweep-runs-before-the-suites] (merged).

@@ -1,7 +1,0 @@
-# 99865ab — plan — [as-planned-reads-the-record-and-stamps] kept: plan-phrases resolve by reading the record; a release compares stamps before packaging
-
-From the release trace's other two failures: "as planned" accepted without the plan being opened, and v1.21.0 cut from the working tree rather than the installed test20. Two fixes: a Prior-decisions clause (a phrase pointing at a recorded plan is resolved by reading the record), and the ritual's pre-package stamp comparison with a standalone warning turn — the warn-don't-enforce shape at the exact point it was missed. The user's corrections during processing were folded in as content after she pressed that they must land somewhere: her invariant — a release releases a tested rezip, rezips never imply releases — is stated on the item, with the ritual to say plainly that packaging reads the working tree and the stamp step guards the invariant. The dissolved-soak capture ([pre-release-rezip-dissolved-into-the-ritual]) was deleted as relocated here, its finding preserved in the audit record.
-
-**Queue changes:** [as-planned-reads-the-record-and-stamps] filed and cleared; [as-planned-accepted-without-rereading-the-plan] and [pre-release-rezip-dissolved-into-the-ritual] deleted as merged/relocated.
-**Work processed:** kept — [as-planned-reads-the-record-and-stamps].
-Rule gate: run at the keep — amendment plus host ritual step; recorded on the item.

@@ -1,6 +1,0 @@
-# 324005c — Raised and kept: Discord posts draft at the planning close, dated into the daily chain, with a posting brief and a staleness check
-
-The user's idea and reasoning: post-session is when reasoning on new items is richest, so drafts are written then — the close sweep offers the post-worthy set for approval and writes full drafts as dated captures. Drafting-versus-posting is what survives the shipped-only rule; the post-time verify-against-shipped step comes from the live comparison-post staleness failure. The brief, with the user's exemplar: posts describe how it works and what the reader gets, never how it was agreed. A daily posting cycle was refused as cry-wolf; the dated captures are the surfacing (which also answered the user's question about why daily posting never surfaced — nothing computed due-ness). Amended at the close on the user's direction: the sweep runs immediately after the wind-down re-scan, over a complete and freshest record. The sweep was then run by hand at this same close — five drafts filed, see the chat entry. Rule gate run — disposition on the item.
-
-**Queue changes:** [plan-close-post-drafting] filed and cleared into Processed, then amended with the ordering.
-**Work processed:** kept — [plan-close-post-drafting].

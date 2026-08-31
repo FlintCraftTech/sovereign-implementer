@@ -31,7 +31,8 @@ import sys
 import tempfile
 
 HOOKS = os.path.join(
-    os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),
+    os.path.dirname(os.path.dirname(os.path.dirname(
+        os.path.dirname(os.path.abspath(__file__))))),
     "plugin", "throughliner", "hooks",
 )
 HOOK = os.path.join(HOOKS, "pre_tool_use.py")

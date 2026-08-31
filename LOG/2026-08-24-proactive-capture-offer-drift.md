@@ -1,5 +1,0 @@
-# a2ce359 — Kept and cleared: the process-now offer's position made operative
-
-Processed 2026-08-24 on three instances recorded the same day, the third identified by the user as the clearest: a raised concern answered with full analysis, a designed fix, and only then "process it now?" — the choice pre-spent, since with the design done, file-for-later had stopped being real. The others: an applied correction left hanging with no offer, and an offer missing its process-now branch. Her originating hypothesis — the hold-until-decided rule's gravity pulling "don't write yet" into "don't move at all" — was checked against the shipped wording, which carries the offer but not its position; position is the fix. The amendment: the offer comes first, before any analysis, design, or write on the raised thing, both branches. SPEC's processing-flow sentence gained "given before the idea is worked". Applied immediately for the rest of the session. Gate: run — amendment to the process-now section, admitted on the three instances.
-
-**Work processed:** kept — [proactive-capture-offer-drift], cleared with build block.

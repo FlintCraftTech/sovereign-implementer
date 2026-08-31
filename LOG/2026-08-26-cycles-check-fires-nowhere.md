@@ -1,6 +1,0 @@
-# aa78310 — Cycles failure diagnosed without the transcripts and its fix cleared: the check was doc-only with no mechanical trigger, so a skipped run and a clean one were indistinguishable
-
-Settled by a grep rather than by the deferred transcript reading: the due-ness check exists only as doc steps at three sites, each silent when nothing is due, and `session_start.py` never mentions CYCLES.md — a fresh opening's payload says nothing about the file, which fits both live failures. The fix gives the check a mechanical trigger (the hook emits a cycles fact line whenever the doc exists) and a visible run (the doc steps become one brief line per cycle where a doc exists, silent otherwise) — so if the true cause was a wrong computation instead, the narration exposes it next run. The silent-when-clean arm for doc-present projects is evicted with the gate run at the keep. Consequence: once shipped and rezipped, [cycles-due-check-verification] can pass and the beta chain lifts through its existing wiring; that verification was held below the line at this close, since walking it before the fix ships can only reproduce the known failure.
-
-**Queue changes:** kept and cleared third; [cycles-due-check-verification] held below the line naming it.
-**Work processed:** kept — [cycles-check-fires-nowhere].

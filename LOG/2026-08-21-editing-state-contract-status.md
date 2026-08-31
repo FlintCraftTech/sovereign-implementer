@@ -1,6 +1,0 @@
-# 3102929 — The editing-state contract stays, settled by a web search: published file-signal formats are recognised practice
-
-Question 3 carried the decision and was answered in-session by search: documented formats for file signals other programs read (pid files, lock files) are established conventions, and the interface-contract literature says a shared file interface gets a written spec both sides can cite, else either side changes it silently. Sources: Agile Modeling's contract models (agilemodeling.com/artifacts/contractModel.htm), the System Interfaces Contract write-up (dwbi1.wordpress.com/2012/05/19/system-interfaces-contract/), pidlockfile (pypi.org/project/pidlockfile/), LockFile::Simple (metacpan.org/pod/LockFile::Simple). The code-is-the-format argument holds only while every reader can read this repository's hook — true of the one consumer today, not of the shape. So: delete refused; questions 1 and 2 get the mechanical answers — a conformance test under `resources/testing/` riding the hook-suite close trigger, and a Known-consumers line in the contract. Build block on the item.
-
-**Queue changes:** [editing-state-contract-status] moved Unprocessed → Processed, cleared.
-**Work processed:** kept, with the deciding research run in-session.

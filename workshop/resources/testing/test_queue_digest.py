@@ -26,7 +26,7 @@ import shutil
 import sys
 import tempfile
 
-ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 SCRIPT = os.path.join(ROOT, "plugin", "throughliner", "scripts", "queue_digest.py")
 
 _spec = importlib.util.spec_from_file_location("queue_digest", SCRIPT)

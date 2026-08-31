@@ -45,10 +45,19 @@ never block or fail a tool call.
 For Bash/PowerShell: checks rule 2 (git safety) only.
 """
 
+import datetime
 import json
 import os
 import re
 import sys
+
+
+# How long a pre-change snapshot of an untracked method document is kept.
+# NOT a chosen number: it is git's own `gc.reflogExpire` default, the window git
+# keeps work that is no longer reachable from a branch. Snapshots exist because
+# these documents have left git's history, so the undo window git itself
+# provides is the figure this is derived from.
+SNAPSHOT_WINDOW_DAYS = 90
 
 
 # --- Git safety patterns ---
@@ -508,6 +517,39 @@ def _is_memory_dir(filepath: str) -> bool:
     return "memory" in parts[claude_idx + 1:]
 
 
+def _is_plans_dir(filepath: str, cwd: str) -> bool:
+    """Check if a path is the harness's plan-mode plans directory.
+
+    Plan mode is a harness feature: it designates one file under the harness's
+    plans directory as the only file the session may edit, and reads the plan
+    back from it on exit. Permitted on the same ground as the scratchpad — it
+    sits outside the repository, so nothing the scope-lock protects lives there.
+
+    Without this the two rules fought and the workaround was worse than either:
+    a session wrote its plan to the scratchpad and copied it across with a shell
+    `cp`, which is a write the hook cannot see at all.
+
+    Matched by path SHAPE — a `plans` directory somewhere beneath a `.claude`
+    directory — exactly as the memory directory is, and never as a hardcoded
+    machine path. The location was observed live rather than documented, and a
+    harness fact can move between versions; a shape holds for every consumer
+    wherever their home lives. A path inside the project is excluded, so a
+    project that happens to contain a `.claude/plans` folder of its own is
+    still governed.
+    """
+    norm = _normalise(filepath)
+    parts = norm.split(os.sep)
+    if ".claude" not in parts:
+        return False
+    claude_idx = parts.index(".claude")
+    if "plans" not in parts[claude_idx + 1:]:
+        return False
+    cwd_norm = _normalise(cwd)
+    if norm == cwd_norm or norm.startswith(cwd_norm + os.sep):
+        return False
+    return True
+
+
 def _is_research_dir(filepath: str, cwd: str) -> bool:
     """Check if a path is under the project's workshop/resources/research/ folder.
 
@@ -628,6 +670,131 @@ def _is_scratchpad_dir(filepath: str, cwd: str) -> bool:
     if norm == cwd_norm or norm.startswith(cwd_norm + os.sep):
         return False
     return True
+
+
+def _is_snapshot_subject(filepath: str, cwd: str) -> bool:
+    """Check whether a path is one of the project's own method documents.
+
+    The set is the documents /setup scaffolds and the privacy posture offers to
+    keep out of the repository — the ones whose only undo is git, and which
+    therefore have no undo at all once they are untracked. Working files are
+    deliberately absent: a build or plan working file is deleted at the close by
+    design, so snapshotting it would preserve the thing the close removes.
+    """
+    norm = _normalise(filepath)
+    for name in ("SPEC.md", "QUEUE.md", "CYCLES.md", "TOOLS.md", "CLAUDE.md"):
+        if norm == _normalise(os.path.join(cwd, name)):
+            return True
+    for folder in ("LOG", "FAQ"):
+        base = _normalise(os.path.join(cwd, folder))
+        if norm.startswith(base + os.sep):
+            return True
+    return False
+
+
+def _is_untracked(filepath: str, cwd: str) -> bool:
+    """Is this file outside git's history, so that git holds no previous copy?
+
+    Fails toward True on any error — no git, git missing from PATH, a timeout, a
+    repository this file does not belong to. The two failure directions are not
+    symmetrical: failing to False silently withdraws the safety net at exactly
+    the moment nobody can tell it is gone, while failing to True costs a copy of
+    a file git already holds. A wasted copy is the cheaper mistake, and the
+    duplicate-collapse in _snapshot_before_write means an unchanging file makes
+    no more than one of them.
+    """
+    try:
+        import subprocess
+        result = subprocess.run(
+            ["git", "ls-files", "--error-unmatch", "--", filepath],
+            cwd=cwd,
+            capture_output=True,
+            encoding="utf-8",
+            timeout=5,
+        )
+        return result.returncode != 0
+    except Exception:
+        return True
+
+
+def _snapshot_before_write(cwd: str, filepath: str) -> None:
+    """Save the current contents of an untracked method document. Never raises.
+
+    Write-first — Claude writes to a project document and then reports what
+    landed — rests on one test: is the previous version recoverable without the
+    user's help? For a tracked document git answers yes. For an untracked one
+    nothing did, so the rule used to flip those documents to show-first. This
+    supplies the recoverability itself instead, and write-first stays.
+
+    Placed before the scope checks so the copy exists before the write does. A
+    write that is then denied leaves one extra snapshot behind, which the
+    duplicate-collapse below absorbs.
+
+    PRUNE DEPTH, and the derivation it is required to state. Snapshots stand in
+    for the history these files no longer have, so the window is git's own: the
+    `gc.reflogExpire` default of 90 days, which is how long git itself keeps
+    work that is no longer reachable from a branch. Within that window every
+    DISTINCT version is kept — an identical re-write adds nothing — so the
+    folder holds what git's history would have held for these files, and no
+    count is invented.
+    """
+    try:
+        if not _is_snapshot_subject(filepath, cwd):
+            return
+        if not os.path.isfile(filepath):
+            return
+        if not _is_untracked(filepath, cwd):
+            return
+
+        rel = os.path.relpath(filepath, cwd).replace(os.sep, "__")
+        snap_dir = os.path.join(cwd, ".throughliner", "snapshots")
+        os.makedirs(snap_dir, exist_ok=True)
+
+        with open(filepath, "rb") as handle:
+            current = handle.read()
+
+        existing = sorted(
+            name for name in os.listdir(snap_dir)
+            if name.startswith(rel + "@")
+        )
+
+        # Duplicate collapse: an unchanged file adds no version.
+        if existing:
+            newest = os.path.join(snap_dir, existing[-1])
+            try:
+                with open(newest, "rb") as handle:
+                    if handle.read() == current:
+                        return
+            except OSError:
+                pass
+
+        stamp = datetime.datetime.now().strftime("%Y%m%dT%H%M%S%f")
+        with open(os.path.join(snap_dir, f"{rel}@{stamp}"), "wb") as handle:
+            handle.write(current)
+
+        _prune_snapshots(snap_dir)
+    except Exception:
+        return
+
+
+def _prune_snapshots(snap_dir: str) -> None:
+    """Drop snapshots older than git's own reflog-expiry window. Never raises."""
+    try:
+        cutoff = datetime.datetime.now() - datetime.timedelta(
+            days=SNAPSHOT_WINDOW_DAYS)
+        for name in os.listdir(snap_dir):
+            _, _, stamp = name.rpartition("@")
+            try:
+                taken = datetime.datetime.strptime(stamp, "%Y%m%dT%H%M%S%f")
+            except ValueError:
+                continue
+            if taken < cutoff:
+                try:
+                    os.remove(os.path.join(snap_dir, name))
+                except OSError:
+                    continue
+    except Exception:
+        return
 
 
 def write_editing_marker(cwd: str, session_id: str, filepath: str, active: bool) -> None:
@@ -1207,6 +1374,42 @@ def _is_sent_register_overwrite(tool_name: str, filepath: str, cwd: str) -> bool
     return _normalise(filepath) == _normalise(os.path.join(cwd, SENT_REGISTER))
 
 
+def _is_hook_suite_file(filepath: str, cwd: str, build_files: list[str]) -> bool:
+    """A test suite, in a run that is already changing a hook.
+
+    Bounded to exactly that pairing, and it completes a requirement the method
+    already imposes rather than widening what a run may write: a close whose
+    staged paths include the hooks directory must run these suites before it can
+    commit, so a hook-touching run ALWAYS meets its suites. Refusing them guarded
+    files the rules make part of every such change.
+
+    The failure it removes, seen twice in one run: an item named "the lint's
+    suite under the testing folder", which is a folder and not a path a `Files:`
+    list can carry, so self-scoping could name only the suite files the item's
+    own text mentioned — and the run then met two others and stopped to ask.
+    Interrupting to widen scope is the one thing a run nobody is watching should
+    not need to do.
+
+    Both the current path and the pre-move one are matched, because a project
+    whose suites have not yet moved is in exactly the same position.
+    """
+    if not any(_normalise(os.path.join(cwd, bf)).startswith(
+            _normalise(os.path.join(cwd, "plugin", "throughliner", "hooks"))
+            + os.sep)
+            for bf in build_files):
+        return False
+
+    norm = _normalise(filepath)
+    for testing_dir in (
+        os.path.join(cwd, "workshop", "resources", "testing"),
+        os.path.join(cwd, "resources", "testing"),
+    ):
+        base = _normalise(testing_dir)
+        if norm.startswith(base + os.sep):
+            return True
+    return False
+
+
 def _is_build_file(filepath: str, cwd: str, build_files: list[str]) -> bool:
     """Check if a path is in the build's file list."""
     norm = _normalise(filepath)
@@ -1215,7 +1418,7 @@ def _is_build_file(filepath: str, cwd: str, build_files: list[str]) -> bool:
         candidate = _normalise(os.path.join(cwd, bf))
         if norm == candidate:
             return True
-    return False
+    return _is_hook_suite_file(filepath, cwd, build_files)
 
 
 # --- Main ---
@@ -1439,6 +1642,14 @@ def main() -> int:
                 "was one variable assignment."
             )
 
+        # The queue tool is the one sanctioned route by which a shell command
+        # rewrites a method document, so it gets the same pre-change snapshot an
+        # Edit would. Without this, every per-item removal in a run — the most
+        # frequent queue write there is — would go unprotected in a project whose
+        # queue has left git.
+        if "reorder_queue" in command:
+            _snapshot_before_write(cwd, os.path.join(cwd, "QUEUE.md"))
+
         return 0
 
     # --- Edit/Write/MultiEdit: file-scope enforcement ---
@@ -1464,6 +1675,12 @@ def main() -> int:
     # or fail the tool call — see write_editing_marker. Reached only after the
     # SPEC.md gate above, so the signal exists only in adopted projects.
     write_editing_marker(cwd, data.get("session_id", ""), filepath, True)
+
+    # Save the previous version of an untracked method document, so write-first
+    # keeps its recoverability test in a project that has taken these documents
+    # out of git. Same placement reasoning as the marker above: before the write,
+    # and never able to block or fail the tool call.
+    _snapshot_before_write(cwd, filepath)
 
     # A Write onto an existing LOG entry destroys it silently. Checked ahead of
     # every scope branch, because LOG/ is editable in all of them — the scope
@@ -1575,6 +1792,9 @@ def main() -> int:
         if _is_scratchpad_dir(filepath, cwd):
             return 0
 
+        if _is_plans_dir(filepath, cwd):
+            return 0
+
         if _is_tools_file(filepath, cwd):
             return 0
 
@@ -1647,6 +1867,7 @@ def main() -> int:
             or _is_memory_dir(filepath)
             or _is_research_dir(filepath, cwd)
             or _is_scratchpad_dir(filepath, cwd)
+            or _is_plans_dir(filepath, cwd)
             or _is_tools_file(filepath, cwd)
             or _is_inbox_dir(filepath)
             or _is_ritual_declared_path(filepath, cwd)

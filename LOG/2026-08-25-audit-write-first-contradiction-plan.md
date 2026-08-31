@@ -1,6 +1,0 @@
-# 324005c — Kept, wider than the finding: write-first's justification reworded, the candidate-set exception admitted, and SPEC's who-it's-for passage rewritten
-
-The audit finding asked only that the parent and children stop contradicting. Mid-processing the user walked back the premise the rule rested on — that they read text directly from QUEUE.md — so the rule's approval story falls, not just its edge case. What survives is the cost argument (text shown then written is produced twice, the user's own 2026-08-01 capture); the replacement approval story is the same-day consent redesign: consent in conversation before the write, the file as the record of agreement. SPEC edits made at the keep: the write-first paragraph reworded, and — on the user's confirmation, "that's true to my experience" — the who-it's-for identity reframed from reading-as-approval to a record to trust and return to, with the orientation-line rewording added to the build. Rule gate run, restatement attempted, exception kept — disposition on the item.
-
-**Queue changes:** [audit-write-first-contradiction] kept into Processed, cleared, scope widened as above.
-**Work processed:** kept — [audit-write-first-contradiction].

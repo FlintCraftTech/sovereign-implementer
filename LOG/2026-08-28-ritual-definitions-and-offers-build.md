@@ -1,7 +1,0 @@
-# 4efdcff — Rituals built: named step lists with a trigger word, offered on procedure-shaped work, promoted to cycles when they gain a cadence
-
-The user's structural read shipped as designed: a ritual is the turn-steps component of a cycle standing alone — no cadence, fired on the user's word — living in the same cycles doc. plan.md's decision step gained the authoring arm, a two-armed offer block (recurring-shaped → cycle, procedure-shaped → ritual, each offered once in the message already discussing the work), and the promotion clause. The parser split into `_parse_cycles_doc()` feeding `cycles_facts()` and a new `rituals_facts()`; the discriminator is what a definition carries (trigger and no cadence), so the format grows additively, every existing doc stays valid, and no epoch bump is owed. Session start reports rituals by name and trigger only — no due-ness exists to compute, and no capture is ever filed for one.
-
-Tick: done, confirmed — all 27 suites passed, with new cases keeping a mixed doc's ritual out of the cycles and reporting it on its own. SPEC's sentence was written at processing, ahead of this build.
-Files touched: plugin/throughliner/docs/plan.md, plugin/throughliner/hooks/session_start.py, resources/testing/test_session_start_cycles_facts.py.
-Rule gate: run — amendments to the decision step's existing cycle rules (parent named); nothing evicted; distribution plan.md. FAQ entry waits for the announcement per the standing rule.

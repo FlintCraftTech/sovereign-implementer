@@ -1,5 +1,0 @@
-# a2ce359 — Deleted on a false premise, and kept: absence claims check a listing that shows hidden files
-
-Processed 2026-08-24, two dispositions from one check. [inbox-address-book-absent] was deleted: the address book exists at `INBOX/.address-book.md` — a hidden dotfile the filing session's plain listing didn't show, so a false capture survived a day as plausible work. The paired keep, [absence-claims-check-hidden-files], adds one clause to the keep-step's read-the-mechanism limb: an absence assertion is checked with a listing that shows hidden files. The user caught the outgoing more-than-once count still steering the first recommendation ("one occurrence doesn't make a rule") — this keep is the first use of the single-instance test after its repeal. Captures stay cheap and unverified; processing stays the filter, which is why the fix rides the processing-time limb. Gate: run — amendment to the read-the-mechanism limb.
-
-**Work processed:** deleted — [inbox-address-book-absent] (premise false); kept — [absence-claims-check-hidden-files], cleared with build block.

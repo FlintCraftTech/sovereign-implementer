@@ -28,7 +28,7 @@ import subprocess
 import sys
 import tempfile
 
-ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 HOOKS = os.path.join(ROOT, "plugin", "throughliner", "hooks")
 PRE = os.path.join(HOOKS, "pre_tool_use.py")
 POST = os.path.join(HOOKS, "post_tool_use.py")
@@ -74,6 +74,12 @@ def read_markers(cwd):
         return {}
     out = {}
     for name in os.listdir(d):
+        # Read only what the contract calls a marker: `editing-<session-id>.json`.
+        # The folder also holds other transient plugin state — the pre-change
+        # snapshots of untracked method documents live in a subfolder here — and
+        # a helper that read every entry was reading a directory as a file.
+        if not (name.startswith("editing-") and name.endswith(".json")):
+            continue
         with open(os.path.join(d, name), encoding="utf-8") as f:
             out[name] = json.load(f)
     return out

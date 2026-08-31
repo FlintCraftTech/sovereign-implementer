@@ -25,7 +25,7 @@ for _stream in (sys.stderr, sys.stdout):
         pass
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-ROOT = os.path.dirname(os.path.dirname(HERE))
+ROOT = os.path.dirname(os.path.dirname(os.path.dirname(HERE)))
 HOOK = os.path.join(ROOT, "plugin", "throughliner", "hooks", "pre_tool_use.py")
 CONTRACT = os.path.join(ROOT, "EDITING-STATE-CONTRACT.md")
 

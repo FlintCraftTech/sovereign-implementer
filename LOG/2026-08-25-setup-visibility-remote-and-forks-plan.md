@@ -1,6 +1,0 @@
-# 324005c — Designed and kept: visibility follow-through, the recorded answer, and the two-repositories rule — Chagora's three defects, one build
-
-The archived report was re-read in full as the item required. Per defect: the keep-private decline gains a plain statement of what results (tracked, no remote, readable nowhere until an online home exists on request — the silence replaced, never auto-publishing); the visibility answer lands as a standing line in the project's own CLAUDE.md, which every session reads; and a new freestanding rule — slot cost owned, no parent exists — makes any session that brings a second repository inside the project say so at that moment, name where the docs live, and put the root choice to the user, recorded the same way, with setup running the same check at adoption. A session_start no-remote check was refused as unneeded while the recorded line reaches every session. The build's close drafts the promised follow-up mail to Chagora, who hold their work on it. SPEC's privacy paragraph updated at the keep. Rule gate run — disposition on the item.
-
-**Queue changes:** [setup-visibility-remote-and-forks] designed and cleared into Processed.
-**Work processed:** kept — [setup-visibility-remote-and-forks].

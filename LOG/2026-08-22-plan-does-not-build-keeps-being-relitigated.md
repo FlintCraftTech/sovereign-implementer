@@ -1,6 +1,0 @@
-# d7ea8a0 — The plan/build boundary investigation ran clean: the teaching source is gone and no build weakened the statements
-
-The item's two checks were run in-session rather than queued, and both came back clean. Lead one: the prose that taught a session to re-open the settled boundary lived in [rescan-as-its-own-skill], which shipped and left the queue; the whole queue was read this session and the one item now framing the boundary as open is [plan-as-rule-author] — legitimately, as the user's own deliberately split-out proposal carrying her words on both sides. Lead two: "No building happens here" stands in plan.md's opening (an initial grep missed it only because the sentence wraps across two lines) and the filing-vs-processing boundary stands in the always-loaded rules; the scope-lock enforces the boundary mechanically regardless, so a planning session that tried to build would be denied at the write. Nothing changes inside any file, so the item resolved as a finding and was deleted, this entry being the record the retrieve ladder reaches.
-
-**Queue changes:** item deleted after its investigation ran clean.
-**Work processed:** deleted — [plan-does-not-build-keeps-being-relitigated] (investigated, clean).

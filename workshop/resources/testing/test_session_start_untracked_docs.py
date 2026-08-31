@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Fixture suite for the untracked-core-docs check.
 
-Run: py resources/testing/test_session_start_untracked_docs.py
+Run: py workshop/resources/testing/test_session_start_untracked_docs.py
 (Plain script, never pytest — see CLAUDE.md's scripting constraints.)
 
 What this is guarding. A whole planning session ran in a consumer project — a red
@@ -31,8 +31,8 @@ for _stream in (sys.stderr, sys.stdout):
     except (AttributeError, ValueError, OSError):
         pass
 
-ROOT = os.path.dirname(
-    os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+ROOT = os.path.dirname(os.path.dirname(
+    os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 HOOK = os.path.join(ROOT, "plugin", "throughliner", "hooks", "session_start.py")
 
 failures = []
@@ -125,6 +125,27 @@ def test_an_unrelated_ignore_line_is_not_reported():
     shutil.rmtree(d, ignore_errors=True)
 
 
+def test_the_report_names_snapshots_and_not_show_first():
+    """The consequence text must match what the plugin now actually does.
+
+    Snapshots restore recoverability for untracked documents, so write-first
+    stands and the old "text is SHOWN to you first instead" clause became false.
+    A stale consequence line is worse than none: it tells the user to expect a
+    behaviour no session will produce. The limit — one machine, no history —
+    is pinned too, because a net described as an equal replacement for git is
+    the over-claim this project guards hardest against.
+    """
+    with open(HOOK, encoding="utf-8") as handle:
+        source = handle.read()
+    check("the untracked report names the snapshot folder",
+          ".throughliner/snapshots/" in source, "snapshot path not named")
+    check("the untracked report states the one-machine limit",
+          "lost disk loses them" in source, "limit not stated")
+    check("the retired show-first consequence is gone",
+          "is SHOWN to you first instead" not in source,
+          "stale show-first clause still present")
+
+
 if __name__ == "__main__":
     print("test_session_start_untracked_docs")
     test_nothing_ignored_reports_nothing()
@@ -132,5 +153,6 @@ if __name__ == "__main__":
     test_all_three_are_detected_together()
     test_outside_a_repository_degrades_quietly()
     test_an_unrelated_ignore_line_is_not_reported()
+    test_the_report_names_snapshots_and_not_show_first()
     print(f"\n{len(failures)} failure(s)" if failures else "\nall passed")
     sys.exit(1 if failures else 0)

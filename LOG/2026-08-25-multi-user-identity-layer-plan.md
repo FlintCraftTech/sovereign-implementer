@@ -1,6 +1,0 @@
-# 324005c — Designed and kept: multi-user identity and attribution — channel-authenticated identity, credit follows the message, co-author trailers; Chagora mailed
-
-The user wanted identity harder than declaration; research run in-session found the handshake exists natively (Discord Connections + Linked Roles — `resources/research/discord-github-linked-roles.md`, filed with its index line). Attribution, agreed on Claude's recommendation: the existing provenance tests generalise, "you" becoming the named person whose message raised the idea — no machinery guesses whose idea something really was. GitHub credit is a consented co-author trailer, no branches — the user's relief at that noted. SPEC's multi-person paragraph extended at the keep. The design was mailed to Chagora on the user's direction and approval of the exact text; the send is on the register. Also answered en route: "consumer" means a project running the plugin; and the report-vs-inbox misroute became the capture [method-report-routing-same-machine].
-
-**Queue changes:** [multi-user-identity-layer] designed and cleared into Processed; [method-report-routing-same-machine] filed to Unprocessed.
-**Work processed:** kept — [multi-user-identity-layer].

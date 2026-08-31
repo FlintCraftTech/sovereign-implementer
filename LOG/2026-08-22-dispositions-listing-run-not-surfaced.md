@@ -1,6 +1,0 @@
-# d7ea8a0 — Dispositions listing merged with its window bug: refusals-only surfacing, and a required close-line with teeth
-
-Merged with [dispositions-listing-window-not-bounded] — two accounts of one broken surface — and kept as one build. The carried observation: the listing printed "176 on record (since the last planning session)" at two consecutive openings against a stated one-session bound, deliberately undiagnosed; the build reads the code before fixing (the planning-entry finder under the per-entry LOG split is the suspect, not the conclusion). The design: fix the window; the opening carries one short line only where the window holds a refusal — refusals being what the user cannot otherwise know to demand — silence otherwise; and the required artifact goes in the planning close's LOG entry (refusals surfaced, or none since last session), so a skipped surfacing is visible afterwards. Prose obligations at a stated site have failed nine recorded times; the two required artifacts on record have held, which is why the teeth go in the entry. Full disposition and build block on the item.
-
-**Queue changes:** [dispositions-listing-window-not-bounded] deleted as merged in; host item kept into Processed, cleared to run.
-**Work processed:** kept — [dispositions-listing-run-not-surfaced]; deleted — [dispositions-listing-window-not-bounded] (merged).

@@ -1,6 +1,0 @@
-# 007a16c — Dated to late September: marketplace submission — posture ends, but company registration gates it
-
-Two things settled and one dependency surfaced. Research answered in-session: the community listing's commit pin updates only after re-review, with no documented turnaround anywhere — so the weekly stable promotion cannot push to the listing; the listing trails on a submit-and-wait rhythm (monthly, or when something worth announcing lands). Her decision: the not-ready-for-the-marketplace posture ends — she is ready. The real gate she named: company registration, stuck behind ABR identity-verification work that another of her projects already carries as a designed walk-through; a dependency note asking no new work was approved and sent to that project's mailbox. Dated `Not before: 2026-09-22` with her approval — a month is when there is plausibly news. Still to settle at the eventual keep: the changelog, and confirming the name is final. Understudy ordering later the same session: the launch does not wait for it (see the chat entry).
-
-**Queue changes:** capture rewritten with the settlements and dated; stays in Unprocessed.
-**Work processed:** dated, not kept — [marketplace-submission].

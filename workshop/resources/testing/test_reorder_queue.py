@@ -22,7 +22,7 @@ import subprocess
 import sys
 import tempfile
 
-ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 SCRIPT = os.path.join(ROOT, "plugin", "throughliner", "scripts", "reorder_queue.py")
 
 MARKER = "--- Cleared to run above this line ---"

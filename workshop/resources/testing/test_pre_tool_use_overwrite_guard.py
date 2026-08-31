@@ -22,7 +22,7 @@ import subprocess
 import sys
 import tempfile
 
-ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 HOOK = os.path.join(ROOT, "plugin", "throughliner", "hooks", "pre_tool_use.py")
 
 _failures = []

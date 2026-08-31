@@ -801,6 +801,45 @@ def _check_mid_line_markers(annotated, warnings):
                 "invisible to all of them and fails silently. Put it on its own "
                 "line."
             )
+    _check_unbracketed_blocker(annotated, warnings)
+
+
+def _check_unbracketed_blocker(annotated, warnings):
+    """Flag a `Blocked by:` line whose blocker is not in square brackets.
+
+    Same silent-failure family as the mid-line markers above, caught at the
+    writing end for the same reason. Every reader of this field matches
+    `[slug]`, so `Blocked by: bravo` parses to no blockers at all: the digest
+    prints nothing for it and reads the item as unheld, while the item itself
+    stays below the readiness line and is never built. The below-the-line
+    revisit works by reading what each held item names, so an item naming
+    nothing has no arm of the revisit — not lifted, not surfaced, not flagged.
+    Silent and permanent.
+
+    Reproduced under control by a consumer project on a four-item scratch queue,
+    where the bracketed and unbracketed forms sat side by side and only the
+    bracketed one resolved. Caught there by eye rather than by any tool.
+    """
+    in_fence = False
+    for i, line, h2, is_heading in annotated:
+        if line.startswith("```"):
+            in_fence = not in_fence
+            continue
+        if in_fence or is_heading:
+            continue
+        if h2 not in ("Processed", "Unprocessed"):
+            continue
+        match = BLOCKED_BY_LINE.match(line.strip())
+        if not match:
+            continue
+        if SLUG_REF.search(match.group(1)):
+            continue
+        warnings.append(
+            f"line {i + 1}: 'Blocked by:' names no slug in square brackets, so "
+            "every reader of this field parses it as no blocker at all — the "
+            "item stays below the readiness line and nothing will ever lift "
+            f"it. Write the blocker as [slug]: {line.strip()}"
+        )
 
 
 def lint(content: str) -> list[str]:
@@ -895,6 +934,24 @@ def _split_warnings(warnings: list, head_content: str):
     for w in warnings:
         (old if _warning_body(w) in known else new).append(w)
     return new, old
+
+
+def _cleared_warnings(warnings: list, head_content: str) -> list:
+    """Flags the last commit carried that the working tree no longer does.
+
+    The other half of reporting a CHANGE rather than a state. A flag appearing
+    is worth a line; a flag going away is worth one too, and between them they
+    are the whole of what has changed — which is why an unchanged set can then
+    say nothing at all.
+    """
+    if not head_content:
+        return []
+    try:
+        head_warnings = lint(head_content)
+    except Exception:
+        return []
+    current = {_warning_body(w) for w in warnings}
+    return [w for w in head_warnings if _warning_body(w) not in current]
 
 
 def _growth_report(cwd: str, content: str) -> list[str]:
@@ -1082,12 +1139,27 @@ def _lint_queue(queue_path: str, with_growth: bool = True) -> int:
             "and never flagged. Judge each one: fix what's genuinely wrong "
             "in a follow-up edit, leave what isn't.\n" + body
         )
-    elif pre_existing:
-        sections.append(
-            f"[Throughliner] QUEUE.md structure lint (advisory): "
-            f"{len(pre_existing)} flag(s), all of them already present in the "
-            "last commit and none introduced by this change."
-        )
+    else:
+        # An unchanged flag set says nothing, so it emits nothing, and silence
+        # carries the meaning the constant line pretended to.
+        #
+        # The line it replaces reported a COUNT and no more, after every edit
+        # and every unrelated shell command. Two failures came of that. It
+        # trained the reader to skim — the cry-wolf shape this project has
+        # repealed measures for twice — and because it never named a flag, a
+        # standing set hid any NEW KIND joining it: one session watched the
+        # count creep from 20 to 27 with the wording never changing once. A
+        # pre-existing flag was invisible in exactly the way an absent one is.
+        #
+        # Computed against the committed file every time, so nothing is stored
+        # and no state file can go stale. The full listing stays available by
+        # running the lint script directly.
+        for cleared in _cleared_warnings(warnings, head_content):
+            sections.append(
+                "[Throughliner] QUEUE.md structure lint (advisory): a flag "
+                "present in the last commit is gone from the working tree — "
+                f"{cleared}"
+            )
 
     if with_growth:
         growth = _growth_report(cwd, content)

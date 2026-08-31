@@ -433,9 +433,15 @@ copy of everything not yet built, and each item drops out of it as it's finished
 
 ```
 progress format:
-    build item  ->  - [x] item description — done
+    build item  ->  - [x] item description — done, confirmed
+                    - [x] item description — done, UNCONFIRMED: <what still
+                          needs running>
     audit item  ->  - [x] Finding description — captured | dropped
 ```
+
+The confirmed/UNCONFIRMED wording belongs to next-build.md's per-item completion
+step, which says how to choose between the two forms; this block shows the shape
+so a run writing the file has the correct specimen in front of it.
 
 The build working file is the crash-recovery mechanism: if the session dies, the
 session that resumes sees it and picks up from it. A working file left by a
@@ -609,19 +615,44 @@ whatever parts you can, give the **first** concrete step the item records, and
 **stop and wait** for the user to report back. Then the next step, and so on —
 walking beside them, not dumping a list for them to work alone.
 
+**What a step turn carries.** Where the step's reasoning is already agreed and on
+the record, the step is the ask alone — what to do and what to look for, in the
+standard ask shape. Full reasoning appears only for something not yet agreed.
+
+```
+reasoning agreed and recorded   ->  the ask alone
+not yet agreed                  ->  the reasoning, then the ask
+```
+
+A step that restates why the work is being done hands the user a paragraph to
+read past before they can find the instruction.
+
 Open with the first step itself, and satisfy this branch only by driving the
 steps — an offer to walk the user through it, or a statement that the item stays
 open until they have done it, leaves the branch unrun.
 
-**Every `[user]` item the run touched ends on one of three outcomes, and the
-record carries which:**
+**Every `[user]` item the run touched ends on a recorded outcome, and the record
+carries which. Three named values cover the ordinary cases; where none of them
+fits, the record says what actually happened in one plain sentence:**
 
 ```
-done         walked to its end this session, or the user said they did it, or
-             its walkthrough named an observable check and that check passed
-deferred     the USER said to leave it — their word, never inferred
-not reached  the run never presented it, or presented it and got no answer
+done          walked to its end this session, or the user said they did it, or
+              its walkthrough named an observable check and that check passed
+deferred      the USER said to leave it — their word, never inferred
+not reached   the run never presented it, or presented it and got no answer
+anything else what actually happened, in one plain sentence, with the detail in
+              the item's own record — "halted mid-drive: its walkthrough says to
+              post into the existing topic, and re-homing needs a new one",
+              "driven to the end of Claude's part; the final step is the user's"
 ```
+
+**The fourth arm is a widening, not a fourth box.** Two real outcomes fit none of
+the three: an item found unbuildable as written and stopped for redesign, and one
+driven to the end of Claude's part with the remainder the user's. Forcing either
+into a named value misdirects the next session — `not reached` would send it to
+drive a walkthrough already known to be wrong. A plain sentence carries what a
+new value would have to be defined for, and each value added is another thing a
+close has to choose between correctly.
 
 **Write `deferred` only from the user's own word.** An item nobody put in front
 of them was not deferred by anyone; recording it that way tells the next session

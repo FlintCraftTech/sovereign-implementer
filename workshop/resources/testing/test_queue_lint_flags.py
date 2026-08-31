@@ -29,7 +29,8 @@ for _stream in (sys.stderr, sys.stdout):
         pass
 
 HOOK = os.path.join(
-    os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),
+    os.path.dirname(os.path.dirname(os.path.dirname(
+        os.path.dirname(os.path.abspath(__file__))))),
     "plugin", "throughliner", "hooks", "post_tool_use.py",
 )
 

@@ -48,7 +48,7 @@ import subprocess
 import sys
 import tempfile
 
-ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 PLUGIN_ROOT = os.path.join(ROOT, "plugin", "throughliner")
 HOOKS = os.path.join(PLUGIN_ROOT, "hooks")
 

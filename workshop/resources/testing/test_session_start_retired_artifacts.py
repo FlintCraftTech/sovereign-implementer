@@ -32,8 +32,8 @@ for _stream in (sys.stderr, sys.stdout):
     except (AttributeError, ValueError, OSError):
         pass
 
-ROOT = os.path.dirname(
-    os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+ROOT = os.path.dirname(os.path.dirname(
+    os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 HOOK = os.path.join(ROOT, "plugin", "throughliner", "hooks", "session_start.py")
 LIST = os.path.join(ROOT, "plugin", "throughliner", "retired-artifacts.md")
 

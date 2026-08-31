@@ -1,5 +1,0 @@
-# a2ce359 — Kept and cleared: keep-step claim-testing bounded to the smallest settling observation
-
-Processed 2026-08-24, from the user's report of a live instance the same day: a plan session in another of her projects completed a logo SVG in full to test its claims, then reverted it and queued the build — dangled work, tokens spent on nothing surviving. Diagnosis: "trying is free at /plan" has no proportionality bound, and the two-limb check asks for a description, never a demonstration — but that distinction is written nowhere, so a model in the over-verifying direction (Opus 5's documented failure mode) proves buildability by building. The bound: trying is the smallest observation that settles the claim; a try producing the item's own deliverable has become the build, and stops. Claim-testing itself stays — the user kept it deliberately. Gate: run — amendment to the keep-step's trying note, admitted on the recorded instance under the single-instance test.
-
-**Work processed:** kept — [plan-claim-testing-proportionality], cleared with build block.

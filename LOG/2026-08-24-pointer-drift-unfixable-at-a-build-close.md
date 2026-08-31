@@ -1,5 +1,0 @@
-# a2ce359 — Kept and cleared: the queue tool gains a narrow in-entry replace
-
-Processed 2026-08-24. The close's pointer-drift arm ("mechanical, fix it here") could not be carried out at a build close — the scope-lock rightly refuses direct QUEUE.md edits and the queue tool moves whole entries only; the arm predates the refusal, so the rule is catching up with the machinery. Kept on the make-it-true design: a literal, slug-keyed, uniqueness-checked replace in `reorder_queue.py`, the sweep arm reworded to name it, suite cases added. Planning-closes-only and capture-from-build-close both lost as demoting or shelving a judgment-free fix. The concrete case was repaired in-session: both stale pointers to the renamed cycles record fixed directly, which a planning session may do. Gate: run — amendment to the sweep arm, admitted on the 2026-08-23 instance.
-
-**Work processed:** kept — [pointer-drift-unfixable-at-a-build-close], cleared with build block. Queue-wide cleanup: two stale record pointers fixed in [cycles-due-check-verification] and [weekly-release-cycle].

@@ -90,7 +90,10 @@ The work cycle. Every piece of work travels the same loop.
   `/setup`, `/plan`, `/next`, `/rescan` and `/done` are theirs to run, and the
   scope-lock refuses an attempt to invoke one. Where a command the user typed
   arrived as ordinary chat text, say it likely had not registered yet and ask
-  them to type it again.
+  them to type it again. **Where the app answered that the command is not
+  available in this environment, ask them to retype it with the plugin's name in
+  front** — `/throughliner:plan` and so on — since these skills are namespaced
+  and the bare name resolves on some installs and not others.
 - **Name the environment a step needs and let the user say whether it fits** —
   "This step needs a terminal open separately from the app, do you have one?"
   rather than "Run this in your terminal:". Users here are non-coders who may
@@ -113,6 +116,13 @@ The work cycle. Every piece of work travels the same loop.
   - saying what the user needs in order to act, in full sentences, and
     stopping there — except that where being readable and being short pull
     apart, readable wins.
+
+  **At the method's own decision turns, the governing specification is that
+  turn's own content line, in the skill's doc.** This bullet says how a message
+  is shaped; those lines say what a particular turn carries, which is what
+  shaping alone cannot settle. Four turns have one: the item summary, the
+  recommendation and the checkpoint in plan.md, and the walkthrough step in
+  next.md.
 
   **The inversion governs sequencing; approval-before-write is a separate
   axis.** Write-first answers *show-then-wait or write-then-report*, and its
@@ -221,14 +231,19 @@ EXCEPTION                         a close-time or /rescan candidate set —
                                   user contests by number
 ```
 
-  **An untracked doc answers the test with a no, so its writes are show-first.**
-  Where `SPEC.md`, `QUEUE.md` or `LOG/` is gitignored — a configuration /setup
-  offers — git holds no previous version, so nothing can be reverted without the
-  user's help. This is the existing test applied to a fact it can now read, not a
-  new rule: session_start reports which of the three are untracked at every
-  opening. Two further consequences are stated rather than repaired: a deleted
-  queue item is genuinely gone, and the close cannot read its own work back from
-  the file's history, so it records from what it remembers.
+  **An untracked doc answers the test with a yes, because the plugin holds the
+  previous version itself.** Where a method document is gitignored — the
+  configuration /setup proposes — `pre_tool_use` saves a copy of the file as it
+  stands before each change, into a local snapshot folder that is itself kept out
+  of the repository, so the previous version is recoverable without the user's
+  help and write-first stands. A deleted queue item is recoverable from its
+  snapshot.
+
+  **One consequence is stated rather than repaired: the close cannot read its own
+  work back from the file's history, so it records from what it remembers.**
+
+  **The snapshots are one machine and hold no history, so say that wherever the
+  configuration is described** — a lost disk loses them.
 
 - **Show-first, on request.** The user can ask to see doc-resident text before
   it is written, for the rest of the chat.
@@ -501,15 +516,26 @@ perform with nobody to ask. Where the surface can be tested harmlessly — a
 throwaway of your own to act on rather than anything of theirs — that test is
 the read, and it goes into the walkthrough as its first step.
 
-**Where the answer is a date, read a computed field — the session opening's date
-line, the queue digest's passed or ahead figures — and where none exists, read
-the clock.** Never derive today's date by assumption, nor restate a non-date
-criterion as a time claim: when saying when something can happen, state the
-criterion and check the world against it, and reach for "today", "tomorrow" or
-"later" only where the criterion itself is a date. Same trigger as the rule
-above, on the one subject where your own confidence is least reliable and least
-checkable: a wrong date is written into a record, a capture or a hold and reads
-exactly like a right one for as long as it stands.
+**Every statement of when something happened or will happen is derived from a
+computed field, a timestamp, or the record — in chat as much as in anything
+written.** A date, "yesterday", "this morning", "twenty minutes ago", "tonight":
+each is a claim about the world, and each is read rather than recalled. The
+sources: the session opening's date line, the queue digest's passed or ahead
+figures, a record's own date field, and where none exists, the clock.
+
+```
+a source exists      ->  read it, and say the time
+no source exists     ->  state the event without a time — "agreed earlier",
+                         "in a previous session, per its record"
+a non-date criterion ->  state the criterion and check the world against it.
+                         "Today", "tomorrow", "later" are for a criterion that
+                         is itself a date.
+```
+
+Same trigger as the rule above, on the one subject where your own confidence is
+least reliable and least checkable: a wrong time written into a record, a capture
+or a hold reads exactly like a right one for as long as it stands, and the ones
+asserting which day it was skew the log hardest.
 
 **On a repeat question about the same thing, look up how that specific thing is
 taught.** Work out first which part did not land, asking the user where it is not
@@ -682,6 +708,11 @@ Not before: YYYY-MM-DD                         # a date. Available in EITHER
                                                # section, meaning something
                                                # different in each — see below.
                                                # It lifts itself
+Cycle: [slug]                                  # the entry is that named cycle's
+                                               # material, so the cycle's turns
+                                               # draw it and the planning ladder
+                                               # passes over it. CAPTURES ONLY —
+                                               # it has no meaning on a work item
 ```
 
 **A date holds an item on its own, with no blocker item standing in for it.**
@@ -874,7 +905,18 @@ real and equally bad; neither warning may be louder than the other. (How a
   so "Open your session list" becomes what to click to get there and what tells
   you it worked. Every consumer of this method is a non-coder, and most will not
   have used the surface a walkthrough names, so a step assuming familiarity is
-  under-specified for the whole audience rather than for one person. This fires
+  under-specified for the whole audience rather than for one person. **A step
+  carries at most three instructions, and anything more splits into further
+  steps each carrying its own look-for** — where a check or a verification
+  counts as an instruction exactly as an action does, and a do-not statement
+  does not, since it asks the reader to do nothing. The figure's derivation:
+  working-memory research puts instruction-following at three to five steps
+  before people forget details or make mistakes, and this takes the low end of
+  that range. The recorded instance is a step bundling six — open a new terminal
+  window, run a quoted command, type a login command, drive a keyboard-only
+  menu, authorise in a browser, close the window — before any look-for at all.
+  Existing walkthroughs are re-cut to this as they are driven, never in a bulk
+  pass. This fires
   at authoring time, where the cost is wording, and stays there — the decision step
   and the hand-off ask no per-item question about whether the user can perform a
   step. **Where the steps cannot be fully scripted yet, file the item with a
@@ -1318,6 +1360,18 @@ premise is broken       ->  halt and course-correct
   user-only gating action *buried in its rationale prose*, split it out into its
   own `[user]` item with its own slug and reference it by slug from the original.
 - **Nothing unrouted survives a chat.** File or drop before close.
+  - **A question deliberately left open is routed as a capture at the moment it
+    is left open, credited to whoever wants it** — a want set aside for a
+    winning alternative, a rejection repealed, a resolution ending in "may be
+    re-proposed later". The capture may carry `Not before:` or `Blocked by:`
+    under their existing provisions; what it may not do is exist only as prose
+    in a record or a rules file, which is read on demand while the queue returns
+    things by itself. The recorded instance: a want raised across many sessions
+    lost a design round, the rejection was later repealed in writing, no capture
+    was ever filed, and the intention's only storage was the user's own memory —
+    surfacing again only because she asked. The failure named plainly: not
+    recording a named intended thing because it is blocked, on the basis that
+    the person can name it again.
 - **One build at a time.** While this chat's build working file exists, finish
   that build before starting another.
 - **One chat runs /plan and /next as many times as the work needs, one after

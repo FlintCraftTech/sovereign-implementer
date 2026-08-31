@@ -183,6 +183,24 @@ dependency BUILT only            ->  NOT enough. Keep the dependent below.
 dependency BUILT and VERIFIED    ->  no hold; it may clear.
 ```
 
+**Except where the held item is itself the only verification of its blocker.**
+There the hold is not written: the item clears, its walkthrough IS the
+verification, and its prose says so.
+
+The deadlock without it, from a consumer project that met it: a build produced a
+script whose first real run happens inside a `[user]` walkthrough, so the blocker
+could not resolve until the held item ran, and the held item could not run until
+the blocker resolved. Two mechanisms both reported it as fine by construction —
+the digest reads an absent-and-built blocker as resolved, and the loop check
+covers only blockers that are queue items, while this loop runs through a
+verification. It surfaced only because someone read the record behind the slug
+by hand.
+
+Restatement was attempted first and lost content: rewording the rule to hold only
+unattended work would also clear attended walkthroughs that do not verify their
+foundation, which is a hold the rule genuinely wants. A walkthrough is driven
+live with the user present, so a failure here is seen as it happens.
+
 Narrate it when it holds an item back — one line naming which item waits on
 which.
 
