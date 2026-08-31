@@ -1,4 +1,4 @@
-# [HASH] — Posting bot gains a read-only permissions command
+# 778d6a3 — Posting bot gains a read-only permissions command
 
 Filed by /rescan at the end of the 2026-08-29 planning session, where it came up and was left hanging: the user asked for a review of the server's permissions after a member accidentally edited a forum's guidelines, and nothing in this project could answer it. Everything said about Discord permissions that day came from Discord's documentation rather than from her server.
 

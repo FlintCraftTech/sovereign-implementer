@@ -1,4 +1,4 @@
-# [HASH] — Co-writing settles as two rule amendments, not a new flavour
+# 778d6a3 — Co-writing settles as two rule amendments, not a new flavour
 
 Raised by the user on 2026-08-28 mid-walk-through of the law-prose article: co-authoring is both her work and Claude's, works slightly differently each time, and — her words — "we always have to just kind of shove it in there somehow". The lived instance was that article's fourteen-claim list, planning-type work performed inside a walkthrough and delivered as fourteen approval turns.
 

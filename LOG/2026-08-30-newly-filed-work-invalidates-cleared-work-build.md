@@ -1,4 +1,4 @@
-# [HASH] — Digest flags a capture whose prose names an item already cleared to run
+# 778d6a3 — Digest flags a capture whose prose names an item already cleared to run
 
 Raised by the user at the end of a /rescan on 2026-08-29: should there be a rule checking that what a scan files blocks nothing in the cleared region? Filed as the reworded version of that, on Claude's recommendation and her agreement.
 

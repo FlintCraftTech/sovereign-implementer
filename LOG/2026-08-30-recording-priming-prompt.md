@@ -1,4 +1,4 @@
-# [HASH] — Reusable priming prompt for recorded demo sessions
+# 778d6a3 — Reusable priming prompt for recorded demo sessions
 
 The user's idea, raised in the site project's planning session and mailed here on 2026-08-28 as the side that owns it. A prompt pasted at the start of any session being recorded: this is a demo, keep revealing information off the screen. Her reason, carried from the mail — a recording exposes more than the method being shown, and preventing it at the source is far cheaper than blurring it in the edit afterwards.
 

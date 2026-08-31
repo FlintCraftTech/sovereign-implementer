@@ -1,0 +1,6 @@
+# [HASH] — setup — the epoch-5 migration run on this project: workshop/ created, resources/ moved in, 107 instruction references re-pointed
+
+The restart landed 1.21.1-test3 and the format halt fired as designed; /setup ran the Epoch 5 conversion. `resources/` moved whole into `workshop/` by `git mv` so history follows; every instruction-doc reference re-pointed — 44 in CLAUDE.md, 54 in QUEUE.md, plus SPEC.md, README.md, CYCLES.md and TOOLS.md — with session records deliberately left naming the old path, which was correct when they were written. Version and epoch markers updated last, after the conversions completed. Scaffold checks found everything else present; the retired-terms read found only a sentence recording a retirement, correct as written. One finding reported and not edited, then filed by the rescan as [claude-md-missing-managed-block]: this project's CLAUDE.md has no plugin-managed block, so nothing in it refreshes automatically — hers to decide. Two stale duplicate red-flag markers left inside rewritten queue blocks (the cause of the opening's false uncleared-flags report) were found and removed in the same sitting.
+
+**Queue changes:** none by the migration itself; the marker fix edited two Processed items in place.
+**Work processed:** none — a migration, not planning.

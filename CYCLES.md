@@ -29,7 +29,7 @@ turn has two halves rather than one.
 2. **Promote last week's beta to stable.** The `beta` branch tip as it stands
    *before* this turn touches it is the build being released — it has had its
    week. Read its commit; that is what the release ships.
-3. Run the release ritual in `resources/release-ritual.md` end to end against
+3. Run the release ritual in `workshop/resources/release-ritual.md` end to end against
    that commit — the version bump, the consistency sweep, the repackage, the
    GitHub pre-release, the host reinstall.
 4. **Pick this week's beta: the most recent rezip labelled stable on the
@@ -43,7 +43,7 @@ turn has two halves rather than one.
    pick it up on their next update. Where the pick is not a descendant of the
    current beta tip, stop and say so rather than forcing the branch.
 6. Offer the beta announcement, filled in from
-   `resources/beta-offer-announcement-template.md`. It goes out through the bot
+   `workshop/resources/beta-offer-announcement-template.md`. It goes out through the bot
    on the user's explicit yes to the exact text, and gets its line in
    `INBOX/sent.md` in the same turn.
 7. Record the turn in `LOG/` under this cycle's slug — both events, with the two
@@ -180,3 +180,50 @@ reads the forum's topic order and reports where it no longer matches the numbers
 in the titles. **Report only: re-ordering a forum is the user's to do, and
 whether it can be done at all is one of the questions
 [howto-posts-bot-authorship]'s first step settles.**
+
+## Maintenance sweep [maintenance-sweep]
+
+**Artifact:** the method's rule corpus — the always-loaded rules
+(`plugin/throughliner/docs/skill-nonspecific-rules.md` and this project's
+CLAUDE.md), the procedure docs under `plugin/throughliner/docs/`, and the
+shipped templates.
+
+**Cadence:** fortnightly, declared by the user 2026-08-31. Derived rather than
+guessed, and the definition says from what: the always-loaded rules went from
+299 statements at the law-prose restyle (2026-08-17) to 392 at declaration —
+roughly 90 new statements a fortnight — so a fortnightly pass reviews a batch
+the size the original restyle handled in one sitting, where a monthly one would
+let twice that accumulate. Grounds to re-declare if the growth rate changes.
+
+**Criteria:** `workshop/resources/method-compliance-audit-checklist.md`, applied
+as written on the day of the turn. A turn proposes no lens of its own — a new
+lens is admitted at planning, through the rule gate, like any rule. The
+checklist operationalises the self-authoring discipline (the user's scope,
+2026-08-31: "anything in the self-authoring rules") into concrete per-lens
+tests; the four sweep lenses this cycle was created for — underived numbers,
+negatives, contradictions, duplication — ship into it via
+[checklist-gains-sweep-lenses], and until that lands a turn covers the
+checklist's existing lenses and says so. The open-class wording this paragraph
+first carried ("whatever would fail the discipline") was replaced the same day
+it was written, on the user's catch: it scheduled the criteria-selection
+decision into the audit's own turn.
+
+**Steps of one turn.**
+1. One `[audit]` pass over the artifact against the criteria file, full corpus,
+   not delta.
+2. Findings filed as captures in Unprocessed, one per discrete observation, like
+   any audit.
+3. The turn recorded in `LOG/` under this cycle's slug, the record opening by
+   saying it records a completed turn of this cycle.
+
+**Observable:** the date of the most recent `LOG/` record under this slug whose
+opening line says it records a completed turn — the same guarded form the
+announced-claims sweep uses, which keeps planning records written under this
+slug (including the one that authored this definition) out of the count.
+
+**What stays outside, so nobody re-merges it:** the five mechanical checks in
+`workshop/resources/rule_signals.py` keep firing independently at openings and
+closes — they were chosen over a positional cycle once, that reasoning stands
+for them, and this cycle covers the judgment reading a script cannot do. The
+delta-scoped compliance audit that the audit-lag check files also stays: it
+covers rule *changes* commit by commit, where this covers the corpus whole.

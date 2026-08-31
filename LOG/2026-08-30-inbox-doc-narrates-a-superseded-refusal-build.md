@@ -1,4 +1,4 @@
-# [HASH] — A defeated position written in rule syntax is deleted from the INBOX doc
+# 778d6a3 — A defeated position written in rule syntax is deleted from the INBOX doc
 
 From the compliance audit of 2026-08-29, lens 4. Common reasoning for this run's five compliance fixes is in `2026-08-30-done-audit-records-a-repealed-approval-step-build.md`.
 

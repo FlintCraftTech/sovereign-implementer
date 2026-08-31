@@ -1,4 +1,4 @@
-# [HASH] — Kept items name the external facts their design rests on, and when each was checked
+# 778d6a3 — Kept items name the external facts their design rests on, and when each was checked
 
 A candidate rule from the proactive-research-offers finding, ranked strongest there and gated in-session with the user present on 2026-08-30. The decision step's kept-item enumeration goes from five entries to six: an item now names the external facts the design rests on and, for each, when it was last verified.
 

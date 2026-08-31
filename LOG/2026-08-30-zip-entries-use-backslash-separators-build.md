@@ -1,4 +1,4 @@
-# [HASH] — Rezip ritual's zip step moves from Compress-Archive to Python zipfile
+# 778d6a3 — Rezip ritual's zip step moves from Compress-Archive to Python zipfile
 
 The item was filed against an observation made during the 1.21.1-test2 rezip: archive zip entries reading `throughliner\skills\`, with the committed release zip said to have the identical shape. The zip format specifies forward slashes; Windows tools tolerate backslashes, which is why nobody here had seen a problem while building, installing and testing on one Windows machine. A macOS or Linux tester unzipping the release would plausibly get flat files literally named `throughliner\skills\next.md`.
 
@@ -15,3 +15,5 @@ The release's repackage check was extended in the same pass: it now counts backs
 **Depth:** full — alternative seriously weighed.
 **Files touched:** `resources/release-ritual.md`.
 **Routed to Captures:** [zip-backslash-finding-does-not-reproduce].
+
+**Correction, 2026-08-31 — the one-minute experiment was run, and it buries the finding.** In the planning session processing [zip-backslash-finding-does-not-reproduce], `Compress-Archive` on this machine's PowerShell 5.1 (5.1.22621.6133) built a fresh two-entry zip in the scratchpad, and `zipfile.namelist()` — the same reader the finding used — returned `pkg/a.txt`, `pkg/sub/b.txt`: forward slashes, zero backslash entries. The named cause cannot produce the claimed defect on this machine, so the original observation was wrong; the display-artifact hypothesis stands as the likeliest account and the stored-bytes claim is withdrawn from the record. No non-conformant zip is known to have ever existed or shipped. The build this entry records is unaffected and stands on its own merits, as stated above. The capture was deleted with the correction written.

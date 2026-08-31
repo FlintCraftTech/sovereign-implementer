@@ -1,4 +1,4 @@
-# [HASH] — Research filings carry an assessment of their own frame
+# 778d6a3 — Research filings carry an assessment of their own frame
 
 Raised by the user on 2026-08-30, correcting the risk-classes finding. Her costly instance was not a premise going stale but research that was never valid — it answered the questions asked without asking whether the approach fitted the situation at all. Her words: *"the user's questions notwithstanding, is the approach itself valid for the given situation?"* The stakes in that instance: the work concerned a child's whole life, and the approach researched addressed only weeks of it.
 

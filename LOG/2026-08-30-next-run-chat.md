@@ -1,4 +1,4 @@
-# [HASH] — Chat record: a 22-item run, one audit, two walk-throughs, and 14 captures filed
+# 778d6a3 — Chat record: a 22-item run, one audit, two walk-throughs, and 14 captures filed
 
 The chat-level record for this session, since it wrote several entries. Each built item has its own entry; this holds what belongs to no work item.
 
@@ -36,6 +36,18 @@ Filed as [walkthrough-outcomes-miss-halted-and-partly-walked].
 **The first beginner beta tester's material arrived mid-session** — a written session record, then five raw transcripts. Five captures cover it, and one is red-flagged: the material carries a third party's identity, and this repository is public. Nothing has been opened or downloaded pending that decision. On the user's instruction, the tester is referred to by role throughout, with no name and no relationship recorded.
 
 **Mail:** one inbound defect report from another project, read at the run's pre-flight, filed as [unpresented-item-content-relocated-early] and archived. A defect report is owed no reply, and none was drafted.
+
+## Tail — after the close, uncommitted
+
+**Pushed as `778d6a3`, then rezipped to 1.21.1-test3.** Suites passed before the install, the cache was pruned to four builds, and the source and installed content stamps were compared immediately after installing and are identical (`a5bc0b18179b`).
+
+**This was the first zip built by the Python step that replaced `Compress-Archive` hours earlier** — 40 entries, no backslash separators, no bytecode. Archived with its readme, which carries the caveat that the finding motivating that change did not reproduce.
+
+**The `Rezip entry: none` line above was true when written and is now stale.** A rezip has happened since, and the readiness test for its channel entry — one full planning session and one full build run on the installed build — has not been met, so no entry is owed yet.
+
+**The app has not been restarted, on the user's word: she is away from home.** So the host loading in the next session is whatever was live before this rezip, not 1.21.1-test3. The session opening reports the installed version and its content stamp; comparing that stamp against the source is what settles which build is actually running, and it will differ until the restart happens.
+
+The version bump and the archive commit nothing here — they ride the next close.
 
 **Files touched:** see the per-item entries. Chat-level: `INBOX/sent.md` (two register lines, one of them a correction), `INBOX/archive/`.
 **Routed to Captures:** [unpresented-item-content-relocated-early], [cycle-field-missing-from-line-format], [bare-command-name-fails-before-rules-load], [expert-role-holds-administrator], [everyone-holds-mention-everyone], [second-bot-role-holds-manage-channels], [port-showcase-allows-mention-everyone], [forum-order-is-by-latest-activity], [walkthrough-premise-read-content-not-type], [howto-rehoming-needs-new-topics], [beta-test-session-records], [setup-infers-a-name-into-spec], [tester-prompt-asks-for-reasoning], [tester-data-collection-instructions], [tester-data-carries-employer-material], [beta-raw-transcripts-arrived], [setup-asks-if-first-time], [zip-backslash-finding-does-not-reproduce], [rebump-welcome-cannot-replace-a-user-post], [walkthrough-step-restates-agreed-reasoning], [stop-hook-missed-an-unfiled-claim].

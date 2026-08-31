@@ -1,4 +1,4 @@
-# [HASH] — Ports being the top priority is written down, not carried by queue position
+# 778d6a3 — Ports being the top priority is written down, not carried by queue position
 
 Filed by /rescan at the end of the 2026-08-29 planning session. The user's words that day: ports are now her number one priority. The four port items were placed at the top of the cleared region because of it, and that placement was the only trace.
 

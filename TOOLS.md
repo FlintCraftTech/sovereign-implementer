@@ -85,7 +85,7 @@ capability is absent.
   tools), used with her direction for her own pages.
 - **A raw Discord API call from a script needs a `User-Agent` header**
   (e.g. `DiscordBot (throughliner, 1.0)`) or it is refused with HTTP 403 before
-  auth is even considered. `resources/discord_post.py` already sets its own;
+  auth is even considered. `workshop/resources/discord_post.py` already sets its own;
   the trap is ad-hoc scripts, where a valid Bot token still 403s without it —
   cost one wrong diagnosis on 2026-08-28.
 

@@ -1,4 +1,4 @@
-# [HASH] — `workshop/` becomes a method folder and `resources/` moves inside it, epoch 4→5
+# 778d6a3 — `workshop/` becomes a method folder and `resources/` moves inside it, epoch 4→5
 
 Working material stops sitting at the repository root. The user's reason, in her own framing at the decision step: only what is part of Throughliner stays in view, so someone shopping online for a method sees the method rather than the workshop. The method's own documents stay visible because they demonstrate it; everything they merely refer to does not.
 

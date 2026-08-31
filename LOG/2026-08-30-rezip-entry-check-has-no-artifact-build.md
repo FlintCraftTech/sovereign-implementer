@@ -1,4 +1,4 @@
-# [HASH] — The test-rezips readiness check gains a required line in the close's record
+# 778d6a3 — The test-rezips readiness check gains a required line in the close's record
 
 Found live on 2026-08-29: the close of a 23-item run did not run the check, and nobody would have known if the user had not asked why the previous rezip was unposted.
 

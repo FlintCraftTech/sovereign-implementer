@@ -1,4 +1,4 @@
-# [HASH] — Queue lint flags a field marker written anywhere but the start of a line
+# 778d6a3 — Queue lint flags a field marker written anywhere but the start of a line
 
 The instance, from 2026-08-29: an item's red-flag marker sat at the end of a prose sentence, the digest's pattern is anchored to the start of a line, and so the digest never reported the flag. Rung 1 of the ordering ladder — an uncleared red flag outranks everything — fired by luck rather than by machinery, because someone happened to grep more loosely than the tool does.
 

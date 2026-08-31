@@ -278,3 +278,16 @@ If you are considering it, the project's Discord server is where the people
 already porting are, and there is a showcase channel for ports and for projects
 built with the method. More support for porters is being written; ask there
 rather than working it out alone.
+
+## Why did my build run stop before finishing the list?
+
+Two deliberate stops exist, and both are yours. A build run works down your
+queue from the top and builds only what sits above the
+`--- Cleared to run above this line ---` line — that line is placed at the end
+of each planning session, just below the last item you agreed was ready, so
+the run never builds anything you didn't sign off. And an item marked
+`Runs alone` ends a run before it: that marker is for work that moves files or
+folders other work depends on, so it always gets a run of its own. If a run
+stops earlier than you expected, check where your line sits and whether the
+next item carries that marker — both stops are the system honouring what was
+set up, not a fault.

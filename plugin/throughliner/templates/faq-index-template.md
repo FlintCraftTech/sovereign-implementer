@@ -32,3 +32,6 @@ announced yet, not that questions aren't welcome: just ask in chat.
 - **Can I use this method with a tool other than Claude Code?** — porting it
   yourself, what you would be taking on, and where the people already doing it
   are. [faq.md](faq.md)
+- **Why did my build run stop before finishing the list?** — the cleared-to-run
+  line you set at planning, and the `Runs alone` marker that gives risky work a
+  run of its own. [faq.md](faq.md)

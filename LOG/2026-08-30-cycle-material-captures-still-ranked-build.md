@@ -1,4 +1,4 @@
-# [HASH] — A `Cycle:` field bows a capture out of the planning ladder
+# 778d6a3 — A `Cycle:` field bows a capture out of the planning ladder
 
 Filed at the authoring of the tips-posting cycle, which was created to stop eighteen near-identical tip candidates being met one at a time. Those eighteen became material a cycle's turns draw from, and the definition said so — but nothing told the planning ladder, which would rank them as ordinary captures and present them one by one again. The exact tedium the cycle was created to end, in the user's own words: the interaction was long and probably too tedious.
 

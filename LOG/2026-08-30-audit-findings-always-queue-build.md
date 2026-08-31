@@ -1,4 +1,4 @@
-# [HASH] — Audit findings always route to the queue, and the actionable filter comes out
+# 778d6a3 — Audit findings always route to the queue, and the actionable filter comes out
 
 Two rewordings from one ruling the user gave on 2026-08-29, after a live instance the same day: Claude read the always-loaded triage's middle arm ("a finding → the observing chat's LOG entry") over the audit procedure's "findings route to Unprocessed", and recommended routing a repository inventory out of the queue. Her words: findings of audits always belong in the queue — it's work (planned writing) that doesn't.
 

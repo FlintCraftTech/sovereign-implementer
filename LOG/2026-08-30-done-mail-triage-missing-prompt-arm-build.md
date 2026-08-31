@@ -1,4 +1,4 @@
-# [HASH] — Shared mail-triage step gains the stop-and-wait arm its own child carried
+# 778d6a3 — Shared mail-triage step gains the stop-and-wait arm its own child carried
 
 From the compliance audit of 2026-08-29, lens 2. The reasoning common to this run's five compliance fixes is carried in `2026-08-30-done-audit-records-a-repealed-approval-step-build.md`; this entry adds only what is particular to this one.
 

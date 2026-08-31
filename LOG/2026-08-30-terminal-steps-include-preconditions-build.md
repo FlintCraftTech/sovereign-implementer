@@ -1,4 +1,4 @@
-# [HASH] — Terminal steps in a walkthrough supply the commands that come before the run
+# 778d6a3 — Terminal steps in a walkthrough supply the commands that come before the run
 
 Captured by the user on 2026-08-30 from a live walkthrough in another of her projects, with a screenshot as the evidence. The step said a separate terminal was needed "sitting in the project folder" and then gave only the command to run. Pasted as instructed, it would have run from `C:\` and failed, because nothing ever supplied the `cd` that gets the terminal there.
 

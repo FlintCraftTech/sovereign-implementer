@@ -1,4 +1,4 @@
-# [HASH] — A LOG-based cycle observable must be distinguishable from planning's own records
+# 778d6a3 — A LOG-based cycle observable must be distinguishable from planning's own records
 
 Found live on 2026-08-30, in the first session to compute the defective observable. The announced-claims sweep's observable was "the most recent LOG entry under this cycle's slug" — and the planning session that *authored* the cycle wrote a record under that slug, as the shipped procedure has it do for every item processed. The due-ness check read the authoring record as a completed turn, and that session's opening reported the claims sweep as having run today. It had never run once.
 

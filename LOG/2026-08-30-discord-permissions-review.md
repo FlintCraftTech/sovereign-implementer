@@ -1,4 +1,4 @@
-# [HASH] — [audit] Discord permissions review: five findings, one red-flagged
+# 778d6a3 — [audit] Discord permissions review: five findings, one red-flagged
 
 The review the user asked for on 2026-08-29, after a member accidentally edited a forum's guidelines and nothing in this project could answer how. Filed alongside the tool that makes it possible, per the tool-then-audit rule: the tool is the build, reading its output is the audit.
 

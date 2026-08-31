@@ -1,4 +1,4 @@
-# [HASH] — Audit close's `Approval outcomes` field becomes `Findings routing`
+# 778d6a3 — Audit close's `Approval outcomes` field becomes `Findings routing`
 
 From the compliance audit of 2026-08-29. This entry carries the reasoning for the five findings that audit produced and that this run built; the sibling entries cite it rather than restating it.
 
