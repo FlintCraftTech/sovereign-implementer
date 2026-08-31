@@ -27,6 +27,13 @@ property, not a detail.
   and QUEUE.md). A reader with a document open walks up the directory tree to find
   it, the way tools locate `.git/`.
 
+- **The folder may hold other transient plugin state, so a conforming reader
+  matches the marker filename shape (`editing-<session-id>.json`) and ignores
+  everything else.** Entries that are not markers may include subdirectories,
+  and a reader that lists the directory and opens every entry will meet one.
+  This is additive: it makes explicit what the normative filename below already
+  implied, so no reader that already filtered by that shape changes.
+
 - **One file per session**, named `editing-<session-id>.json`, holding:
 
   - `version` — leading, so a reader can recognise a format it doesn't understand

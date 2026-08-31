@@ -771,15 +771,6 @@ the account the session runs under — and none of it is an answer they gave. Wh
 a personal fact would improve a document and nobody supplied it, leave it out;
 where it is genuinely needed, ask for it as a question like any other.
 
-The instance this comes from: a first-time user was never asked his name, and
-SPEC.md — the file every session reads first — recorded a shortened form he does
-not use and had given to nobody. It surfaced only because a message about to go
-out under his own name was signed with it. Nothing checked it, and a fact nobody
-sourced reads exactly like one the user supplied. The shortened form may in fact
-be a colleague's, which makes it the very thing the scrub checklist exists to
-keep out of a committed document: a personal name belonging to someone not in the
-room.
-
 ```
 1.  fill SPEC.md from the interview answers
 2.  write ONE capture in Unprocessed from the first-thing-to-build answer

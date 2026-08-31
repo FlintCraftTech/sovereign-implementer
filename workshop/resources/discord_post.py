@@ -502,6 +502,26 @@ def edit(token, channel, message_id, body_path):
     )
 
 
+def get_message(token, channel, message_id, out_path):
+    """Write one message's body verbatim to a file.
+
+    `list` prints only each message's first line cut at 80 characters, so a
+    re-post that must be byte-identical to the original cannot be assembled
+    from it. The body goes straight to a file rather than to stdout so it can
+    be handed to `send --body` without passing through a chat surface that
+    could reflow it.
+    """
+    channel_id = resolve_channel(token, channel)
+    message = request(
+        token, "GET",
+        "/channels/%s/messages/%s" % (channel_id, message_id),
+    )
+    content = message.get("content") or ""
+    with open(out_path, "w", encoding="utf-8", newline="") as handle:
+        handle.write(content)
+    return message, content
+
+
 def fetch(token, channel, limit=50):
     """List recent messages, newest first."""
     channel_id = resolve_channel(token, channel)
@@ -677,6 +697,12 @@ def rebump_welcome(token, channel, welcome_path):
     posting the entry covers re-bumping the welcome's UNCHANGED bytes. Any
     change to the welcome text is a new send and needs its own explicit yes to
     the exact text.
+
+    A copy of the welcome someone ELSE posted is found and reported, never
+    touched: a bot can only delete what it wrote. Without the report, a channel
+    whose standing welcome the user wrote gets a truthful "no previous copy
+    found" at the exact moment a visible duplicate appears, which reads as
+    nothing to do.
     """
     channel_id = resolve_channel(token, channel)
     text = read_text(welcome_path)
@@ -685,22 +711,27 @@ def rebump_welcome(token, channel, welcome_path):
     wanted = text.strip()
 
     removed = 0
+    foreign = None
     for message in fetch_all(token, channel_id):
-        if message.get("author", {}).get("id") != me or message.get("pinned"):
-            continue
         if (message.get("content") or "").strip() != wanted:
+            continue
+        author = message.get("author", {})
+        if author.get("id") != me:
+            if foreign is None:
+                foreign = (message["id"], author.get("username", "someone else"))
+            continue
+        if message.get("pinned") or removed:
             continue
         request(token, "DELETE",
                 "/channels/%s/messages/%s" % (channel_id, message["id"]))
         removed += 1
         time.sleep(0.35)
-        # Only the most recent copy is expected to exist; stopping at one keeps
-        # a content collision from cascading into a sweep.
-        break
+        # Only the most recent copy of the bot's own is expected to exist;
+        # stopping at one keeps a content collision from cascading into a sweep.
 
     posted = request(token, "POST", "/channels/%s/messages" % channel_id,
                      body={"content": text})
-    return removed, posted
+    return removed, posted, foreign
 
 
 def set_avatar(token, image_path):
@@ -750,6 +781,19 @@ def main(argv=None):
     p_edit.add_argument("--channel", required=True)
     p_edit.add_argument("--message-id", required=True)
     p_edit.add_argument("--body", required=True)
+
+    p_get = sub.add_parser(
+        "get",
+        help="write one message's whole body verbatim to a file — what `list` "
+             "truncates. A read only.")
+    p_get.add_argument("--channel", required=True,
+                       help="channel name or id — a forum topic's id works "
+                            "too, and reaches its opening post")
+    p_get.add_argument("--message-id", required=True,
+                       help="the message's id. A forum topic's opening message "
+                            "carries the topic's own id.")
+    p_get.add_argument("--out", required=True,
+                       help="path to write the body to, verbatim")
 
     p_list = sub.add_parser("list", help="list recent messages, newest first")
     p_list.add_argument("--channel", required=True)
@@ -817,16 +861,29 @@ def main(argv=None):
             # A prune that removed an older copy simply leaves nothing to
             # delete here, which is why the two need no coordination.
             if args.rebump_welcome:
-                dropped, message = rebump_welcome(
+                dropped, message, foreign = rebump_welcome(
                     token, args.channel, args.rebump_welcome)
                 print("Welcome re-bumped: %s, reposted as message id %s"
                       % ("previous copy deleted" if dropped
                          else "no previous copy found",
                          message["id"]))
+                if foreign:
+                    print("The channel now shows the welcome TWICE: message %s "
+                          "carries the same text and was posted by %s, so this "
+                          "bot cannot delete it — only its author can."
+                          % (foreign[0], foreign[1]))
 
         elif args.command == "edit":
             edit(token, args.channel, args.message_id, args.body)
             print("Edited message %s in #%s" % (args.message_id, args.channel))
+
+        elif args.command == "get":
+            message, content = get_message(
+                token, args.channel, args.message_id, args.out)
+            print("Wrote message %s by %s to %s — %d characters, %d line(s)."
+                  % (args.message_id,
+                     message.get("author", {}).get("username", "?"),
+                     args.out, len(content), len(content.splitlines())))
 
         elif args.command == "list":
             for message in fetch(token, args.channel, args.limit):

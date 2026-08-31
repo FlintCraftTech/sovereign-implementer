@@ -449,6 +449,12 @@ blocker absent from the
     reference             ->  a fault; surface it and fix it this session
 ```
 
+**A turn proposing a lift says what the item's premise rests on, and whether
+anything has verified it since it was written** — read off the item's rests-on
+line where it has one, and said plainly where it has none. Held work is the work
+whose premise has had longest to go stale, and the lift is the one moment
+anybody looks at it.
+
 **Where an item's hold names work belonging to a subproject** — a project set
 up inside this one, which `session_start` detects and reports — check it by
 reading that subproject's log index rather than this project's. That is the one
@@ -684,6 +690,11 @@ means hold this back until the date, so such an entry is not ranked, not
 presented and not counted toward the session's floor. Take it up in the ordinary
 way once the date has passed — the digest prints `Not before: <date> ->
 passed/ahead` on every entry, so this reads a computed field and needs no judgment.
+**The turn that takes such an entry up says what its premise rests on, and
+whether anything has verified it since it was written** — from its rests-on line
+where it has one, plainly where it has none. A dated capture waited on something
+outside the project, so the date passing says the wait is over and says nothing
+about whether the thing it waited for turned out as assumed.
 
 **Pass over any Unprocessed entry whose `Blocked by:` names an entry still open**
 [SILENT], on the same terms. On a capture the field means don't offer this again

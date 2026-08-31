@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Run every test suite in resources/testing/.
+"""Run every test suite in workshop/resources/testing/.
 
 Host-only dev artifact — not shipped in the plugin package.
 
-Run:  py resources/testing/run_all.py
+Run:  py workshop/resources/testing/run_all.py
 
 Why this exists ([testing-suite-runner-discovers-all]): the release ritual named
 three suites by hand. That list went stale the moment a fourth was written, and
@@ -42,6 +42,40 @@ for _stream in (sys.stderr, sys.stdout):
 HERE = os.path.dirname(os.path.abspath(__file__))
 SELF = os.path.basename(os.path.abspath(__file__))
 
+# This file sits at <project root>/workshop/resources/testing/, so the root is
+# three levels up. Every suite computes its own root the same way, by walking a
+# fixed number of levels from its own location.
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(HERE)))
+# What must exist under a correct root. The suites test the hooks, so a root
+# with no hooks folder is not this project.
+FOOTING = os.path.join("plugin", "throughliner", "hooks")
+
+
+def assert_footing():
+    """Fail loudly where the computed project root is not this project.
+
+    A suite's link to the code it tests is a PATH, so a rename or a folder move
+    breaks every suite at once while touching no hook. Commit `e04b514` moved
+    this testing folder under `workshop/`, every suite ended up one level short
+    and pointed at a folder that does not exist, and the close-time trigger
+    never fired because that commit staged no hook. The suites were dead from
+    that commit onward with nothing reporting it.
+
+    So the harness asserts its own footing before discovering anything: a dead
+    harness then reports as dead, with no trigger needed anywhere.
+    """
+    if os.path.isdir(os.path.join(PROJECT_ROOT, FOOTING)):
+        return True
+    print("run_all: STOPPING — the computed project root does not look like "
+          "this project.")
+    print(f"run_all:   computed root: {PROJECT_ROOT}")
+    print(f"run_all:   expected to find: {FOOTING}")
+    print("run_all: this file walks three folders up from its own location, so "
+          "a move or rename of the testing folder breaks that arithmetic and "
+          "every suite with it. Fix the level count here and in each suite.")
+    print("run_all: NOT a pass. No suite was run.")
+    return False
+
 
 def is_suite(name):
     if not name.endswith(".py") or name == SELF:
@@ -50,6 +84,9 @@ def is_suite(name):
 
 
 def main():
+    if not assert_footing():
+        return 1
+
     entries = sorted(
         n for n in os.listdir(HERE) if os.path.isfile(os.path.join(HERE, n))
     )
@@ -60,11 +97,12 @@ def main():
     ]
 
     if not suites:
-        print("run_all: no suites found in resources/testing/ — that is itself "
-              "a finding, not a pass.")
+        print("run_all: no suites found in workshop/resources/testing/ — that "
+              "is itself a finding, not a pass.")
         return 1
 
-    print(f"run_all: {len(suites)} suite(s) discovered in resources/testing/")
+    print(f"run_all: {len(suites)} suite(s) discovered in "
+          f"workshop/resources/testing/")
     if skipped:
         print("run_all: not run (name matches neither test_*.py nor "
               "*_check.py): " + ", ".join(skipped))

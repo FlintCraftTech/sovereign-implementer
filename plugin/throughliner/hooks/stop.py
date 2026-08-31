@@ -84,11 +84,42 @@ PLACEHOLDER_SLUG = re.compile(r"(^|-)slug($|-)", re.IGNORECASE)
 
 # Words that mean the sentence is talking ABOUT a slug rather than claiming it
 # was just written. Cheap false-positive suppression.
+#
+# Scoped to the claim's OWN sentence, and that scope is the whole guard. A
+# fixed character window reaches backwards past the full stop into whatever
+# preceded it, and `next-build.md` REQUIRES a capture report to say why the
+# thing was captured rather than done now — so the mandated wording ("I
+# captured this rather than folding it in. Filed as [slug].") puts this
+# pattern's own trigger words in the previous sentence, and three real filing
+# claims went undetected because of it. A past-tense claim standing as its own
+# sentence is a claim whatever precedes it; a genuine hedge ("I would file
+# [slug]", "I'll file [slug] once the build lands") shares the claim's
+# sentence and is still suppressed.
 NEGATION_NEAR = re.compile(
     r"\b(will|would|should|could|about to|going to|plan to|propose|"
     r"recommend|suggest|if |once |before |instead of|rather than|not )\b",
     re.IGNORECASE,
 )
+
+
+# A sentence ends at ./!/? followed by whitespace or the end of the text, or at
+# a line break. Deliberately crude: the cost of splitting one sentence in two is
+# a hedge that stops suppressing, which fails toward blocking and is visible;
+# the cost of not splitting is a hedge that suppresses a real claim, which is
+# silent. Bullet and heading markers count as breaks because they are newlines.
+SENTENCE_BREAK = re.compile(r"(?:[.!?](?=\s|$))|\n")
+
+
+def _sentence_span(message, start, end):
+    """The bounds of the sentence containing message[start:end]."""
+    left = 0
+    for match in SENTENCE_BREAK.finditer(message, 0, start):
+        left = match.end()
+    right = len(message)
+    match = SENTENCE_BREAK.search(message, end)
+    if match:
+        right = match.end()
+    return left, right
 
 
 def _claimed_slugs(message):
@@ -106,9 +137,10 @@ def _claimed_slugs(message):
                 continue
             if PLACEHOLDER_SLUG.search(slug):
                 continue
-            # Look at the sentence around the match for hedging language.
-            start = max(0, match.start() - 60)
-            window = message[start:match.end() + 20]
+            # Look at the claim's OWN sentence for hedging language — not a
+            # fixed window, which reached back into the preceding sentence.
+            left, right = _sentence_span(message, match.start(), match.end())
+            window = message[left:right]
             if NEGATION_NEAR.search(window):
                 continue
             found.add(slug)

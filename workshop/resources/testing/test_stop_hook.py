@@ -3,7 +3,7 @@
 
 Host-only dev artifact — not shipped in the plugin package.
 
-Run:  py resources/testing/test_stop_hook.py
+Run:  py workshop/resources/testing/test_stop_hook.py
 (Plain script, never pytest — see CLAUDE.md's scripting constraints.)
 
 The hook is driven as a subprocess, because what needs pinning is whether it
@@ -193,6 +193,72 @@ def test_missing_log_directory_behaves_as_before():
     shutil.rmtree(d, ignore_errors=True)
 
 
+# --------------------------------------------------------------------------
+# Hedge-suppression fixtures, widened to full-paragraph reports.
+#
+# [stop-hook-negation-window-eats-real-claims]: every fixture above is a bare
+# sentence, so the hedging suppressor can never fire in one — the suite passed,
+# correctly, while the guard was defeated live. The general lesson, which
+# belongs to the record rather than to this file: a fixture that isolates the
+# unit can isolate away the interaction that breaks it.
+#
+# The three CATCH cases are the three replies driven through the live hook on
+# 2026-08-31 that went undetected. Each carries its hedge in the sentence
+# BEFORE the claim, which is the shape next-build.md's capture-report rule
+# actually mandates.
+# --------------------------------------------------------------------------
+
+RECORDED_MISSES = [
+    ("hedge in the previous sentence — 'rather than'",
+     "I captured this **rather than** folding it in. Filed as "
+     "[never-written]."),
+    ("hedge in the previous sentence — 'instead of'",
+     "This needed a decision instead of a build, so it goes to planning. "
+     "I've filed [never-written] to Unprocessed."),
+    ("hedge in the previous sentence — 'not'",
+     "That is not part of the described work, so it is not being folded in "
+     "here.\nFiled [never-written] as a capture."),
+]
+
+SAME_SENTENCE_HEDGES = [
+    ("same-sentence hedge — 'would'",
+     "I would file [never-written] if you want it tracked."),
+    ("same-sentence hedge — 'once'",
+     "I'll file [never-written] once the build lands."),
+]
+
+
+def test_recorded_misses_are_now_caught():
+    """The three live misses: a real claim whose hedge sits one sentence back."""
+    for label, message in RECORDED_MISSES:
+        root = project()
+        code, out = run(root, message)
+        check(label + " now blocks", blocked(out, code), out)
+        shutil.rmtree(root, ignore_errors=True)
+
+
+def test_same_sentence_hedges_are_still_suppressed():
+    """The suppressor's real job survives: it was added for exactly this."""
+    for label, message in SAME_SENTENCE_HEDGES:
+        root = project()
+        code, out = run(root, message)
+        check(label + " stays suppressed", not blocked(out, code), out)
+        shutil.rmtree(root, ignore_errors=True)
+
+
+def test_hedge_paragraph_around_a_shipped_citation_still_passes():
+    """A paragraph-length citation of finished work must not start blocking."""
+    root = project(log_files=["2026-08-21-already-shipped.md"])
+    code, out = run(
+        root,
+        "I looked at whether this belonged in the run rather than in the "
+        "queue. It was already built, so nothing was written this time. "
+        "I've filed [already-shipped] as agreed, back when it was raised.")
+    check("a paragraph citing shipped work does not block",
+          not blocked(out, code), out)
+    shutil.rmtree(root, ignore_errors=True)
+
+
 if __name__ == "__main__":
     print("test_stop_hook")
     test_cited_shipped_slug_does_not_block()
@@ -205,5 +271,8 @@ if __name__ == "__main__":
     test_unticked_absent_slug_still_blocks_with_working_file()
     test_no_working_file_behaves_as_before()
     test_missing_log_directory_behaves_as_before()
+    test_recorded_misses_are_now_caught()
+    test_same_sentence_hedges_are_still_suppressed()
+    test_hedge_paragraph_around_a_shipped_citation_still_passes()
     print(f"\n{len(failures)} failure(s)" if failures else "\nall passed")
     sys.exit(1 if failures else 0)

@@ -145,24 +145,32 @@ Covers what the mechanical near-duplicate matcher cannot see: **two passages doi
 
 **Read this before treating anything about this project's narration as evidence the method works.** Three layers assert the method's communication rules in every session here, and only one of them is the method. Where a rule is doubled, no session can tell which layer it followed — so a rule that is weak, badly worded, or missing from `skill-nonspecific-rules.md` still produces correct behaviour in this project, supplied by a layer consumers do not have. The defect then ships and this project never sees it.
 
-**Two layers now, not three, and the change is recent.** A shipped output style — `plugin/throughliner/output-styles/concise-throughliner.md`, applied automatically at system-prompt priority — was the third until it was deleted on 2026-08-14 for asserting rules the other two already carried. Its three unique rules migrated into the method's own file. What remains: **(G)** the user's global `~/.claude/CLAUDE.md`, loaded in every session on this machine and in every project; **(M)** the method's own `plugin/throughliner/docs/skill-nonspecific-rules.md`. Only M ships as the method's steering; G is personal and reaches every project.
+**Three layers, and the third is switched on in this project.** They are: **(G)** the user's global `~/.claude/CLAUDE.md`, loaded in every session on this machine and in every project; **(M)** the method's own `plugin/throughliner/docs/skill-nonspecific-rules.md`; and **(B)** the shipped output style `plugin/throughliner/output-styles/brevity.md`, named **Throughliner Brevity**, which asserts the method's communication shape at system-prompt priority. Only M and B ship; G is personal and reaches every project.
 
-| Rule | G | M |
-|---|---|---|
-| One item per message when the next action depends on the last | yes | yes |
-| State the count upfront before a multi-part exchange | yes | yes |
-| Never preview later items | yes | yes |
-| Alternatives the user is choosing between are shown together | yes | yes |
-| Lead with the decision; don't front-load reasoning | yes | yes |
-| Skip recaps of what the user can already see | yes | — |
-| The single user-facing ask goes in bold, as a question, at the end | yes | yes |
-| Offer a web search rather than guessing at an external fact | yes | yes |
-| Plain English for a non-coder; no unexplained jargon | yes | yes |
-| Gate detail behind an explicit request | — | yes |
-| How often to speak while working (narration cadence) | — | yes |
-| A written file's length matches what the task needs | — | yes |
+**B's rows are conditional, and the table marks them so.** The style is opt-in — offered at /setup and written into a project's own settings file with the user's consent — so a consumer project may not have it, and a row it covers is doubled *here* while being M working alone *there*. **This project has it enabled**: `.claude/settings.local.json` carries `"outputStyle": "Throughliner Brevity"`. So every `yes*` below is a layer this project's narration is being supplied by and a consumer's may not be.
 
-**How to read it.** Eight of the twelve are asserted by both layers, so this project's behaviour on those eight is unattributable and its good behaviour on them is not evidence about M. The four single-layer rows are where this project's narration *does* test something: the three M-only rows are M working alone, and the one G-only row is carried by nothing the method ships. **The deletion of the style improved this table's diagnostic value** — three rules that were previously S-only and untested here are now M's, so they are exercised by the layer that actually ships.
+**The retired style is history, not the current state.** `concise-throughliner.md` — a different file, auto-applied with no consent — was deleted on 2026-08-14 and its three unique rules migrated into M. B is the successor and is a distinct thing: opt-in, per project, consented. Reading the 2026-08-14 deletion as "there is no third layer now" is the error this section carried until 2026-08-31, and the 2026-08-29 compliance audit inherited it.
+
+| Rule | G | M | B\* |
+|---|---|---|---|
+| One item per message when the next action depends on the last | yes | yes | yes\* |
+| State the count upfront before a multi-part exchange | yes | yes | yes\* |
+| Never preview later items | yes | yes | yes\* |
+| Alternatives the user is choosing between are shown together | yes | yes | yes\* |
+| Lead with the decision; don't front-load reasoning | yes | yes | yes\* |
+| Skip recaps of what the user can already see | yes | — | yes\* |
+| The single user-facing ask goes in bold, as a question, at the end | yes | yes | yes\* |
+| Offer a web search rather than guessing at an external fact | yes | yes | — |
+| Plain English for a non-coder; no unexplained jargon | yes | yes | yes\* |
+| Gate detail behind an explicit request | — | yes | yes\* |
+| How often to speak while working (narration cadence) | — | yes | yes\* |
+| A written file's length matches what the task needs | — | yes | — |
+
+\* Present only where the project has the Brevity style enabled. This one does.
+
+**How to read it.** With B counted, **eleven of the twelve rows are asserted by two or more layers here**, so this project's behaviour on them is unattributable and its good behaviour on them is not evidence about M. **Exactly one row is M working alone**: a written file's length matching what the task needs. The web-search row is G and M with no B. The two rows that used to read as M-only — gating detail behind a request, and narration cadence — are not M working alone in this project, because B asserts both; they *are* M working alone in a consumer project that declined the style. The row that used to read as carried by nothing the method ships — skipping recaps — is now carried by B, conditionally.
+
+**So this project tests M on one row of twelve.** That is the number to hold when anyone reaches for this project's narration as evidence. Testing the communication rules in a consumer project with the style declined and no global overrides is the real answer, and it is separate work.
 
 **What was rejected, and why it is not reopened.** Stripping the duplicated rules out of G was refused: those instructions serve the user across every other project, and removing them to improve one project's test fidelity trades real everyday benefit for a diagnostic. Testing the communication rules in a consumer project without the global overrides is the real answer and is separate work. Making the overlap visible — this table — costs nothing and loses nothing, which is why it is what was built.
 

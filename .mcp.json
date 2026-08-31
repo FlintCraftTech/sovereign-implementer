@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "throughliner-state": {
+      "command": "py",
+      "args": [
+        "plugin/throughliner/mcp/server.py"
+      ]
+    }
+  }
+}
