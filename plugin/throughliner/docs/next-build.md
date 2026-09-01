@@ -27,7 +27,7 @@ readable content (a doc, copy, a spec section — anything a person READS)
     ->  no approval ask; the change was already agreed in /plan
 
 code
-    ->  no reveal. A non-coder can't review code text the same way.
+    ->  no reveal. A no-code developer can't review code text the same way.
     ->  success path stays silent (still no preview)
 ```
 
@@ -382,18 +382,20 @@ built (every Claude-work item ticked, any `[user]` item walked through):
 
 ```
 1. tell the user the build is complete
-2. say what remains — nothing to record yet, and the option to tighten what
-   was just built before closing
-3. do NOT end on a command string. Naming the close as the thing to type, at
-   the end of a long finished piece of work, is how a completion message gets
-   acted on as an instruction. The user reaches for the close themselves.
+2. say what remains — nothing recorded yet, and done work can be tightened
+   before closing
+3. end on a statement, naming any command in words and keeping it clear of
+   the sentence's end — a completion message that ends on a command string,
+   at the end of a long finished piece of work, gets acted on as an
+   instruction. The user reaches for the close themselves.
 ```
 
-Recording still only happens at the close — that is why nothing else is
-recommended here, another build included.
+**The completion message carries those two things and stops there** — the LOG
+entries /done writes are the single session record, and recording happens only
+at the close, which is why nothing further is recommended here, another build
+included.
 
-Tightening means refining done work — not raising new work. Anything new routes
-through the existing paths. **No chat summary of the changes** — the LOG entries
-/done writes are the single session record.
+Tightening means refining done work; anything new routes through the existing
+paths.
 
 **Leave the build working file in place** — deleting it is /done's job.

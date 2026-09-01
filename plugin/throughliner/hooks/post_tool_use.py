@@ -793,6 +793,15 @@ def _check_mid_line_markers(annotated, warnings):
             # reader tolerates the emphasis, so it is not a deviation.
             if line[:pos].strip("*") == "":
                 continue
+            # A field name inside backticks is prose DISCUSSING the mechanism
+            # — "rather than by a `Blocked by:` line" — not a field being
+            # written, and no reader would parse it either way. A corpus-wide
+            # check found every mid-line occurrence backticked and zero bare,
+            # so this drops the false positives (nine per tool call in one
+            # live session) and loses no real case: a load-bearing field
+            # written bare mid-line is still caught.
+            if line.count("`", 0, pos) % 2 == 1:
+                continue
             warnings.append(
                 f"line {i + 1}: '{marker}' appears mid-line rather than at the "
                 "start of its own line. Every tool that reads this field — the "
@@ -902,6 +911,52 @@ def _head_queue(cwd: str) -> str:
         return proc.stdout
     except Exception:
         return ""
+
+
+def _snapshot_queue(cwd: str) -> str:
+    """QUEUE.md as last snapshotted, or "" — the untracked project's baseline.
+
+    Untracked-by-design is the configuration setup proposes, so a missing
+    committed copy is normal there — and treating it as everything-new made
+    the whole standing flag set print after every tool call, which is the
+    cry-wolf shape this lint exists to avoid. The pre-change snapshots exist
+    precisely because these files have no git history: the newest one is the
+    previous version of the queue, so a report against it means "what this
+    change introduced", exactly what the committed copy means for a tracked
+    project. Never raises.
+    """
+    snap_dir = os.path.join(cwd, ".throughliner", "snapshots")
+    try:
+        names = [n for n in os.listdir(snap_dir)
+                 if n.startswith("QUEUE.md@")]
+    except OSError:
+        return ""
+    if not names:
+        return ""
+    # The stamp suffix is zero-padded (%Y%m%dT%H%M%S%f), so the lexical
+    # maximum is the newest snapshot.
+    try:
+        with open(os.path.join(snap_dir, max(names)), "r",
+                  encoding="utf-8", errors="replace") as f:
+            return f.read()
+    except OSError:
+        return ""
+
+
+def _baseline_queue(cwd: str):
+    """(content, kind) — the queue's previous version, from wherever one exists.
+
+    kind is "commit", "snapshot", or None. Both warning directions — new
+    flags and cleared flags — read this same baseline, so they cannot
+    disagree about what the previous version was.
+    """
+    head = _head_queue(cwd)
+    if head:
+        return head, "commit"
+    snap = _snapshot_queue(cwd)
+    if snap:
+        return snap, "snapshot"
+    return "", None
 
 
 # A warning's line number moves whenever anything above it is edited, but its
@@ -1121,17 +1176,33 @@ def _lint_queue(queue_path: str, with_growth: bool = True) -> int:
         return 0
 
     cwd = os.path.dirname(queue_path) or "."
-    head_content = _head_queue(cwd)
+    baseline_content, baseline_kind = _baseline_queue(cwd)
 
     sections = []
     warnings = lint(content)
-    new, pre_existing = _split_warnings(warnings, head_content)
+    if baseline_kind is None:
+        # No committed copy and no snapshot: a report with no baseline is not
+        # a comparison, so it is one plain line — never everything-as-new,
+        # which printed the whole standing set after every tool call.
+        if warnings:
+            sections.append(
+                "[Throughliner] QUEUE.md structure lint (advisory): "
+                f"{len(warnings)} flag(s) in the file, and no previous "
+                "version to compare against (no committed copy, no snapshot) "
+                "— so new-vs-standing cannot be told apart. Run the lint "
+                "script directly for the full listing."
+            )
+        new, pre_existing = [], list(warnings)
+    else:
+        new, pre_existing = _split_warnings(warnings, baseline_content)
     if new:
+        baseline_name = ("the last commit" if baseline_kind == "commit"
+                         else "the previous version")
         body = "\n".join(f"- {w}" for w in new)
         if pre_existing:
             body += (
                 f"\n\n{len(pre_existing)} further flag(s) were already present "
-                "in the last commit and are not repeated here."
+                f"in {baseline_name} and are not repeated here."
             )
         sections.append(
             "[Throughliner] QUEUE.md structure lint (advisory). "
@@ -1139,7 +1210,7 @@ def _lint_queue(queue_path: str, with_growth: bool = True) -> int:
             "and never flagged. Judge each one: fix what's genuinely wrong "
             "in a follow-up edit, leave what isn't.\n" + body
         )
-    else:
+    elif baseline_kind is not None:
         # An unchanged flag set says nothing, so it emits nothing, and silence
         # carries the meaning the constant line pretended to.
         #
@@ -1151,14 +1222,15 @@ def _lint_queue(queue_path: str, with_growth: bool = True) -> int:
         # count creep from 20 to 27 with the wording never changing once. A
         # pre-existing flag was invisible in exactly the way an absent one is.
         #
-        # Computed against the committed file every time, so nothing is stored
-        # and no state file can go stale. The full listing stays available by
-        # running the lint script directly.
-        for cleared in _cleared_warnings(warnings, head_content):
+        # Computed against the baseline every time — the committed file, or
+        # the newest pre-change snapshot where the queue is untracked — so
+        # nothing is stored and no state file can go stale. The full listing
+        # stays available by running the lint script directly.
+        for cleared in _cleared_warnings(warnings, baseline_content):
             sections.append(
                 "[Throughliner] QUEUE.md structure lint (advisory): a flag "
-                "present in the last commit is gone from the working tree — "
-                f"{cleared}"
+                "present in the previous version is gone from the working "
+                f"tree — {cleared}"
             )
 
     if with_growth:

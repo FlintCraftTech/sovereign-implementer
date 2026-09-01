@@ -42,7 +42,7 @@ Want an email when a new version ships? GitHub can send you one. On the [plugin'
 
 ## Who it's for
 
-Non-coders who know what their project should do but need a framework to keep Claude on track through multi-session builds.
+No-code developers who know what their project should do but need a framework to keep Claude on track through multi-session builds.
 
 ## What a project looks like
 
@@ -73,6 +73,8 @@ The plugin splits your project into a build queue and walks you through it. Five
 - `/rescan` — look back over the conversation for anything you decided or noticed but never wrote down, and file it in the queue. Run it whenever you like, as often as you like: it only looks back as far as the last time you ran it, so it never repeats itself. It files things; deciding what happens to them is still `/plan`'s job
 - `/done` — record what happened, commit. It tells you what's next and stops there, rather than inviting you straight into another build in the same conversation — a fresh one works better, and a message ending in a command is easy to send by accident. If you carry on working afterwards and something changes, it offers once to add that to the session's record
 - If you ask for something mid-build that isn't part of the current job, Claude writes it into your queue and says why rather than silently deferring it — and if you ask a second time, a small change gets done there and then
+
+A new project is set up **nested**: your product lives in a subfolder with a clean git repository of its own — the one that goes public if you ever publish — while the planning documents stay tracked in an outer repository that never leaves your machine. You get undo and history for everything, and a visitor to your published code sees the product, not the workshop. `/done` commits both. An existing flat project is never forced over; the conversion is offered at setup and again at the moment you go public, which is when the layout starts to matter.
 
 Running the method on a tool other than Claude Code is supported, and a port says which of two flavours it is: **tracking** (takes this project's changes as they come, adding nothing beyond what its own system needed to fit) or **independent** (its own thing, adopting only the changes it wants). Both are welcome, and saying which is what lets anyone tell what a port promises — see [plugin/throughliner/docs/ports.md](plugin/throughliner/docs/ports.md).
 

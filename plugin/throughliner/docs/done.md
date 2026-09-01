@@ -90,6 +90,12 @@ Several checks fire across a close — verify completion, the staleness sweep, t
 red-flag lifecycle, the wind-down re-scan. Combine what they turn up into one
 "here's what came up: …" rather than letting each speak in turn.
 
+**What the narration carries: every subject named outright, never a referring
+expression only the scrollback resolves** — "the item above", "that fix", "the
+same file" name nothing to a reader who is not holding the messages before
+this one, and the user is deciding whether to let the commit happen on this
+report alone.
+
 **The wind-down re-scan's numbered set is its own message**, being something the
 user must act on.
 
@@ -162,8 +168,8 @@ the rationale  ->  the entry body
 The user approves both once, at the entry-writing step, and the commit step reuses
 them verbatim — nothing new to read.
 
-**Entry template** (placeholder hash — backfilled automatically at the next
-session start):
+**Entry template** (placeholder hash — this close replaces it with the real
+hash right after the commit, when the hash first exists):
 
 ````markdown
 # [HASH] — [one-line summary]
@@ -319,7 +325,8 @@ sentence in its record, and change no filename or datestamp:**
 
 **Write the hash into the entry heading and the index line only** — the commit
 hash doesn't exist yet when the file is written, which is why the placeholder
-pattern exists, and the filename carries the date instead.
+pattern exists, and the filename carries the date instead. The close itself
+fills the placeholder right after the commit (the commit step below says how).
 
 **Write the literal placeholder token in hash position only**, where the
 automatic backfill treats any match mechanically, so a prose mention is one
@@ -543,8 +550,8 @@ RECOGNISE THE INHERITED TAIL FIRST — and skip the investigation:
 RECOGNISE THE HASH-BACKFILL SIGNATURE TOO — and skip the investigation:
     a dirty LOG/index.md or LOG/<slug>.md whose ONLY change is a placeholder
     hash becoming a real hash, in an entry heading or the start of an index line
-        -> the session-start hook's automatic backfill, already announced in
-           its opening housekeeping line
+        -> the previous close's own post-commit hash write (or, in a tracked
+           project, the session-start backfill's safety-net fill)
         -> fold it in with at most a one-line note, no diff opened
 
 any OTHER out-of-scope dirty path
@@ -625,9 +632,21 @@ or the user decides.
 **6. Commit with `git commit -F`.** No fresh okay needed. Then offer push only
 when a remote exists, and push only if the user accepts.
 
-The LOG entry keeps its placeholder. The session-start hook backfills it at the
-next session, as a working-tree edit folding into that session's commit — no
-amend, no two-commit flow.
+**In a nested project the close commits both repositories** — the product's
+changes as a commit in the inner repository (the product subfolder's own), and
+everything else, the method documents included, in the outer. Same message
+mechanics for each, the inner commit's message covering the product work
+alone. A session that touched only one side makes only that side's commit. A
+flat project — one repository — is unchanged by all of this.
+
+**Then write the commit hash into the headings and index lines this close just
+wrote** — the close is the one moment the hash exists and the files are at
+hand, and it is one convention for tracked and untracked projects alike (an
+untracked log never appears in any commit, so nothing later can attribute it
+from git). Read the hash from the commit just made, replace each placeholder
+this session wrote, and stop there — a working-tree edit riding into the next
+close's commit, no amend, no two-commit flow. In a tracked project the
+session-start backfill remains as the safety net for a fill this step missed.
 
 ## Recommend next  [BRIEF, PROMPT]
 
@@ -701,7 +720,7 @@ the close                ->  ONE commit. Everything the session did.
 the post-commit tail     ->  writes files, commits NOTHING:
                                a capture appended to QUEUE.md
                                an append to this session's LOG entry
-                               a hash the session-start backfill filled in
+                               the hash this close wrote in after its commit
                              all of it rides into the NEXT close's commit
 /rescan                  ->  the one-word route to the same tail. Files by the
                              three-way triage — work to Unprocessed, what
@@ -714,11 +733,11 @@ the post-commit tail     ->  writes files, commits NOTHING:
 **The cost, stated rather than discovered: the tree is dirty between one close
 and the next, always.** That is accepted, and it is what makes the dirt
 *legible* — uncommitted changes at a session's opening mean one thing, the
-previous session's tail plus the backfill, so a session recognises the signature
-instead of investigating it.
+previous session's tail plus its post-commit hash write, so a session
+recognises the signature instead of investigating it.
 
 **Read tail-shaped dirt as the previous session's LOG entry, a capture at the
-bottom of Unprocessed, or a backfilled hash, and give anything else the full
+bottom of Unprocessed, or a filled-in hash, and give anything else the full
 treatment** — which is what keeps the close's staging check its teeth.
 
 **In a tail, route an urge to run or drive testing or verification into a skill

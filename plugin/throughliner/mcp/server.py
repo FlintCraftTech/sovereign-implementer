@@ -1,18 +1,22 @@
 #!/usr/bin/env python3
-"""Throughliner state — a read-only MCP server answering four live questions.
+"""Throughliner state — an MCP server answering four live questions, plus one
+structured write.
 
-Slice one of the MCP helper. It is deliberately **read-only**: it opens no file
-for writing and runs no command that changes anything, so it proves the
-plumbing — a server registered, trusted, connected, its tools reachable from a
-session — without any risk that a bug in the plumbing costs a file. The writing
-slice is designed only once this one has been proven in real sessions.
+Slices one and two of the MCP helper. Slice one is the four read-only tools,
+which proved the plumbing — a server registered, trusted, connected, its tools
+reachable from a session — with no risk that a bug in the plumbing costs a
+file. Slice two adds the first write, `file_capture`, which starts where the
+writes are most frequent: filing a capture. It refuses only what is checkably
+wrong, echoing the reason so the retry is instant, and appends to the bottom
+of Unprocessed and nowhere else, so placement cannot go wrong by construction.
 
-**Every tool wraps a calculation existing code already performs.** Nothing here
-invents an answer: the queue counts and the next pick come from
-`scripts/queue_digest.py`, the cycle facts and the content stamp from
-`hooks/session_start.py`. That is what keeps the server's answers and the
-session opening's answers the same answer rather than two implementations that
-drift.
+**Every tool wraps a calculation or a write path existing code already
+performs.** Nothing here invents an answer or a second write mechanism: the
+queue counts and the next pick come from `scripts/queue_digest.py`, the cycle
+facts and the content stamp from `hooks/session_start.py`, and the capture
+append goes through `scripts/reorder_queue.py`'s own append path. That is what
+keeps the server's answers and the session opening's answers the same answer
+rather than two implementations that drift.
 
 **Registration is project-scoped.** This file travels inside the plugin package
 but nothing in the package registers it; the registration is a `.mcp.json` at
@@ -24,11 +28,15 @@ Standard library only, like every script in this project — it runs on machines
 whose interpreters nobody here controls.
 """
 
+import contextlib
 import datetime
 import importlib.util
+import io
 import json
 import os
+import re
 import sys
+import tempfile
 
 # UTF-8 on both streams, copied from reorder_queue.py, which is the canonical
 # copy. The duplication is deliberate: this file may run standalone from a
@@ -44,7 +52,7 @@ for _stream in (sys.stderr, sys.stdout):
 
 PROTOCOL_VERSION = "2024-11-05"
 SERVER_NAME = "throughliner-state"
-SERVER_VERSION = "0.1.0"
+SERVER_VERSION = "0.2.0"
 
 # This file sits at <plugin-root>/mcp/server.py, so the plugin root is its
 # grandparent. Derived rather than hardcoded, per the working conventions.
@@ -82,6 +90,11 @@ def _digest():
 def _session_start():
     return _load("throughliner_session_start",
                  os.path.join(PLUGIN_ROOT, "hooks", "session_start.py"))
+
+
+def _mover():
+    return _load("throughliner_reorder_queue",
+                 os.path.join(PLUGIN_ROOT, "scripts", "reorder_queue.py"))
 
 
 def _queue_path(root):
@@ -254,6 +267,148 @@ def tool_host_currency(_arguments):
     return "\n".join(lines)
 
 
+SLUG_SHAPE = re.compile(r'^[a-z0-9][a-z0-9-]*$')
+
+
+def tool_file_capture(arguments):
+    """File one capture at the bottom of Unprocessed, refusing what is
+    checkably wrong.
+
+    The tool composes the canonical entry itself and appends it through
+    reorder_queue.py's own append path, so no second write mechanism exists.
+    Placement is not a parameter: the bottom of Unprocessed is the only
+    destination, which is the Captures placement rule by construction.
+
+    It refuses only what is checkably wrong, echoing the reason so the retry
+    is instant. Body prose, length and structure pass untouched — the lint
+    stays advisory, and a tool that enforced more of it would turn advice
+    into a gate nobody agreed to.
+    """
+    root = project_root()
+    queue = _queue_path(root)
+    mover = _mover()
+    if mover is None:
+        return "Cannot write: reorder_queue.py is not where this server " \
+               "expects it (%s)." % PLUGIN_ROOT
+    if not os.path.isfile(queue):
+        return "Cannot write: no QUEUE.md at %s." % queue
+
+    heading = (arguments.get("heading") or "").strip()
+    slug = (arguments.get("slug") or "").strip()
+    body = (arguments.get("body") or "").strip()
+    blocked_by = arguments.get("blocked_by") or []
+    if isinstance(blocked_by, str):
+        blocked_by = [s.strip() for s in blocked_by.split(",") if s.strip()]
+    blocked_by = [s.strip().strip("[]") for s in blocked_by]
+    not_before = (arguments.get("not_before") or "").strip()
+    cycle = (arguments.get("cycle") or "").strip().strip("[]")
+
+    problems = []
+
+    if not heading:
+        problems.append("heading is missing — the entry's one-line "
+                        "description, distinguishing words first.")
+    else:
+        first_word = heading.split()[0].lower().rstrip(",.:;")
+        if first_word in ("a", "an", "the"):
+            problems.append(
+                "heading leads with %r — the queue is read through an "
+                "outline that truncates each heading, so put the "
+                "distinguishing words first and drop the leading article."
+                % heading.split()[0])
+
+    if not slug:
+        problems.append("slug is missing — kebab-case, e.g. "
+                        "'lint-cries-wolf-on-prose'.")
+    elif not SLUG_SHAPE.match(slug):
+        problems.append("slug %r is malformed — lowercase letters, digits "
+                        "and hyphens only, starting with a letter or digit."
+                        % slug)
+
+    if not body:
+        problems.append("body is missing — the rationale prose, in plain "
+                        "short sentences.")
+
+    with open(queue, 'r', encoding='utf-8', newline='') as f:
+        queue_lines = f.read().splitlines(keepends=True)
+    existing = (mover.section_slugs(queue_lines, 'Processed')
+                | mover.section_slugs(queue_lines, 'Unprocessed'))
+
+    if slug and slug in existing:
+        problems.append("slug %r is already taken by an entry in the queue — "
+                        "pick another, or edit the existing entry instead."
+                        % slug)
+
+    for b in blocked_by:
+        if b not in existing:
+            problems.append("blocked_by names [%s], which is not an entry in "
+                            "the queue — a blocker must resolve to a real "
+                            "entry." % b)
+
+    if not_before:
+        try:
+            datetime.date.fromisoformat(not_before)
+        except ValueError:
+            problems.append("not_before %r is not a real date — YYYY-MM-DD."
+                            % not_before)
+
+    if cycle:
+        hooks = _session_start()
+        cycle_slugs = []
+        if hooks is not None and os.path.isfile(
+                os.path.join(root, "CYCLES.md")):
+            cycle_slugs = [row[0] for row in hooks.cycles_facts(root)]
+        if cycle not in cycle_slugs:
+            problems.append(
+                "cycle names [%s], which matches no definition in the "
+                "project's cycles doc — a typo at write time is refused even "
+                "though a later-deleted cycle correctly releases its "
+                "material.%s" % (cycle,
+                                 " Definitions on file: %s."
+                                 % ", ".join("[%s]" % c for c in cycle_slugs)
+                                 if cycle_slugs else
+                                 " This project has no cycle definitions."))
+
+    if problems:
+        return "Refused — nothing was written:\n" + \
+               "\n".join("- " + p for p in problems)
+
+    entry = ["#### %s [%s]\n" % (heading, slug), body.rstrip() + "\n"]
+    if blocked_by:
+        entry.append("Blocked by: %s\n"
+                     % ", ".join("[%s]" % b for b in blocked_by))
+    if not_before:
+        entry.append("Not before: %s\n" % not_before)
+    if cycle:
+        entry.append("Cycle: [%s]\n" % cycle)
+
+    # The append goes through the mover's own path. Its refusals call
+    # sys.exit via die(), which must not kill the server — so the call runs
+    # under a captured stderr and a caught SystemExit, and a refusal comes
+    # back as this tool's answer instead.
+    tmp = tempfile.NamedTemporaryFile('w', encoding='utf-8', suffix='.md',
+                                      delete=False)
+    try:
+        tmp.write("".join(entry))
+        tmp.close()
+        captured = io.StringIO()
+        try:
+            with contextlib.redirect_stderr(captured), \
+                    contextlib.redirect_stdout(captured):
+                mover.append_item(queue, 'Unprocessed', tmp.name)
+        except SystemExit:
+            return "Refused by the queue tool — nothing was written:\n" + \
+                   captured.getvalue().strip()
+    finally:
+        try:
+            os.unlink(tmp.name)
+        except OSError:
+            pass
+
+    return "Filed at the bottom of Unprocessed: #### %s [%s]" \
+           % (heading, slug)
+
+
 TOOLS = [
     {
         "name": "queue_checkpoint_counts",
@@ -310,6 +465,61 @@ TOOLS = [
             "whether they match. A match means host-side changes are live.",
         "inputSchema": {"type": "object", "properties": {}},
         "handler": tool_host_currency,
+    },
+    {
+        "name": "file_capture",
+        "description":
+            "File one capture at the bottom of the queue's Unprocessed "
+            "section. Takes a heading, a slug, the body prose, and optional "
+            "blocked_by, not_before and cycle fields; composes the canonical "
+            "entry and appends it through the queue tool's own append path. "
+            "Refuses only what is checkably wrong — a missing, malformed or "
+            "taken slug, a blocker resolving to no entry, an unreal date, a "
+            "cycle naming no definition, a heading led by A/An/The — echoing "
+            "the reason so the retry is instant. Body prose passes untouched.",
+        "inputSchema": {
+            "type": "object",
+            "required": ["heading", "slug", "body"],
+            "properties": {
+                "heading": {
+                    "type": "string",
+                    "description":
+                        "One-line description, distinguishing words first, "
+                        "without the [slug] — the tool appends it.",
+                },
+                "slug": {
+                    "type": "string",
+                    "description": "Kebab-case slug, unique in the queue.",
+                },
+                "body": {
+                    "type": "string",
+                    "description":
+                        "The rationale prose, passed through untouched.",
+                },
+                "blocked_by": {
+                    "type": "array",
+                    "items": {"type": "string"},
+                    "description":
+                        "Slugs of entries this capture waits on. Each must "
+                        "resolve to a real entry in the queue.",
+                },
+                "not_before": {
+                    "type": "string",
+                    "description":
+                        "YYYY-MM-DD — do not offer this capture again "
+                        "before the date. Needs the user's approval, per "
+                        "the capture rules.",
+                },
+                "cycle": {
+                    "type": "string",
+                    "description":
+                        "Slug of a cycle definition this capture is "
+                        "material for. Must name a definition in the "
+                        "project's cycles doc.",
+                },
+            },
+        },
+        "handler": tool_file_capture,
     },
 ]
 

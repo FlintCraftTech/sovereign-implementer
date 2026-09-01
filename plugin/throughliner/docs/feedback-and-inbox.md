@@ -19,7 +19,7 @@ plugin's author — a method problem goes to the channel below instead.
 
 ```
 the discriminator:  which thing is misbehaving?
-    my app       ->  an ordinary capture in my QUEUE
+    my project   ->  an ordinary capture in my QUEUE
     the method   ->  mail to the plugin's own project where this project's
                      address book records it as a correspondent — same
                      machine, no public post, and it lands in the queue
@@ -108,7 +108,7 @@ date by which there is plausibly news. No reply wanted: nothing filed.
 - Apply the same scrub-by-construction standard as the method report.
 
 **The posting mechanics differ deliberately.** An issue is posted by Claude,
-after explicit approval, because `gh` can post it and a non-coder shouldn't be
+after explicit approval, because `gh` can post it and a no-code developer shouldn't be
 sent to a GitHub form; a form report is pasted by the user because Claude can't
 submit a web form. Both keep the same
 guarantee — nothing leaves without the user seeing the exact text and saying

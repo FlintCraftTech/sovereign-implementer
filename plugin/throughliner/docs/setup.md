@@ -23,7 +23,7 @@ inside an already-adopted project, where they are. So a step is followed from
 its prose on either run, and a tag never carries anything the prose does not
 already say.
 
-**Plain-language guard.** Everything you say during /setup is read by a non-coder
+**Plain-language guard.** Everything you say during /setup is read by a no-code developer
 who may be brand new to all of this. Keep internal terms out of what they see — no
 hook filenames, no working-file names, no "scope-lock," "method docs," or "Case B"
 labels. Say "your project's files," not "method docs"; say "I'll set this up as a
@@ -250,6 +250,16 @@ Adding an ignore line stops future commits; it does not untrack what is already
 committed, and it cannot remove anything from history. Tell the user what is
 there and that the line does not undo it — the line goes in only alongside that
 plain statement, so nobody is left thinking the mail is now private.
+
+**1c. Offer the nested conversion to a flat project**  [BRIEF, PROMPT] — an
+offer, never a halt. Where the project is one flat repository, say in two or
+three sentences what the nested shape is (the product in a subfolder with its
+own clean repository, the method's documents tracked privately in the outer
+one, the close committing both) and that converting means creating the inner
+repository and moving the product's files into its subfolder. On a yes, plan
+the conversion with the user file by file; on anything else, drop it — the
+flat shape keeps working exactly as before, and the offer returns once more
+only at the moment the project goes public.
 
 **2. Retire REGISTRY.md if present**  [SILENT] when it holds only what the old
 setup put there; [BRIEF, PROMPT] when the user has written into it. No longer
@@ -530,9 +540,24 @@ on the same document can hold off rather than the two of you typing over each
 other. It is transient state about the session running right now, so it stays
 out of the repository.
 
-**Git repository** — if the folder isn't already one, run `git init`, silently and
-mechanically like the rest of the scaffold. Without a repository there is nothing
-for the close-out to commit to.
+**Git repositories — the nested shape.** A new project is set up nested: the
+top folder is the larger project — the method's documents and working material
+— and the product sits in a subfolder. Name the product subfolder with the
+user in one line (their own word for the thing they are building is usually
+its name), create it where absent, and run `git init` twice where either
+repository is missing: once at the project root, once in the product
+subfolder. The inner repository holds only the product, displayed cleanly,
+and is the one that goes public when the user asks; the outer one never gets
+a remote, so the method's documents are tracked there — privately — and undo,
+history and the close's read-back all work from ordinary git. The close
+commits both, the product commit into the inner repository and everything
+else into the outer. One product subfolder per project; a project with
+several outgrowing parts uses the subproject pop-out, which exists for that.
+
+**A folder that is already a flat repository is never restructured here.** The
+conversion is an offer — at the migration path, and again at the moment the
+project goes public, which is when a flat layout starts to matter — and
+declining leaves the flat shape working exactly as before.
 
 **Keep-private option**  [BRIEF, PROMPT]. Offer once, as part of scaffolding.
 **There are two named configurations, and the private one is what setup
@@ -609,12 +634,17 @@ protection.
 
 **The private configuration is the proposal, so a user who says nothing about it
 ends up private.** Acceptance is the default here and nowhere else in scaffolding:
-the material is the most personal the method produces, and the recoverability the
-tracked configuration used to be needed for is now supplied by the plugin.
+the material is the most personal the method produces.
 
 **This adds no sixth interview question.** It is part of scaffolding, where the
 files are being created, and it is answerable without knowing anything about the
 project.
+
+**In the nested shape the documents are private by architecture** — tracked in
+an outer repository that never gets a remote — so the tracked configuration is
+the natural answer there and keeps undo, history and read-back whole. The
+ignore option remains for a user who wants a document out of even the local
+history, with the same costs stated.
 
 **The brevity-style offer**  [BRIEF, PROMPT]. The plugin ships an output style
 called Throughliner Brevity — a setting that keeps Claude's replies short and
@@ -644,8 +674,14 @@ user declines               ->  say nothing further; every session opening
 Say once that the style takes effect at the next session or /clear — styles
 never apply mid-conversation.
 
-**The public-repository offer — one subject, four provisions** [DISCUSS,
+**The public-repository offer — one subject, five provisions** [DISCUSS,
 PROMPT]. Make it only where the user asks for a public repository, and then:
+
+- where the project is flat, re-offer the nested conversion first — going
+  public is the moment a flat layout starts to matter, since a nested
+  project's inner repository is what goes public while the method's documents
+  stay in the private outer one. Declining keeps the flat shape and the offer
+  proceeds on it;
 
 - ask what licence the project should carry, and why it is being asked now:
 
@@ -670,7 +706,7 @@ sentence most likely to slip in here.
 
 **Two things are deliberately NOT asked, recorded so they are not re-proposed.**
 A standalone licence question in the interview — moved onto this offer, because
-most non-coders cannot answer it while still describing what their app is, which
+most no-code developers cannot answer it while still describing what their project is, which
 turns a question into a small failure with "I don't know" as the honest reply. And
 the idea that open source implies open logging — dropped entirely, because raising
 it at all nudges a user toward publishing their planning documents, which is the
@@ -710,7 +746,7 @@ are** — two in one message is bundling.
   generated from what's missing, not from a fixed position in a script.
 - **Recommend an answer to each question** rather than asking cold — offer a
   plausible answer the user can accept, correct, or replace ("My guess is this is for
-  personal use rather than a team — is that right?"). A non-coder finds it far
+  personal use rather than a team — is that right?"). A no-code developer finds it far
   easier to react to a proposal than to fill a blank.
 - **Cover these topics** — a bank to draw on, not a checklist to recite:
 

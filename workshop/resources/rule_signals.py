@@ -162,13 +162,17 @@ GROWTH_WINDOW = 30
 # this stage buildable at all.
 RULE_BEARING = [
     "plugin/throughliner/docs/",
-    "resources/self-authoring-rules.md",
-    "resources/rule-maintenance.md",
-    "resources/method-compliance-audit-checklist.md",
+    "workshop/resources/self-authoring-rules.md",
+    "workshop/resources/rule-maintenance.md",
+    "workshop/resources/method-compliance-audit-checklist.md",
     "CLAUDE.md",
 ]
 
-RETIRED_TERMS_FILE = "resources/retired-terms.md"
+# Matched by startswith against commit file lists, so these carry the full
+# post-move path. The pre-move `resources/` forms were dead here for the same
+# reason the retired-terms constant below was — e04b514 moved the folder and a
+# string constant is read by nobody until it is needed.
+RETIRED_TERMS_FILE = "workshop/resources/retired-terms.md"
 
 # The commit in which the rule-gate disposition obligation shipped. BORN and
 # CONTRADICTED examine only commits AFTER this one; everything at or before it
@@ -958,12 +962,25 @@ def signal_repealed(root):
     produces a visible signal. No number, no calendar.
     """
     terms = load_retired_terms(root)
+    if not terms and not os.path.isfile(os.path.join(root, RETIRED_TERMS_FILE)):
+        # A missing list is a footing failure, not a clean result. The old
+        # behaviour returned a no-list line grouped with the passes, which
+        # read as clean while one of the five checks had not run at all —
+        # worse than a failure, which would at least be visible.
+        raise SystemExit(
+            "rule_signals: FOOTING FAILURE — no retired-terms list at %s. "
+            "The retired-terms check cannot run, so no report is produced at "
+            "all: a clean-looking result with a dead check inside it is the "
+            "failure this refusal exists to prevent. Fix the path or restore "
+            "the file." % RETIRED_TERMS_FILE)
     if not terms:
         return {"stage": "REPEALED", "firing": False, "value": 0,
                 "slug": "live-rules-name-retired-terms",
-                "message": f"No retired-terms list at {RETIRED_TERMS_FILE}."}
+                "message": "Retired-terms list present and empty — nothing "
+                           "is retired, so nothing can be named."}
 
-    scan_roots = ["plugin/throughliner", "resources", "FAQ", "CLAUDE.md", "SPEC.md"]
+    scan_roots = ["plugin/throughliner", "workshop/resources", "FAQ",
+                  "CLAUDE.md", "SPEC.md"]
     hits = []
     for rel in scan_roots:
         base = os.path.join(root, rel)

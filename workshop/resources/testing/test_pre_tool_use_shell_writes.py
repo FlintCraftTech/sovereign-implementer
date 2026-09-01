@@ -346,6 +346,44 @@ def main():
         "got: " + decision(d3, SED_READ),
     )
 
+    # 12b. The QUOTED target — the live escape of 2026-09-01. The old token
+    #      filter skipped every quoted token to avoid reading the quoted sed
+    #      script as a path, and on a machine whose folders carry spaces every
+    #      target path is quoted — so the skip removed exactly the targets the
+    #      check exists for. A `sed -i` ran against a project test file and
+    #      nothing fired. Quotes are resolved now, and the script is told
+    #      apart by its own shape.
+    for label, cmd in (
+        ("quoted relative target",
+         "sed -i 's/a/b/' \"workshop/resources/testing/test_stop_hook.py\""),
+        ("single-quoted relative target",
+         "sed -i 's/a/b/' 'plugin/throughliner/docs/plan.md'"),
+        ("quoted absolute target with spaces",
+         "sed -i 's/a/b/' \"" + os.path.join(d3, "sub dir", "file.py") + "\""),
+        ("suffix variant -i.bak on a quoted target",
+         "sed -i.bak 's/a/b/' \"QUEUE.md\""),
+    ):
+        check(
+            f"sed -i with a {label} is denied",
+            decision(d3, cmd) == "deny",
+            "got: " + decision(d3, cmd),
+        )
+
+    # 12c. The narrowing that must survive 12b: a target OUTSIDE the project
+    #      passes, quoted or not, and a pipe-delimited script is never read as
+    #      a path (which would have denied by a bogus in-project resolution).
+    for label, cmd in (
+        ("quoted outside target",
+         "sed -i 's/a/b/' \"C:/elsewhere/some file.md\""),
+        ("pipe-delimited script, outside target",
+         "sed -i 's|a|b|' \"C:/elsewhere/whatever.md\""),
+    ):
+        check(
+            f"sed -i with a {label} still passes",
+            decision(d3, cmd) == "pass",
+            "got: " + decision(d3, cmd),
+        )
+
     # --- raw-string paths: literal passes, computed still denied -------------
     #
     # `r'C:\...'` is the ordinary way to write a Windows path in Python. The

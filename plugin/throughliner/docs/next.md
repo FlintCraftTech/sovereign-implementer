@@ -562,6 +562,18 @@ walkthrough in QUEUE.md**; where an item carries none, halt on it rather than
 inventing steps. Walking one through does **not** end
 the run — it's the last pass of a run whose Claude work is already done.
 
+**Open the item's record, then give the first concrete step and wait.** The
+record comes first: open the item's LOG entry file under its slug when the
+drive starts, and append each action as it happens. A walk-through
+legitimately has Claude doing real work — running a reinstall, bumping a
+version, pruning a cache — and none of it has any other home: a `[user]` item
+never enters the build working file, so without this the work exists only in
+conversation and a crash loses it entirely, leaving a working file that
+positively suggests it never happened. The item itself stays in QUEUE.md
+untouched, so nothing is stranded, and a crash mid-walk-through leaves a
+partial entry saying exactly what was done. The close then finds an entry
+already started rather than writing one fresh.
+
 **Present every `[user]` item the pass reaches.** No item is set aside before it
 has had its own turn, and nothing is filtered out of the pass in advance on a
 judgment about whether its moment has come.
@@ -587,18 +599,7 @@ moving to the next. (This is *not* the [SEQUENCE] bulk-approval inversion: that'
 for a deterministic result set the user reads and accepts in one pass. A
 walk-through is an action driven live.)
 
-**Open the item's LOG entry file when the walk-through starts, and append each
-action as it happens.** A walk-through legitimately has Claude doing real work —
-running a reinstall, bumping a version, pruning a cache — and none of it has any
-other home: a `[user]` item never enters the build working file, so without this
-the work exists only in conversation and a crash loses it entirely, leaving a
-working file that positively suggests it never happened. Write the entry under the
-item's slug, in `LOG/`, and add to it as you go. The item itself stays in QUEUE.md
-untouched, so nothing is stranded, and a crash mid-walk-through leaves a partial
-entry saying exactly what was done. The close then finds an entry already started
-rather than writing one fresh.
-
-**Where that record shows the item was handed over for completion after a close
+**Where the item's record shows it was handed over for completion after a close
 and names no observable this run can reach, replace the drive with the one
 ask** — where did that land? Both facts together, read off the record, and one
 ask rather than a walk-through of steps the user may already have finished days
@@ -646,14 +647,6 @@ anything else what actually happened, in one plain sentence, with the detail in
               "driven to the end of Claude's part; the final step is the user's"
 ```
 
-**The fourth arm is a widening, not a fourth box.** Two real outcomes fit none of
-the three: an item found unbuildable as written and stopped for redesign, and one
-driven to the end of Claude's part with the remainder the user's. Forcing either
-into a named value misdirects the next session — `not reached` would send it to
-drive a walkthrough already known to be wrong. A plain sentence carries what a
-new value would have to be defined for, and each value added is another thing a
-close has to choose between correctly.
-
 **Write `deferred` only from the user's own word.** An item nobody put in front
 of them was not deferred by anyone; recording it that way tells the next session
 a decision was made when none was, and the item then sits unpresented with a
@@ -684,7 +677,7 @@ these words with nobody to ask.
 so is safe — a scratch fixture — or read the tool's `--help`. The scope is
 narrow on purpose: a command *Claude* runs with a wrong flag costs one turn and
 self-corrects. The cost only lands when the command goes into a block for the
-user to run: they are a non-coder, they cannot tell a typo from a broken tool,
+user to run: they are a no-code developer, they cannot tell a typo from a broken tool,
 and the failure arrives in their hands rather than yours.
 
 **Say nothing about /done until the walk-through is complete** — while driving

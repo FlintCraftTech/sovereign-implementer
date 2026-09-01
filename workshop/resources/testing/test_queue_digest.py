@@ -722,8 +722,42 @@ def test_whats_next_rung_changes_when_the_queue_changes_beneath_it():
           rung == 1 and item["slug"] == "risky", f"rung {rung}")
 
     rung, _, item = digest.whats_next(items, root, queue, skip=("risky",))
-    check("skipping it falls through to rung 2",
-          rung == 2 and item["slug"] == "alpha", f"rung {rung}")
+    check("skipping it falls through to rung 3 (unblock potential)",
+          rung == 3 and item["slug"] == "alpha", f"rung {rung}")
+    shutil.rmtree(root, ignore_errors=True)
+
+
+def test_whats_next_cycle_pass_over_and_due_rung():
+    """A `Cycle:` naming a live definition never returns; a capture filed
+    UNDER a definition's own slug is due cycle work and ranks at rung 2.
+    A Cycle: naming no definition is a deleted cycle's release and ranks."""
+    root = project(
+        unprocessed=(
+            "#### Tip pool entry [tip-something]\nProse.\n"
+            "Cycle: [tips-posting]\n"
+            "\n"
+            "#### First tips turn due [tips-posting]\nProse.\n"
+            "\n"
+            "#### Ordinary capture [ordinary]\nProse.\n"
+        ),
+    )
+    with open(os.path.join(root, "CYCLES.md"), "w", encoding="utf-8") as f:
+        f.write("# Cycles\n\n## Tips posting [tips-posting]\n\nCadence: x.\n")
+    queue = os.path.join(root, "QUEUE.md")
+    rung, _, item = digest.whats_next(digest.parse(queue), root, queue)
+    check("a due-turn capture ranks at rung 2",
+          rung == 2 and item["slug"] == "tips-posting",
+          f"rung {rung}, {item and item['slug']}")
+    rung, _, item = digest.whats_next(digest.parse(queue), root, queue,
+                                      skip=("tips-posting",))
+    check("cycle-owned material is never returned",
+          item["slug"] == "ordinary", str(item and item["slug"]))
+    os.remove(os.path.join(root, "CYCLES.md"))
+    _, _, item = digest.whats_next(digest.parse(queue), root, queue,
+                                   skip=("tips-posting", "ordinary"))
+    check("a deleted cycle releases its material",
+          item is not None and item["slug"] == "tip-something",
+          str(item and item["slug"]))
     shutil.rmtree(root, ignore_errors=True)
 
 
@@ -1003,6 +1037,7 @@ if __name__ == "__main__":
     test_no_runs_alone_work_says_none()
     test_whats_next_answers_only_the_pick()
     test_whats_next_rung_changes_when_the_queue_changes_beneath_it()
+    test_whats_next_cycle_pass_over_and_due_rung()
     test_whats_next_respects_a_capture_bowing_out()
     test_incoming_citations_are_computed_not_guessed()
     test_copied_finding_flags_the_item_as_resting_on_a_snapshot()

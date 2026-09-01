@@ -1093,15 +1093,25 @@ def whats_next(items, root, queue_path, skip=(), picked=0, today=None):
     which is why the opening digest's fields cannot stand in for it.
 
     `skip` and `picked` are session state the script cannot see: which entries
-    the user set aside this session, and how many picks have been made (rung 4
+    the user set aside this session, and how many picks have been made (rung 5
     alternates on that parity). Without them the mode would answer wrongly the
     moment anything was skipped, which is the case it exists for.
+
+    The plan-time pass-overs are all applied here, so a session reading the
+    pick never re-applies them by hand: a `Not before:` still ahead, a
+    `Blocked by:` naming an open entry, and a `Cycle:` naming a live
+    definition (that cycle's turns draw the entry; a cycle deleted from the
+    doc releases its material, so a dead reference ranks normally). The first
+    two were implemented from the start; the cycle pass-over was left to the
+    reader and re-applied by hand on every pick of a thirty-odd-pick session,
+    which is the derivation cost this mode exists to remove.
 
     Returns (rung number, rung name, item) or (None, why not, None).
     """
     import datetime
     ages = first_seen(root, queue_path)
     today = today or datetime.date.today().isoformat()
+    cycle_slugs = _cycle_definition_slugs(root)
 
     pool = []
     for item in items:
@@ -1115,6 +1125,8 @@ def whats_next(items, root, queue_path, skip=(), picked=0, today=None):
             continue
         if any(_entry_open(items, ref) for ref in item["blocked_by"]):
             continue
+        if item["cycle"] and item["cycle"] in cycle_slugs:
+            continue
         pool.append(item)
 
     if not pool:
@@ -1124,11 +1136,19 @@ def whats_next(items, root, queue_path, skip=(), picked=0, today=None):
     if flagged:
         return 1, "an uncleared red flag", flagged[0]
 
+    # Due cycle work: a capture filed UNDER a cycle definition's own slug is
+    # that cycle's due turn — timing work that loses its value waiting in the
+    # pack. Distinct from the Cycle: field above, which marks standing
+    # material the ladder passes over.
+    due = [i for i in pool if i["slug"] and i["slug"] in cycle_slugs]
+    if due:
+        return 2, "due cycle work — its slug names a cycle definition", due[0]
+
     counts = incoming_citations(items)
     cited = [i for i in pool if i["slug"] and counts.get(i["slug"], 0) > 0]
     if cited:
         cited.sort(key=lambda i: (-counts[i["slug"]], i["first_line"]))
-        return 2, ("unblock potential — %d other entries cite it"
+        return 3, ("unblock potential — %d other entries cite it"
                    % counts[cited[0]["slug"]]), cited[0]
 
     in_section = [i for i in items if i["section"] == "Unprocessed"]
@@ -1147,9 +1167,9 @@ def whats_next(items, root, queue_path, skip=(), picked=0, today=None):
     both = sorted([i for i in pool if is_long(i) and is_old(i)],
                   key=age_of)
     if both:
-        return 3, "both longer and older than the section's medians", both[0]
+        return 4, "both longer and older than the section's medians", both[0]
 
-    # Rung 4 alternates: oldest first, with every other pick required to be one
+    # Rung 5 alternates: oldest first, with every other pick required to be one
     # of the long entries. Alternation is what makes a short old entry
     # reachable at all — ordering by one key then the other only relabels the
     # starvation under a new name.
@@ -1157,12 +1177,33 @@ def whats_next(items, root, queue_path, skip=(), picked=0, today=None):
     if picked % 2 == 1:
         long_ones = [i for i in by_age if is_long(i)]
         if long_ones:
-            return 4, "alternating — this pick must be a long entry", long_ones[0]
-    return 4, "alternating — oldest first", by_age[0]
+            return 5, "alternating — this pick must be a long entry", long_ones[0]
+    return 5, "alternating — oldest first", by_age[0]
 
 
 def _entry_open(items, slug):
     return any(i["slug"] == slug for i in items)
+
+
+def _cycle_definition_slugs(root):
+    """Slugs of the definitions in the project's cycles doc, or an empty set.
+
+    Read live at each pick rather than stored, so a definition deleted from
+    the doc releases its material by itself — the same recompute-from-the-
+    artifact posture every other field here takes.
+    """
+    path = os.path.join(root, "CYCLES.md")
+    slugs = set()
+    try:
+        with open(path, "r", encoding="utf-8") as handle:
+            for line in handle:
+                match = re.match(
+                    r"^#{2,4}\s+.*\[([a-z0-9][a-z0-9-]*)\]\s*$", line.strip())
+                if match:
+                    slugs.add(match.group(1))
+    except OSError:
+        return set()
+    return slugs
 
 
 def render_whats_next(items, root, queue_path, skip=(), picked=0):

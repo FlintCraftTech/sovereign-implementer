@@ -242,6 +242,57 @@ def summary_of(text):
     return ""
 
 
+DATE_PREFIX = re.compile(r"^\d{4}-\d{2}-\d{2}-")
+SLUG_SUFFIX = re.compile(r"-(plan|build|\d+)$")
+
+
+def slug_of(name):
+    """The work-item slug a record's filename carries.
+
+    Records are named `<date>-<slug>.md`, with planning records for the same
+    item as `<date>-<slug>-plan.md` (and occasional `-build`/`-2` variants).
+    Stripping those affixes is what lets a build record and the planning
+    record that decided it be matched without any stored index.
+    """
+    base = DATE_PREFIX.sub("", name[:-3] if name.endswith(".md") else name)
+    return SLUG_SUFFIX.sub("", base)
+
+
+def deciding_record(project_root, entry_file):
+    """The planning record for this entry's item, or None.
+
+    The reason a change was made is written where it was decided — the
+    planning session's per-item record — and the build record only carries
+    the doing. The match is by slug, which is the same retrieval idea the
+    development project's own rules write down (search the index for the
+    rule's words); here the slug is mechanical where the words are not.
+    """
+    slug = slug_of(entry_file)
+    log_path = os.path.join(project_root, LOG_DIR)
+    candidates = []
+    try:
+        names = sorted(os.listdir(log_path))
+    except OSError:
+        return None
+    for name in names:
+        if not name.endswith(".md") or name == entry_file:
+            continue
+        if slug_of(name) != slug:
+            continue
+        if "plan" not in name:
+            continue
+        candidates.append(name)
+    if not candidates:
+        return None
+    name = candidates[-1]  # newest by the date-prefixed sort
+    try:
+        with open(os.path.join(log_path, name), encoding="utf-8") as handle:
+            text = handle.read()
+    except OSError:
+        return None
+    return {"file": name, "summary": summary_of(text)}
+
+
 def build(project_root, since, until):
     """The changelog as a list of lines. Empty where nothing shipped."""
     lines = []
@@ -284,6 +335,12 @@ def build(project_root, since, until):
             if summary:
                 lines.append("")
                 lines.append(summary)
+            deciding = deciding_record(project_root, entry["file"])
+            if deciding and deciding["summary"]:
+                lines.append("")
+                lines.append("**Why it was made** (from the record of the "
+                             "session that decided it, `LOG/%s`): %s"
+                             % (deciding["file"], deciding["summary"]))
             if epoch:
                 lines.append("")
                 lines.append("**FORMAT EPOCH -> %s.** Your own users' "
@@ -314,14 +371,36 @@ def main(argv=None):
     parser = argparse.ArgumentParser(
         description="Generate the port-facing changelog for a release.")
     parser.add_argument("project_root", nargs="?", default=".")
-    parser.add_argument("--from", dest="since", required=True,
+    parser.add_argument("--from", dest="since",
                         help="the previous release's tag or commit")
     parser.add_argument("--to", dest="until", default="HEAD",
                         help="this release's tag or commit (default: HEAD)")
+    parser.add_argument(
+        "--catch-up", dest="catch_up", metavar="VERSION",
+        help="everything since the version you last ported from, up to HEAD "
+             "— for a porter picking up after a gap, possibly spanning "
+             "several releases. Takes a tag, a commit, or a bare version "
+             "number (1.19.0 is tried as v1.19.0 too).")
     parser.add_argument("--out", help="write to this path instead of stdout")
     args = parser.parse_args(argv)
 
-    lines = build(args.project_root, args.since, args.until)
+    since = args.since
+    if args.catch_up:
+        if since:
+            parser.error("--catch-up replaces --from; pass one or the other")
+        since = args.catch_up
+        # A porter reasonably types the bare version number; git knows the tag.
+        probe = subprocess.run(
+            ["git", "-C", args.project_root, "rev-parse", "--verify",
+             since + "^{commit}"],
+            capture_output=True, encoding="utf-8", errors="replace")
+        if probe.returncode != 0:
+            since = "v" + args.catch_up
+    if not since:
+        parser.error("one of --from or --catch-up is required")
+
+    lines = build(args.project_root, since, args.until)
+    args.since = since
 
     if not lines:
         print("Nothing shipped between %s and %s — every commit in that range "

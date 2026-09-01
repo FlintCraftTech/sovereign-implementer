@@ -159,12 +159,39 @@ def _file_is_committed(cwd, relpath):
     return result.returncode == 0 and bool(result.stdout.strip())
 
 
+def _log_is_tracked(cwd):
+    """True if any file under LOG/ is tracked by git right now.
+
+    An untracked log never appears in any commit, so `git log -S` has nothing
+    to read for its records and attribution by git is impossible — a different
+    state from a backfill that is failing, and reported as one.
+    """
+    try:
+        result = subprocess.run(
+            ["git", "ls-files", "--", "LOG/"],
+            cwd=cwd,
+            capture_output=True,
+            text=True,
+            timeout=15,
+        )
+    except (OSError, subprocess.SubprocessError):
+        return True  # unknown — behave as before rather than claiming blindness
+    return result.returncode != 0 or bool(result.stdout.strip())
+
+
 def backfill_log_hashes(cwd):
     """Fill hash placeholders across LOG/*.md in place.
 
     Returns a one-line report for additionalContext, or "" when nothing
     was filled. Placeholders whose entry isn't committed yet resolve to
     no commit and stay in place for a later session.
+
+    Where the log is untracked, filling and anomaly-flagging are both
+    impossible — no record file appears in any commit — so the report says
+    that plainly when a placeholder exists, and stays silent otherwise. The
+    close writes the hash itself right after the commit in that
+    configuration (done.md's commit step), which is what makes silence here
+    the normal state rather than a gap.
     """
     log_dir = os.path.join(cwd, "LOG")
     if not os.path.isdir(log_dir):
@@ -173,6 +200,31 @@ def backfill_log_hashes(cwd):
         names = sorted(os.listdir(log_dir))
     except OSError:
         return ""
+    if not _log_is_tracked(cwd):
+        stranded = []
+        for name in names:
+            if not name.endswith(".md"):
+                continue
+            try:
+                with open(os.path.join(log_dir, name), "r", encoding="utf-8",
+                          newline="") as f:
+                    content = f.read()
+            except (OSError, UnicodeDecodeError):
+                continue
+            if any(_HASH_POSITION.match(line)
+                   for line in content.splitlines()):
+                stranded.append(name)
+        if not stranded:
+            return ""
+        return (
+            f"[Throughliner] Log housekeeping: {len(stranded)} entry file(s) "
+            f"carry an unfilled hash placeholder ({', '.join(stranded)}), and "
+            "this project's log is not tracked by git — no record file appears "
+            "in any commit, so the automatic backfill cannot attribute them "
+            "and is not failing. The close writes the hash itself right after "
+            "each commit; fill these stranded ones from each record's own "
+            "dates checked against git log."
+        )
     filled = 0
     touched_files = []
     # Placeholders that stayed unresolved even though their entry file is

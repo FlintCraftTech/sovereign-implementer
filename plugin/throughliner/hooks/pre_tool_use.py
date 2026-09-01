@@ -49,6 +49,7 @@ import datetime
 import json
 import os
 import re
+import shlex
 import sys
 
 
@@ -350,25 +351,57 @@ def _is_inside(filepath: str, cwd: str) -> bool:
     return norm == root or norm.startswith(root + os.sep)
 
 
+# A sed script token, unquoted: s/a/b/, y|a|b|, s#a#b#, 1,3d, $d, 2,5p.
+# Recognised so the script is never read as a target — which matters more now
+# that quotes are resolved, since a quoted script arrives here unwrapped.
+_SED_SCRIPT_TOKEN = re.compile(r"^(?:[a-z]?[0-9,$]*[a-z]?[/|,;#]|[0-9,$]+[a-z]{1,2}$)")
+
+
+def _unquoted_tokens(segment: str):
+    """The segment's tokens with shell quoting resolved, or None on a form
+    that does not tokenise cleanly.
+
+    Backslashes are kept literal — Windows paths carry them as separators, and
+    treating them as escapes would mangle every such path into a token the
+    resolution step cannot place.
+    """
+    lex = shlex.shlex(segment, posix=True)
+    lex.whitespace_split = True
+    lex.escape = ""
+    lex.commenters = ""
+    try:
+        return list(lex)
+    except ValueError:
+        return None
+
+
 def _sed_inplace_targets(command: str) -> list:
     """Literal file paths a `sed -i` segment names as its target.
 
     Same narrowness as the Python patterns: the in-place flag must be present
-    and the target must be readable from the command's own text. A token is a
-    target when it is neither an option, nor a quoted argument (the script, or
-    BSD's separate backup suffix), nor an unquoted sed script.
+    and the target must be readable from the command's own text. Tokens are
+    read with quoting RESOLVED: the live escape this closes was a quoted
+    target path — every path on a machine whose folders carry spaces must be
+    quoted, so skipping all quoted tokens (meant for the quoted script)
+    skipped exactly the targets the check exists to catch. The script is told
+    apart by its own shape instead. Where the segment does not tokenise
+    cleanly, the old whitespace split with the quoted-token skip is the
+    fallback, so a malformed command is never guessed at.
     """
     targets = []
     for segment in _split_segments(command):
         if not SED_INPLACE.search(segment):
             continue
-        for token in segment.split():
-            if token in ("sed",) or token.startswith("-"):
+        tokens = _unquoted_tokens(segment)
+        quotes_resolved = tokens is not None
+        if not quotes_resolved:
+            tokens = segment.split()
+        for token in tokens:
+            if not token or token == "sed" or token.startswith("-"):
                 continue
-            if token[:1] in "'\"":
+            if not quotes_resolved and token[:1] in "'\"":
                 continue
-            # An unquoted sed script — s/a/b/, y/a/b/, 1,3d — is not a path.
-            if re.match(r"^[a-z]?[0-9,]*[a-z]?[/,;]", token):
+            if _SED_SCRIPT_TOKEN.match(token):
                 continue
             if "$" in token or "{" in token:
                 continue

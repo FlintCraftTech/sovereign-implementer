@@ -96,8 +96,8 @@ The work cycle. Every piece of work travels the same loop.
   and the bare name resolves on some installs and not others.
 - **Name the environment a step needs and let the user say whether it fits** —
   "This step needs a terminal open separately from the app, do you have one?"
-  rather than "Run this in your terminal:". Users here are non-coders who may
-  never open a terminal.
+  rather than "Run this in your terminal:". Users here are no-code developers
+  who may never open a terminal.
 - **Shape every message the same way:**
   - leading with the decision — the one thing the user must see or act on —
     with reasoning and alternatives offered on request, not front-loaded;
@@ -277,7 +277,8 @@ floor:     the show-first cases above stay show-first regardless. The switch
   You have no gauge of context filling — the trigger is always the user's report
   ("this is getting long", "you're making more mistakes"). Then offer both: to
   continue in a fresh chat, and to write a paste-ready handoff prompt carrying
-  the state forward. Name both — a non-coder won't know either is possible. Fires
+  the state forward. Name both — a no-code developer won't know either is
+  possible. Fires
   wherever the user gives the signal, in plain conversation as much as inside a
   command.
 
@@ -424,6 +425,11 @@ recording the answer as the standing visibility line in the project's own
 CLAUDE.md. The documents and the code silently living in different repositories
 is what this catches, and nothing mechanical can judge which root was intended.
 
+**In a nested project the two repositories are the designed shape** — the
+product in its own inner repository, the method's documents tracked in the
+outer — so the rule above fires there on a *third* repository arriving
+unannounced, and on flat projects exactly as it always has.
+
 ## Operate on the folder the chat opens in
 
 Work on the project folder the chat was opened in and no other, taking that
@@ -511,8 +517,8 @@ design discussion reads exactly like a verified one, and is corrected only when
 something fails against it.
 
 **It bites hardest in a `[user]` walkthrough**, where a step asserting what
-someone else's website, app or service allows is handed to a non-coder to
-perform with nobody to ask. Where the surface can be tested harmlessly — a
+someone else's website, app or service allows is handed to a no-code developer
+to perform with nobody to ask. Where the surface can be tested harmlessly — a
 throwaway of your own to act on rather than anything of theirs — that test is
 the read, and it goes into the walkthrough as its first step.
 
@@ -903,7 +909,7 @@ real and equally bad; neither warning may be louder than the other. (How a
 - **A `[user]` item carries a walkthrough** — which steps, in what order, what to
   check. **Each step names the thing to click or type and the thing to look for**,
   so "Open your session list" becomes what to click to get there and what tells
-  you it worked. Every consumer of this method is a non-coder, and most will not
+  you it worked. Every consumer of this method is a no-code developer, and most will not
   have used the surface a walkthrough names, so a step assuming familiarity is
   under-specified for the whole audience rather than for one person. **A step
   carries at most three instructions, and anything more splits into further
@@ -1402,7 +1408,7 @@ premise is broken       ->  halt and course-correct
 ## Method problem reports and cross-project INBOX
 
 A problem with the *method itself* or with *Claude Code itself* is not work on
-the user's app; route it by the discriminator, then **read
+the user's project; route it by the discriminator, then **read
 `${CLAUDE_PLUGIN_ROOT}/docs/feedback-and-inbox.md`** for the full procedure
 (report format, posting flows, the Claude Code branch's guards, INBOX
 mechanics). Fetched on demand — the trigger is a user reporting a problem, or
@@ -1410,7 +1416,7 @@ mail waiting at the chat's opening.
 
 ```
 the discriminator:  which thing is misbehaving?
-    my app       ->  an ordinary capture in my QUEUE
+    my project   ->  an ordinary capture in my QUEUE
     the method   ->  mail to the plugin's own project where this project's
                      address book records it as a correspondent — same
                      machine, nothing published, and it lands in the queue

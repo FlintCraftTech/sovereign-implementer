@@ -10,7 +10,7 @@ It is a dev artifact. It audits the method's own docs, so it is host-only — no
 
 **The routine form is DELTA SCOPE: audit the rule files changed since the last audit, against every lens, at parent axis.** The corpus-wide sweep is not the standing shape — one full pass exists as its own separately filed item, and after it the delta is the unit. Delta scope is what keeps each audit small enough to actually run, which the full-sweep duty never was.
 
-Run all four lenses over each doc in scope. One read of the doc serves all four. Findings route to Captures for a later /plan to scope — an audit produces findings, not edits to the docs it reads.
+Run every lens over each doc in scope. One read of the doc serves them all. Findings route to Captures for a later /plan to scope — an audit produces findings, not edits to the docs it reads.
 
 ## State the axis before you start, and it is the parent axis
 
@@ -105,6 +105,8 @@ Check what the doc causes Claude to *say to the user* against the communication 
 
 **The detector is the delete-and-read test, run sentence by sentence over operative text.** Delete the sentence and read what remains: a complete instruction means what was deleted was rationale or history, and it belongs in the record — the deciding LOG entry, or git history — not in the rule. An unfinished instruction means the sentence was operative and stays.
 
+**Where the reasoning went, and how to check it arrived:** search `LOG/index*.md` for the rule's distinctive words and open the matched entry — the index line ends with its filename; where the index misses, `git log -S` over the rule's own shipped file finds the commit that added it, whose message names the session. Evicted rationale goes to that record, and an eviction is complete only when the reasoning is reachable there.
+
 This lens catches **disguised rationale**: decision history written in the syntax of a rule — a dated "reinstated by the user's decision of…", a "was tried and retired on measured grounds", an alternative's defeat narrated inside the operative statement. The SPEC output-style paragraph found and rewritten on 2026-08-22 is the founding instance: it survived every earlier audit because the earlier lenses looked for rationale *clauses* riding rules, and this was history wearing a whole paragraph's worth of rule syntax. No "because" is required for a sentence to fail this lens — history is rationale whatever conjunction it travels under.
 
 ## Lens 5 — underived numbers
@@ -140,6 +142,12 @@ Covers what the mechanical near-duplicate matcher cannot see: **two passages doi
 **Within one file.** The merge rule's own test applies: two accounts of the same thing under different headings file as a merge candidate.
 
 **Stated limit:** the lens compares rules naming the same mechanism. A duplication paraphrased past shared vocabulary stays unread — the same residual the contradictions lens states.
+
+## Lens 9 — turns
+
+Each sweep turn extracts every tagged turn fresh by grep — the five response-shape tags are grep-able, so the extraction is exhaustive over the tagged set — and asks of each turn whether a content rule governs what the turn must *say*, not only its shape. A tag settles length and waiting; a turn a user acts on also needs its content settled, or the script decays silently as edits around it change what the turn carries. One capture per ungoverned turn worth governing, satisfied while an open capture carries it.
+
+**Stated limit, by the turns inventory's own floor paragraph** (`workshop/resources/research/scripted-turns-inventory.md`): untagged turns are mechanically unreachable — nothing marks them, so no grep can enumerate them — which makes this lens a floor, recomputed fresh each turn rather than read from the stored map.
 
 ## The doubled communication rules — what this project's own narration cannot test
 

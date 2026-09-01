@@ -146,6 +146,26 @@ def test_marker_on_its_own_line_is_not_flagged():
               f"got: {warnings}")
 
 
+def test_marker_in_backticks_mid_line_is_not_flagged():
+    """Prose discussing a field writes its name in backticks mid-sentence.
+
+    Nine such mentions fired the warning on every tool call of a hundred-call
+    session — every one a false positive, every real field written bare at
+    line start. A backticked name is discussion; no reader parses it.
+    """
+    lint = load_lint()
+    for prose in (
+        "carried in prose rather than by a `Blocked by:` line.",
+        "what `Not before:` means on a capture is different.",
+        "the `Cycle:` field marks a cycle's standing material.",
+    ):
+        ok = CLEAN.replace("Rationale for beta.",
+                           f"Rationale for beta, {prose}")
+        warnings = [w for w in lint(ok) if "mid-line" in w]
+        check(f"a backticked mid-line mention ({prose[:26]}…) is not flagged",
+              not warnings, f"got: {warnings}")
+
+
 def test_marker_quoted_in_a_fence_is_not_flagged():
     """A fenced block legitimately SHOWS the shape; quoting is not writing."""
     lint = load_lint()
@@ -515,6 +535,66 @@ def test_cleared_item_naming_other_files_is_not_flagged():
           f"got: {warnings}")
 
 
+def _load_module():
+    spec = importlib.util.spec_from_file_location("post_tool_use", HOOK)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
+def test_untracked_baseline_is_the_newest_snapshot():
+    """With no committed copy, the baseline is the newest pre-change snapshot.
+
+    The untracked configuration is what setup proposes, so this is the default
+    consumer's path — and before this existed, a missing committed copy made
+    every standing flag print as new after every tool call, permanently.
+    """
+    import tempfile
+
+    mod = _load_module()
+    with tempfile.TemporaryDirectory() as td:
+        snap = os.path.join(td, ".throughliner", "snapshots")
+        os.makedirs(snap)
+        for stamp, text in (("20260901T010000000000", "older version"),
+                            ("20260901T020000000000", "newer version")):
+            with open(os.path.join(snap, f"QUEUE.md@{stamp}"), "w",
+                      encoding="utf-8") as f:
+                f.write(text)
+        content, kind = mod._baseline_queue(td)
+        check("the untracked baseline is the newest snapshot",
+              (content, kind) == ("newer version", "snapshot"),
+              f"got kind={kind!r}, content={content!r}")
+
+
+def test_untracked_standing_flag_reads_as_pre_existing():
+    """A flag present in the snapshot is standing, not new — both directions
+    read the same baseline, so an untouched queue lints silent."""
+    mod = _load_module()
+    bad = CLEAN.replace("#### Perfectly ordinary work item [alpha]",
+                        "#### Work item nobody gave a slug")
+    warnings = mod.lint(bad)
+    new, pre = mod._split_warnings(warnings, bad)
+    check("a flag also in the snapshot baseline is pre-existing",
+          not new and len(pre) == len(warnings),
+          f"new={new}, pre={pre}")
+    check("the same baseline clears nothing when the flag still stands",
+          mod._cleared_warnings(warnings, bad) == [],
+          f"got: {mod._cleared_warnings(warnings, bad)}")
+
+
+def test_untracked_no_snapshot_yields_no_baseline():
+    """No committed copy and no snapshot: kind is None, and the caller emits
+    one plain no-baseline line — never the whole set as new."""
+    import tempfile
+
+    mod = _load_module()
+    with tempfile.TemporaryDirectory() as td:
+        content, kind = mod._baseline_queue(td)
+        check("no snapshot and no commit means no baseline",
+              (content, kind) == ("", None),
+              f"got kind={kind!r}, content={content!r}")
+
+
 if __name__ == "__main__":
     print("test_queue_lint_flags")
     test_clean_queue_is_silent()
@@ -524,6 +604,7 @@ if __name__ == "__main__":
     test_valid_red_flag_states_are_not_flagged()
     test_mid_line_marker_is_flagged()
     test_marker_on_its_own_line_is_not_flagged()
+    test_marker_in_backticks_mid_line_is_not_flagged()
     test_marker_quoted_in_a_fence_is_not_flagged()
     test_orphaned_prose_is_flagged()
     test_date_held_item_needs_no_blocker()
@@ -551,5 +632,8 @@ if __name__ == "__main__":
     test_cleared_audit_item_naming_queue_is_flagged()
     test_held_item_naming_queue_is_not_flagged()
     test_cleared_item_naming_other_files_is_not_flagged()
+    test_untracked_baseline_is_the_newest_snapshot()
+    test_untracked_standing_flag_reads_as_pre_existing()
+    test_untracked_no_snapshot_yields_no_baseline()
     print(f"\n{len(failures)} failure(s)" if failures else "\nall passed")
     sys.exit(1 if failures else 0)

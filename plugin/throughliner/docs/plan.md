@@ -29,8 +29,12 @@ gets built first — through discussion, not silently.
   skill-nonspecific-rules.md's approval-time outputs.
 - **A planning session is scope-locked to a standing list, and a write outside it
   is denied.** Writable: QUEUE.md, SPEC.md, CYCLES.md, `LOG/`, `FAQ/`,
-  `workshop/resources/research/`, the scratchpad and the memory directory. Everything
-  else is work — including a template, whose edit reaches every future
+  `workshop/resources/research/`, the scratchpad, the memory directory, and the
+  two FAQ templates (`faq-template.md`, `faq-index-template.md`) — the
+  templates are canonical for `FAQ/`, and the announcement-time FAQ rule
+  requires the entry written in the same turn as the sent-register line.
+  Everything
+  else is work — including any other template, whose edit reaches every future
   consumer — and work is
   queued rather than done here, which is what this doc's opening already
   requires. When the lock refuses a write, say in plain words what you were
@@ -717,25 +721,33 @@ meaningfully unblocks anything else, work down it:
 
 ```
 1. an uncleared red flag in Unprocessed   a breach outranks a delay
-2. unblock-potential                      order by how many other items cite
+2. DUE CYCLE WORK                         a capture whose slug names a
+                                          definition in the project's cycles
+                                          doc — a due turn is timing work and
+                                          loses its value waiting in the pack
+3. unblock-potential                      order by how many other items cite
                                           this one's slug, most-cited first
-3. LONG AND OLD, oldest first             among entries at or above BOTH the
+4. LONG AND OLD, oldest first             among entries at or above BOTH the
                                           section's median line count and its
                                           median age, order by date filed,
                                           oldest first
-4. ALTERNATING, oldest first              oldest first across the whole
+5. ALTERNATING, oldest first              oldest first across the whole
                                           section, with every other pick
                                           required to be one of the long half
                                           — the decay rung
 ```
 
 Every rung either reads a digest field or subtracts two line numbers. Rung 1 is
-the red-flag state. Rung 2 is the incoming arrow — the count of other entries
-citing this one's slug — so it ranks the whole section, not one item. Rungs 3 and
-4 read the digest's First seen date for order, and each entry's line count against
-the median the digest prints for membership.
+the red-flag state. Rung 2 is a slug match against the cycles doc's definition
+slugs — a capture filed under a cycle's own slug is that cycle's due turn, and
+membership is computed, never judged (this reaches due-turn captures; a
+standing-material capture carrying a `Cycle:` line is the ladder's existing
+pass-over and never ranks). Rung 3 is the incoming arrow — the count of other
+entries citing this one's slug — so it ranks the whole section, not one item.
+Rungs 4 and 5 read the digest's First seen date for order, and each entry's
+line count against the median the digest prints for membership.
 
-**Length decides membership; the date filed decides order**, in rungs 3 and 4
+**Length decides membership; the date filed decides order**, in rungs 4 and 5
 alike. Line count
 is not a stable key — an entry grows while it is being processed — and the date an
 entry was filed cannot change.
@@ -751,11 +763,11 @@ and re-enter a group already worked past, so the group stops shrinking.
 derivation; a proportion of the thing it governs is admissible, and both medians
 are proportions.
 
-**Rung 3 reaches the work that keeps coming back, not the best-designed work.**
+**Rung 4 reaches the work that keeps coming back, not the best-designed work.**
 It depends on a capture being able to bow out — via `Not before:` where the wait
 is outside the project, or via `Blocked by:` where the queue itself holds it.
 
-**Rung 4 alternates, and that is what makes decay reachable at all.** Age-ordering
+**Rung 5 alternates, and that is what makes decay reachable at all.** Age-ordering
 within the long half never reaches a short old entry, and running the two concerns
 one after the other lets one key dominate while the other starves. **A composite
 score is refused** — mixing age and size needs a weight, and a weight is a bare
@@ -764,7 +776,7 @@ number with no derivation.
 **Every rung must yield, so each is a selector rather than a total order.** A rung
 that ranks every entry never yields, and any rung beneath it can never fire.
 
-**Rung 4 reads the date filed rather than file order**, because the queue can be
+**Rung 5 reads the date filed rather than file order**, because the queue can be
 reordered on request and a file-order rung would then rank by what was just
 overwritten.
 
@@ -817,13 +829,13 @@ then presents just the next item, in the same shape.
 
 **Re-check the rung at every pick, and narrate in one clause only when it has
 changed.** A rung can change mid-session — a red flag arrives, the item holding
-everything up gets processed, or the long-and-old group empties into rung 4 —
+everything up gets processed, or the long-and-old group empties into rung 5 —
 even though the bottom rung no longer runs out.
 
 **A rung can become live again rather than only run out, so re-check reads in
 both directions.** Filing a blocker into Unprocessed is the move that does it: a
 new entry other work cites is unblock-potential where there was none, which makes
-rung 2 live again after the session has already fallen past it. **Re-derive the
+rung 3 live again after the session has already fallen past it. **Re-derive the
 throughput floor at the same moment.**
 
 Narrating on every item is explicitly not proposed.
@@ -1552,8 +1564,7 @@ any other rung     ->  no age in the pointer
 Read the date rather than working it out: the digest computes First seen, and a
 date derived any other way is the unfounded time statement the rules forbid.
 
-**Four parts, and no fifth.** The existing shape above is untouched; the date
-rides part 2's pointer.
+**Four parts, and no fifth.** The date rides part 2's pointer.
 
 **Both numbers are forward-looking, which is why both are here.** How much is
 left to process tells the user whether to carry on now; how much is ready to
