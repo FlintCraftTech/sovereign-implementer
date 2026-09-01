@@ -56,6 +56,10 @@ full project of its own. That's called a **pop-out**, and it's deliberately
 one-way — there's no scripted route back in. You don't need to decide any of
 this upfront.
 
+The link back is deliberately simple: work in a subproject can hold up work in
+the parent — never the other way round — and anything crossing between the two
+travels as mail you approve, never as one project silently editing another.
+
 **After a plugin update**, running `/setup` again on an older project migrates
 its documents to the current format rather than replacing them.
 

@@ -24,6 +24,17 @@ reading, and reading covered `skill-nonspecific-rules.md`, `next.md`,
 **So: the tagged inventory is complete; the untagged one is a floor.** That
 asymmetry is itself the first finding below.
 
+**This is the same limit the corpus already accepted for rules, now stated for
+turns** (relocated here 2026-09-01 from the capture
+[untagged-turns-are-unsweepable]): `rule_signals.py` sees a rule only in its
+three shapes, and widening the pattern was refused because a rule stated
+mid-paragraph cannot be told from prose. Any future sweep over turns inherits
+the same bound — read its coverage from this section rather than treating any
+turns inventory as complete. An always-loaded statement of this limit was
+weighed at processing and refused on the distribution test: a session sweeping
+turns knows to fetch this file, and every other session would pay for a
+sentence that can never fire for it.
+
 ## The tagged inventory
 
 Counts are tag occurrences per doc, including the definitions themselves.
