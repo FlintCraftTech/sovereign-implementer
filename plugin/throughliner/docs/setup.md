@@ -294,10 +294,6 @@ no preamble under the heading     ->  nothing to do; the scaffold's own
                                       wording is not backfilled here
 ```
 
-**Widening the lint's exemption to any first paragraph was refused, and stays
-refused (2026-08-15):** it would exempt genuinely orphaned prose, which is the
-thing the check exists to catch.
-
 **3. Update `.throughliner-version`**  [SILENT] to the current plugin version.
 
 If the project instead carries the pre-rename marker `.si-version`, write the
@@ -554,16 +550,38 @@ commits both, the product commit into the inner repository and everything
 else into the outer. One product subfolder per project; a project with
 several outgrowing parts uses the subproject pop-out, which exists for that.
 
+**Write the shape into the project CLAUDE.md's Visibility line as part of the
+scaffold**: which two repositories exist, which holds the product and goes
+public, which holds the documents and never gets a remote. The template's
+Visibility slot carries the pattern. This is the standing line every later
+session reads when weighing a git operation, so a nested scaffold that leaves
+it blank leaves "which repository am I in" unanswered.
+
 **A folder that is already a flat repository is never restructured here.** The
 conversion is an offer — at the migration path, and again at the moment the
 project goes public, which is when a flat layout starts to matter — and
-declining leaves the flat shape working exactly as before.
+declining leaves the flat shape working exactly as before. **A conversion that
+is accepted writes the same Visibility line the scaffold writes**, replacing
+whatever the flat answer was.
 
 **Keep-private option**  [BRIEF, PROMPT]. Offer once, as part of scaffolding.
-**There are two named configurations, and the private one is what setup
-proposes** — the same acceptance-default shape the brevity-style offer uses:
-describe it, say why it is preferable, and let the user accept it or choose the
-alternative.
+**The offer forks by project shape, and the fork is the first thing to read:**
+
+```
+NESTED project   ->  propose TRACKED-IN-THE-OUTER: the documents are tracked
+                     in the outer repository, which never gets a remote, so
+                     they are private by architecture and undo, history and
+                     the close's read-back all work from ordinary git. The
+                     per-document `.gitignore` remains available for the one
+                     honest case — a document the user wants out of even the
+                     local history — with the same costs stated below.
+FLAT project     ->  propose PRIVATE-via-gitignore, as follows.
+```
+
+**For a flat project there are two named configurations, and the private one is
+what setup proposes** — the same acceptance-default shape the brevity-style
+offer uses: describe it, say why it is preferable, and let the user accept it
+or choose the alternative.
 
 ```
 PRIVATE (proposed)  the project's Throughliner documents go in `.gitignore` and
@@ -632,19 +650,15 @@ interview. **The offer may set up the repository and may never represent the
 contents as screened** — not publishing these documents is the only complete
 protection.
 
-**The private configuration is the proposal, so a user who says nothing about it
-ends up private.** Acceptance is the default here and nowhere else in scaffolding:
-the material is the most personal the method produces.
+**Whichever arm the fork lands in, the proposed configuration is what a user
+who says nothing about it ends up with — private via the ignore in a flat
+project, private by architecture in a nested one.** Acceptance is the default
+here and nowhere else in scaffolding: the material is the most personal the
+method produces.
 
 **This adds no sixth interview question.** It is part of scaffolding, where the
 files are being created, and it is answerable without knowing anything about the
 project.
-
-**In the nested shape the documents are private by architecture** — tracked in
-an outer repository that never gets a remote — so the tracked configuration is
-the natural answer there and keeps undo, history and read-back whole. The
-ignore option remains for a user who wants a document out of even the local
-history, with the same costs stated.
 
 **The brevity-style offer**  [BRIEF, PROMPT]. The plugin ships an output style
 called Throughliner Brevity — a setting that keeps Claude's replies short and

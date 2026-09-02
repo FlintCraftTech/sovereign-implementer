@@ -316,7 +316,10 @@ is what distinguishes it.
 you are closing. That covers the filename prefix and every date written into the
 words of a session record or a queue item alike ("processed 2026-08-12",
 "cleared 2026-08-12"). It is not the commit date, and the filename prefix is not
-a second copy of the hash; its only job is the name sort.
+a second copy of the hash; its only job is the name sort. **The record's own
+date field carries date and time, read from the clock at the moment of
+writing, never recalled** — a bare date leaves same-day relative-time claims
+with no source finer than a day. The filename prefix stays date-only.
 
 **Where a session ran across more than one calendar day, say so in one plain
 sentence in its record, and change no filename or datestamp:**
@@ -376,7 +379,9 @@ in practice, so mid-run is the wrong place for text that leaves the machine.
 ## Wind-down re-scan (file-only)  [BRIEF, PROMPT]
 
 Commit core points here, so it runs at **every** /done close regardless of session
-type.
+type. **This section is the canonical statement of the memory-limit machinery —
+the limit sentence, the artifact cross-check, the asymmetry, the no-proxy rule
+— and rescan.md applies it by reference at its own depth.**
 
 **Look back only as far as the last /rescan in this chat.** /rescan is the same
 step with its own trigger, and it can be run as often as the user likes; the
@@ -652,6 +657,13 @@ session-start backfill remains as the safety net for a fill this step missed.
 
 Every sub-doc's final step points here, adding only its flavor delta.
 
+**Content line for this turn: it states the queue situation as the next
+planning session would present it, and the continuations — more planning, or a
+build — as statements of fact, and nothing else.** Neither continuation is
+assumed or recommended over the other: a user may plan as many times as they
+want until enough is queued to justify a build, so which comes next is theirs,
+and this turn's job is to leave them holding the facts that decide it.
+
 **Two arms, decided by whether this close filed a concrete advisory:**
 
 ```
@@ -666,7 +678,11 @@ no advisory filed    ->  the full narration below, unchanged.
 ```
 
 **Narrate the queue situation in everyday words**, and say how much work is
-waiting to be sorted wherever any is.
+waiting to be sorted wherever any is — counting only what the next planning
+session would actually present, which is the same set plan.md's own pass-overs
+leave in play: a capture dated out, one bowed out behind an open blocker, and
+cycle-owned material are not waiting, and are not counted or described as
+available.
 
 **Overlap scan.** Before recommending, scan the still-unprocessed work for overlap
 with the top processed item — work that contradicts, invalidates, or would benefit
@@ -690,9 +706,13 @@ as a hedge.
 1. captures appended this session that affect the next work
        ->  recommend /plan, name the blocker
 2. work sits ABOVE the readiness marker
-       ->  name the next item as information, say a build wants a fresh
-           session, and end the message there — a statement, with no command
-           string in it
+       ->  state the situation and both continuations as facts: the next
+           cleared item by name, and how much work is waiting to be sorted
+           (counted as the narration above defines). Where the build route is
+           stated, the statement includes that a build runs best in a fresh
+           session — information about that route, never the assumed next
+           step. End the message there — a statement, with no command string
+           in it
 2b. Processed holds work but the cleared region is EMPTY (the marker is at
     the top)
        ->  say the next work still needs vetting, and point at planning.
@@ -707,8 +727,10 @@ asking a question whose answer looks like a command is one keystroke from being
 run by accident, because the harness offers the slash command it just saw as a
 tab-completion.
 
-**A build wants a fresh session**, which is the user's decision and is why rung 2
-states the next item rather than inviting one.
+**A build runs best in a fresh session — a fact about the build route, not the
+assumed next step.** What comes next is the user's decision, planning again as
+much as building, which is why rung 2 states both continuations rather than
+inviting either.
 
 **A session makes exactly one commit, and the tail makes none.** That is the
 whole shape, and everything below follows from it. The close commits; work

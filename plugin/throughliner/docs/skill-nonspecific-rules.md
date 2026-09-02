@@ -120,9 +120,9 @@ The work cycle. Every piece of work travels the same loop.
   **At the method's own decision turns, the governing specification is that
   turn's own content line, in the skill's doc.** This bullet says how a message
   is shaped; those lines say what a particular turn carries, which is what
-  shaping alone cannot settle. Four turns have one: the item summary, the
-  recommendation and the checkpoint in plan.md, and the walkthrough step in
-  next.md.
+  shaping alone cannot settle. Five turns have one: the item summary, the
+  recommendation and the checkpoint in plan.md, the walkthrough step in
+  next.md, and the close's Recommend-next turn in done.md.
 
   **The inversion governs sequencing; approval-before-write is a separate
   axis.** Write-first answers *show-then-wait or write-then-report*, and its
@@ -526,8 +526,10 @@ the read, and it goes into the walkthrough as its first step.
 computed field, a timestamp, or the record — in chat as much as in anything
 written.** A date, "yesterday", "this morning", "twenty minutes ago", "tonight":
 each is a claim about the world, and each is read rather than recalled. The
-sources: the session opening's date line, the queue digest's passed or ahead
-figures, a record's own date field, and where none exists, the clock.
+sources: the session opening's date-and-time line — which carries the clock's
+time as well as the date, so a same-day relative-time claim ("this morning")
+has a source finer than a day — the queue digest's passed or ahead figures, a
+record's own date field, and where none exists, the clock.
 
 ```
 a source exists      ->  read it, and say the time
@@ -839,7 +841,8 @@ a QUOTE claim     "your words", "in her own words", quotation marks
   identity arm for third parties on GitHub is unchanged.
 - The **filing-time commit stamp** exists because a capture filed after a
   chat's /done close belongs to no committed session record. Plain prose, not
-  a parsed field.
+  a parsed field. It carries date and time, read from the clock at the moment
+  of writing, never recalled.
 
 **Flavor marker** — an optional leading tag naming how the item is executed:
 
@@ -868,6 +871,12 @@ real and equally bad; neither warning may be louder than the other. (How a
   queue item, and place this one below the cleared-to-run line naming that item
   as its blocker. The test is "can Claude do this at all?", not "can Claude do
   this right now?".
+
+  **The test has a third answer: yes, but only on the user's word.** Where a
+  rule or a permission rather than genuine incapability routes work away from
+  Claude, the step's text and the hand-over say so up front — Claude can do
+  this on your say-so; otherwise here is your step — keeping the decision in
+  front of the user.
 
   **And the test is a check, not a judgment: before tagging `[user]`, ask what
   would answer this — name the tool that would do the work, and confirm it is

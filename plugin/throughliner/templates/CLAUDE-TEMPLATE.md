@@ -27,7 +27,12 @@ This project uses the Throughliner method.
 ## Visibility
 
 <!-- Set at setup: which repository holds this project's documents, and whether
-     they are published anywhere. Left blank until that is settled. -->
+     they are published anywhere. Left blank until that is settled. In a
+     nested project the line names both repositories and their roles, e.g.:
+     "Visibility: nested — the outer repository (this folder) holds the
+     method's documents and never gets a remote; the inner repository
+     (<product subfolder>/) holds only the product and is the one that goes
+     public when asked." -->
 
 Visibility:
 

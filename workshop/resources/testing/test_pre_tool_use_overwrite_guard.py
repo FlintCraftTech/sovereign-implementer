@@ -185,6 +185,17 @@ def main():
         check(f"shell: {what} -> {expected}", got == expected,
               f"{command!r} got {got}")
 
+    # Two-direction case ([sent-register-creation-blocked]): a Write CREATING
+    # an absent register must pass — a project's first-ever send has nothing
+    # to protect, and Edit cannot create a missing file, so refusing the
+    # create left no working route — while a Write over an existing one stays
+    # refused (asserted above).
+    d = make_project()
+    os.makedirs(os.path.join(d, "INBOX"), exist_ok=True)
+    out = drive_write(d, register)
+    check("a Write creating an absent register passes",
+          out.get("permissionDecision") != "deny", str(out))
+
     print()
     if _failures:
         print("FAILURES: %d" % len(_failures))

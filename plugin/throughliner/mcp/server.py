@@ -38,10 +38,14 @@ import re
 import sys
 import tempfile
 
-# UTF-8 on both streams, copied from reorder_queue.py, which is the canonical
-# copy. The duplication is deliberate: this file may run standalone from a
-# copied plugin cache and cannot rely on importing a shared module.
-for _stream in (sys.stderr, sys.stdout):
+# UTF-8 on all three streams, copied from reorder_queue.py, which is the
+# canonical copy. The duplication is deliberate: this file may run standalone
+# from a copied plugin cache and cannot rely on importing a shared module.
+# stdin is included because this server READS it: on Windows a bare sys.stdin
+# decodes the incoming tool call as the legacy codepage, which is how every
+# em-dash in a filed capture landed as mojibake — the corruption happened on
+# the way in ([mcp-file-capture-encoding-mangles]).
+for _stream in (sys.stderr, sys.stdout, sys.stdin):
     try:
         _stream.reconfigure(encoding='utf-8', errors='replace')
     except (AttributeError, ValueError, OSError):
@@ -373,7 +377,14 @@ def tool_file_capture(arguments):
         return "Refused — nothing was written:\n" + \
                "\n".join("- " + p for p in problems)
 
-    entry = ["#### %s [%s]\n" % (heading, slug), body.rstrip() + "\n"]
+    # The filed-at stamp is written mechanically, date and time, read from
+    # the clock at the moment of writing ([captures-carry-a-time]): a bare
+    # date leaves same-day relative-time claims with no source finer than a
+    # day. Prose convention, not a parsed field — the lint reads nothing here.
+    filed_at = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
+    entry = ["#### %s [%s]\n" % (heading, slug),
+             body.rstrip() + "\n",
+             "Filed %s, stamped by the capture tool.\n" % filed_at]
     if blocked_by:
         entry.append("Blocked by: %s\n"
                      % ", ".join("[%s]" % b for b in blocked_by))
@@ -472,7 +483,8 @@ TOOLS = [
             "File one capture at the bottom of the queue's Unprocessed "
             "section. Takes a heading, a slug, the body prose, and optional "
             "blocked_by, not_before and cycle fields; composes the canonical "
-            "entry and appends it through the queue tool's own append path. "
+            "entry, stamps the filed-at date and time from the clock, and "
+            "appends it through the queue tool's own append path. "
             "Refuses only what is checkably wrong — a missing, malformed or "
             "taken slug, a blocker resolving to no entry, an unreal date, a "
             "cycle naming no definition, a heading led by A/An/The — echoing "

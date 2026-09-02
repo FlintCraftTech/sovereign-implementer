@@ -73,7 +73,11 @@ one numbered report.
 
 ```
 the RECORD this step sweeps:
-    the build working file's notes
+    the build working file's notes, its Run-level section included — the
+        writes belonging to the run rather than to any item (mid-run
+        captures, live-opened records), which reach the session record
+        from there. A working file from before the section existed lacks
+        it; fall back to memory as before.
     any captures already appended at the moment of noticing
 conversation memory  ->  a same-session BONUS pass, never a source the step
                          depends on

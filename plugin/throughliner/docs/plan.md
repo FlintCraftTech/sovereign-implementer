@@ -992,9 +992,6 @@ The words are the method's own — the ones the queue itself shows — explained
 first use and then used (skill-nonspecific-rules.md's Vocabulary section). **The
 delete ask is unchanged**: it already asks the fate question directly.
 
-A separate consent turn was weighed and refused as over-asking — the two-part
-form keeps the turn.
-
 **A recommendation to process an entry into Processed must describe what would
 actually get built**, in terms
 the user recognizes as the work product — which files change, what gets added,
@@ -1055,10 +1052,6 @@ nothing observable exists     ->  say so, in the item. The item then waits
 **The second half carries as much weight as the first**, and is the part that gets
 left out: it is what tells a later run to ask rather than check.
 
-**Notification is refused, not merely unbuilt.** Mail is fire-and-forget in both
-directions, so a message nobody is obliged to read moves the problem rather than
-closing it.
-
 **Folding something into an existing item is two different operations. Say which
 one you are doing, because they want opposite treatments:**
 
@@ -1109,7 +1102,11 @@ the cost, paid at every keep.
 **Write them for a reader with less of the project in view than you have, and
 possibly less capability.** The session that builds this did not sit through the
 conversation that designed it, so anything the work needs in order to start —
-paths, names, values — is stated, not implied.
+paths, names, values — is stated, not implied. **A kept item's prose opens with
+one plain-language sentence saying what its subject is, before the rationale**
+— hardest-required on a `[user]` item, which waits for a person rather than a
+run: items are read cold weeks later, and rationale explains why the decision
+was made without establishing what the thing is.
 
 **An observation reaches files of its own, routinely different ones — the test
 suite that has to pass, the sibling document an acceptance check greps — so name
@@ -1138,7 +1135,13 @@ settles on" names a file and a purpose and supplies no decision, which is what
 the limb asks for. **Prose that schedules a design decision into the build fails
 the same way, however carefully phrased** — "to be settled at the start of the
 build rather than during it" reads as care about sequencing and does the
-opposite, because the start of the build is still the build.
+opposite, because the start of the build is still the build. **A walkthrough
+step whose content depends on an external fact not yet read fails the same
+way — the read happens here, at the decision step, where trying is free.** A
+genuinely volatile fact needs no exception: the decision step still performs
+the read once, proving the source reachable and recording what it found, so a
+drive-time re-read refreshes a known answer rather than fetches an unknown
+one.
 
 **The disposal is a split, not a refusal.** The open question becomes its own
 small item and the large one is held against it by slug. Most of such an item is
@@ -1352,9 +1355,18 @@ yourself" aside. Then draft the walkthrough into the item's prose. Where the
 steps cannot all be scripted yet, file it with a rough walkthrough and
 sharpen it here.
 
+*Where a kept item produces text the user may edit — a draft, a post, an
+article — ask once: "do you potentially want to edit the draft?"* On a yes,
+write the item's drafting steps in the co-authored-draft shape (the `.txt`
+handed to the side panel, read back on their word — the walkthrough sub-rule
+in skill-nonspecific-rules.md, which stays canonical there).
+
 **Run the THOROUGH capability check here — this is its site.** Restate the
 question as *what would answer this?* **before** searching, then name the tool
-that would do the work and confirm it is absent or unauthenticated. Trying a tool
+that would do the work — the candidates include the method's own skills and
+flows, not only external tools, and whether such a feature exists is answered
+by reading the FAQ index, the record of what has been announced — and confirm
+it is absent or unauthenticated. Trying a tool
 is allowed where trying is quick: the user is in the room, which is what makes
 this the heavy site. Where no tool plausibly exists, that is itself the answer.
 **Aim the check at the one job in hand.** An inventory sweep of everything
@@ -1607,9 +1619,7 @@ on skip:
 things landed.
 
 **What that gives up:** a skipped item returns to the top next session and is
-offered again. **Skipping stays unrecorded** — a durable marker, and a file to
-hold the skips, were both refused as phantom queue state, and that refusal
-stands.
+offered again. **Skipping stays unrecorded.**
 
 A skipped item is not deleted and not processed. Next session it's ordinary
 Unprocessed again.

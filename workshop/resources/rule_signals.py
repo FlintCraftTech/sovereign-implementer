@@ -879,10 +879,10 @@ ARCHIVAL_PATHS = (
     # what the detector must and must not match — the same reason the
     # retired-terms list is already excluded. A file whose subject is retired
     # terms will always name them.
-    "resources/rule_signals.py",
-    "resources/research/",
-    "resources/testing/",
-    "resources/plugin-behaviour-retired.md",
+    "workshop/resources/rule_signals.py",
+    "workshop/resources/research/",
+    "workshop/resources/testing/",
+    "workshop/resources/plugin-behaviour-retired.md",
     "INBOX/archive/",
     "LOG/",
 )

@@ -1401,10 +1401,18 @@ def _is_sent_register_overwrite(tool_name: str, filepath: str, cwd: str) -> bool
     The limit, stated rather than implied: a hook sees only what goes through
     Claude's tools. A file deleted outside the app, or a lost disk, is not
     reached by this.
+
+    EXISTING FILES ONLY, like its LOG sibling: a Write that CREATES the
+    register — a project's first-ever send — has nothing to protect and must
+    pass, or the register can never come to exist at all (Edit cannot create
+    a missing file, so the refusal's escape route was a dead end; two consumer
+    projects hit exactly that on their first send).
     """
     if tool_name != "Write":
         return False
-    return _normalise(filepath) == _normalise(os.path.join(cwd, SENT_REGISTER))
+    if _normalise(filepath) != _normalise(os.path.join(cwd, SENT_REGISTER)):
+        return False
+    return os.path.exists(filepath)
 
 
 def _is_hook_suite_file(filepath: str, cwd: str, build_files: list[str]) -> bool:
@@ -1744,8 +1752,10 @@ def main() -> int:
             "The mailbox folder is deliberately kept out of git — it holds "
             "other projects' folder paths — so this one file has no history to "
             "restore from and an overwrite is final.\n\n"
-            "Use Edit instead. Adding a line, or changing one, is always "
-            "allowed; replacing the whole file is what is refused."
+            "Use Edit instead: append the new line to the existing register, "
+            "or change the line that needs changing. Replacing the whole file "
+            "is what is refused. (This fires only against a register that "
+            "already exists — a Write creating one passes.)"
         )
 
     # Rule 1: the working file's Files: section governs editability. Tri-state:

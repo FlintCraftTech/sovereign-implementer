@@ -164,7 +164,10 @@ Stay within the active run's described work. Growing past it needs approval firs
 
 **The item's `Changes:` entry is one of the four per-item completion writes**
 (next.md's per-item completion step) — written at the tick, never loosely along
-the way, so /done needn't re-explore:
+the way, so /done needn't re-explore. (A write belonging to the run rather
+than to any item — a mid-run capture, a live-opened record — goes to the
+working file's `Run-level:` section at the moment of the write instead;
+next.md carries that rule.) The Changes shape:
 
 ```
 Changes:
@@ -208,8 +211,10 @@ same words, and Claude judges that rather than pretending a mechanical test
 exists.
 
 ```
-second ask, MINOR (1-2 files)  ->  carry it through. Append any unlisted file
-                                   to the working file's Files: BEFORE editing.
+second ask, MINOR              ->  carry it through. Append any unlisted file
+  (fits the run's existing         to the working file's Files: BEFORE editing.
+   shape — Claude decides;
+   typically a file or two)
 second ask, SIGNIFICANT        ->  still propose the split. A repeated request
                                    does not make a large change small, and
                                    absorbing a many-file change mid-run is what
@@ -237,8 +242,12 @@ decision this step owes them.
 
 ```
 minor        ->  recommend adding it: "This needs [work], which means editing
-(1-2 files)      [file]. I'd add it to this run — or I can file it instead.
-                 Add it?" Once approved, append any unlisted file to
+(fits the        [file]. I'd add it to this run — or I can file it instead.
+ run's shape     Add it?" Once approved, append any unlisted file to
+ — Claude
+ decides;
+ typically a
+ file or two)
                  the build working file's Files: BEFORE editing it — the scope-lock denies
                  edits to unlisted files.
 

@@ -191,13 +191,21 @@ rules no longer name.
 with rather than what it ships. Keeping it in one folder is what lets someone
 landing on the repository see the product and the method's own documents first.
 
+**Look inside `resources/` before moving anything.** `resources/` is a common
+folder name, and a project may keep product data under it — files the build
+copies, the application loads by path, a generator writes into, or SPEC and
+the README name. Moving those breaks the build and falsifies SPEC.
+
 ```
-project has resources/ at its root  ->  create workshop/ and MOVE the whole
-                                        resources/ folder inside it, so its
-                                        contents keep their relative paths:
-                                        resources/research/x.md
-                                          becomes
-                                        workshop/resources/research/x.md
+project has resources/ at its root  ->  create workshop/, then discriminate on
+                                        contents: MOVE the research and testing
+                                        material (resources/research/,
+                                        resources/testing/), keeping relative
+                                        paths — resources/research/x.md becomes
+                                        workshop/resources/research/x.md. For
+                                        ANYTHING ELSE found inside resources/,
+                                        list it and put the split to the user
+                                        rather than moving it.
 project has no resources/ folder    ->  create workshop/ with an empty
                                         workshop/resources/research/ inside it
 project already has workshop/       ->  nothing to do
@@ -211,12 +219,15 @@ files keep their history rather than arriving as new files with none.
 
 **Anything else the project keeps but does not publish may go in `workshop/` too**
 — post drafts, article drafts, reference material. That is the user's call, item
-by item, and nothing is moved there without asking. Only `resources/` moves
-automatically, because the method's own tools name that path.
+by item, and nothing is moved there without asking. Only the research and
+testing material moves automatically, because the method's own tools name that
+path.
 
-**Check it landed:** `workshop/resources/` exists, no `resources/` folder remains
-at the project root, and a research note the queue cites still opens from the
-path the digest reports.
+**Check it landed:** `workshop/resources/` exists and holds the research and
+testing material, whatever remains at the root under `resources/` is what the
+user chose to keep there, and a research note the queue cites still opens from
+the path the digest reports. A partial move the user directed is a correct
+outcome, not a failure.
 
 **Then re-point what named the old path.** A project's own `CLAUDE.md`, and any
 queue item or session record that gives a `resources/…` path as an instruction to

@@ -113,6 +113,18 @@ check(
     f"context was: {context[:400]!r}",
 )
 
+# The line carries a time of day beside the date ([captures-carry-a-time]):
+# a bare date left same-day relative-time claims ("this morning") with no
+# source finer than a day. Matching "<date> HH:MM" loosely — the minute may
+# tick over between the hook run and this check, so only the shape is pinned.
+import re  # noqa: E402 — kept beside the one check that uses it
+
+check(
+    "the line carries a clock time beside the date",
+    re.search(re.escape(today) + r" \d{2}:\d{2}", context) is not None,
+    f"expected '{today} HH:MM' in the payload; got: {context[:400]!r}",
+)
+
 shutil.rmtree(d, ignore_errors=True)
 
 print()

@@ -350,6 +350,13 @@ you CAN scope it, but notice OTHER work      ->  adjacent-work discovery
                                                  scope-ask.
 ```
 
+**A capture filed mid-run also gets one line in the working file's Run-level
+section, written at the moment of the write** — it belongs to the run rather
+than to any item, so no tick will ever record it, and after a crash the
+working file would otherwise say it never happened. A working file from before
+this section existed simply lacks it, and the close falls back to memory as it
+always did.
+
 **An item is buildable only when it says what changes *inside* the files it
 names.** The same two-limb test runs at /plan's decision step, which carries the full
 argument and is where an item like this should be stopped; meeting one here means
@@ -386,6 +393,11 @@ read from there.]
 
 Index entry candidates:
 [empty — one added as each item is ticked]
+
+Run-level:
+[writes belonging to the run rather than to any item — a capture filed
+mid-run, a LOG record opened live for a walkthrough — one line each, written
+at the moment of the write]
 
 Files:
 - [each file the run's items will change — one bare path per line, nothing else]
@@ -489,9 +501,12 @@ under, and a later tick written above it silently takes it. The LOG-entry
 `Rule gate:` format is unchanged and stays slugless — that line describes the
 session, not one item, and `workshop/resources/rule_signals.py` reads it as it is.
 
-**The tick is the accumulation point.** `Progress:`, `Index entry candidates:`
+**The tick is the accumulation point for per-item writes.** `Progress:`,
+`Index entry candidates:`
 and `Changes:` all grow one item at a time, at the tick and never later, so the
-working file only ever describes work that actually happened. The index candidate is artifact touched +
+working file only ever describes work that actually happened. The `Run-level:`
+section is the one exception, written at the moment of its write rather than
+at any tick, because what it records belongs to no item. The index candidate is artifact touched +
 nature of change (skill-nonspecific-rules.md, Index entries), and written here it
 *describes* the build rather than predicting it.
 
@@ -564,7 +579,10 @@ the run — it's the last pass of a run whose Claude work is already done.
 
 **Open the item's record, then give the first concrete step and wait.** The
 record comes first: open the item's LOG entry file under its slug when the
-drive starts, and append each action as it happens. A walk-through
+drive starts, and append each action as it happens. **Opening it also gets one
+line in the working file's Run-level section, written then** — the record
+belongs to the run rather than to any build item, and without the line a
+crashed session's working file positively suggests the drive never started. A walk-through
 legitimately has Claude doing real work — running a reinstall, bumping a
 version, pruning a cache — and none of it has any other home: a `[user]` item
 never enters the build working file, so without this the work exists only in

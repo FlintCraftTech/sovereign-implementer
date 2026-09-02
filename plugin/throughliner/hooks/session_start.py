@@ -1645,17 +1645,21 @@ def main() -> int:
     context_parts.append(f"  SPEC.md: {'found' if has_spec else 'MISSING'}")
     context_parts.append(f"  QUEUE.md: {'found' if has_queue else 'MISSING'}")
 
-    # Today's date, read from the system clock. Sessions were deriving "today"
-    # by assumption and writing wrong dates into records and captures, which is
-    # the kind of error nothing downstream can catch: a wrong date looks exactly
-    # like a right one. Worded as the date AT SESSION START rather than "today",
-    # because a long chat can cross midnight and the anchor would then be a day
-    # behind while still reading as current.
+    # Today's date and time, read from the system clock. Sessions were deriving
+    # "today" by assumption and writing wrong dates into records and captures,
+    # which is the kind of error nothing downstream can catch: a wrong date
+    # looks exactly like a right one. Worded as the date AT SESSION START
+    # rather than "today", because a long chat can cross midnight and the
+    # anchor would then be a day behind while still reading as current. The
+    # time is there because a bare date leaves same-day relative-time claims
+    # ("this morning", "yesterday" said of a same-date capture) with no source
+    # finer than a day, so sessions filled the gap by assumption.
     context_parts.append(
         "  Date at session start: "
-        f"{datetime.date.today().isoformat()} — read from the system clock. "
-        "Anchor every date decision to a computed field like this one; never "
-        "derive today's date by assumption."
+        f"{datetime.datetime.now().strftime('%Y-%m-%d %H:%M')} — read from "
+        "the system clock. "
+        "Anchor every date and time decision to a computed field like this "
+        "one; never derive today's date or the time of day by assumption."
     )
 
     # Surface the installed host version (the version of the plugin actually
