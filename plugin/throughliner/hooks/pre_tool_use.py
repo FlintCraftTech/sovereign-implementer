@@ -6,9 +6,11 @@ PreToolUse hook — enforces three rules:
    the standing list — QUEUE.md, SPEC.md, CYCLES.md, LOG/, FAQ/, the
    session's own notes, plus the always-editable paths — is DENIED, never asked: an ask
    that gets waved through is not consent, and a planning session is where
-   a change becomes queued work instead of an edit. A freeform session
-   extends the standing list by declaring a scope file
-   (_freeform-<session-id>.md) listing the paths its queue item names.
+   a change becomes queued work instead of an edit. A session extends the
+   standing list by declaring a scope file (_freeform-<session-id>.md)
+   listing paths — a freeform session copies them from its queue item's
+   instructions; any no-build session writes one path at a time on the
+   user's repeated direction, which is the user's door through a denial.
    An unscoped build (a working file with no Files: section) is surfaced
    once.
 
@@ -1184,9 +1186,11 @@ def _freeform_scope_files(cwd: str, session_id: str) -> list[str]:
     2026-08-21 freeform sitting was worked around by hand, on approval, once
     per file. The fix mirrors the build's mechanism rather than inventing one:
     the session writes `_freeform-<session-id>.md` (same location and naming
-    shape as the build working file) carrying a `Files:` section copied from
-    its queue item's instructions, and those paths EXTEND the standing list for
-    that session only.
+    shape as the build working file) carrying a `Files:` section, and those
+    paths EXTEND the standing list for that session only. The list comes from
+    the freeform item's instructions, or — in any no-build session — from the
+    user's repeated direction, one path at a time; this parser reads the file
+    and consults no queue either way.
 
     Reuses _parse_build_files, deliberately — one parser, one format, one set
     of parsing bugs. Returns an empty list when no scope file exists (standing
@@ -1932,7 +1936,12 @@ def main() -> int:
                 "here.\n\n"
                 "Add this to the queue as a piece of work instead, and tell the "
                 "user in plain words what you were about to change and why it "
-                "is now an item rather than an edit."
+                "is now an item rather than an edit. Where the user then asks "
+                "for the same change again in their own words, write "
+                "_freeform-<session-id>.md in the project root with a Files: "
+                "section naming this one path, say so in one line, and make "
+                "the edit — the user's repeated direction is what opens that "
+                "door, one path at a time."
             )
 
     return 0

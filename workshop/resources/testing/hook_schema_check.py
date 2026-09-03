@@ -228,6 +228,12 @@ def test_session_start_points_at_the_rules_rather_than_pasting_them():
     check("SessionStart: rules are pointed at, not pasted",
           "plugin-behaviour.md IN FULL NOW" in ctx or "IN FULL NOW" in ctx,
           "no read-first instruction found")
+    # [skill-docs-exceed-one-read]: the rules file can outrun a single read,
+    # and the directive must say so, or a session takes the first page as
+    # the whole.
+    check("SessionStart: the directive says the read may take more than one page",
+          "no further page" in ctx,
+          "the more-than-one-read sentence is missing from the directive")
     # The giveaway that someone re-inlined the file: its own body text.
     check("SessionStart: the rules file's contents are absent from the payload",
           "## Response-shape tags" not in ctx and "## The throughline" not in ctx,

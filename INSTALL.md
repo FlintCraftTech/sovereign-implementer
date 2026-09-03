@@ -69,6 +69,8 @@ Once Claude Code is installed and the user is on a paid plan, the plugin install
 
 **This still hands off.** You (Claude, in the claude.ai chat) cannot run the install from here — you have no access to the user's machine. The install happens inside **Claude Code**, driven by the Claude Code agent there. Your job in this chat is to tell the user exactly what to ask Claude Code to do, then wait for them to report back. Never pretend this chat can run the install itself.
 
+**Prerequisite — Python 3, installed and on the path.** The plugin's safety checks and its session-opening facts are small Python scripts that Claude Code runs for you; without Python they silently do nothing, and the plugin reports success anyway. Before installing, have the user ask Claude Code to run `python --version`. It must print a version number. On a fresh Windows machine it may instead print "Python was not found; run without arguments to install from the Microsoft Store" — that is a placeholder, not Python. Install Python from python.org (ticking "Add python.exe to PATH" in the installer), fully restart Claude Code, and check again before going on.
+
 ### B.1 — Ask Claude Code to install the plugin
 
 The install uses Claude Code's plugin marketplace. It's two commands — but the user does **not** have to type them. Instead, have them open a chat **inside Claude Code** and ask the Claude Code agent, in plain words, to install the plugin. Give them this to paste or say:

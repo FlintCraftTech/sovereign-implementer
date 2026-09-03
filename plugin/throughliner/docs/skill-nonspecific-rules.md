@@ -120,9 +120,10 @@ The work cycle. Every piece of work travels the same loop.
   **At the method's own decision turns, the governing specification is that
   turn's own content line, in the skill's doc.** This bullet says how a message
   is shaped; those lines say what a particular turn carries, which is what
-  shaping alone cannot settle. Five turns have one: the item summary, the
+  shaping alone cannot settle. Six turns have one: the item summary, the
   recommendation and the checkpoint in plan.md, the walkthrough step in
-  next.md, and the close's Recommend-next turn in done.md.
+  next.md, the close's Recommend-next turn in done.md, and the hand-back turn
+  in rescan.md.
 
   **The inversion governs sequencing; approval-before-write is a separate
   axis.** Write-first answers *show-then-wait or write-then-report*, and its
@@ -130,9 +131,18 @@ The work cycle. Every piece of work travels the same loop.
   together*. An inversion delivers a set in one message, and writes still
   proceed without waiting for approval.
 
+  **Alternatives are delivered together and asked singly:** recommend one, and
+  let the other be declined — the ask stays the one fixed formula, never a
+  two-way question in one sentence. Where Claude genuinely has no
+  recommendation, the ask opens with the fixed words **"Your call, two ways:"**
+  and names both; that is the only shape a two-way ask may take, so it reads
+  as different from the ordinary ask in the same way every time.
+
   ```
   inversions — deliver together, not one at a time:
       alternatives the user is choosing between   # the choice is between them
+                                                  # — delivered together, ASKED
+                                                  # singly (see above)
       a deterministic result set under approved
       criteria                                    # bulk approval; contested
                                                   # items then go one at a time
@@ -189,6 +199,17 @@ The work cycle. Every piece of work travels the same loop.
   work. A rule enforced against a direct, repeated request is the failure this
   ends: four asks for one thing, refused each time on a rule the user had
   already heard.
+
+  **Where the thing held back is a write the scope-lock refused in a session
+  with no build running, the mechanics are these:** on the user's next word,
+  write `_freeform-<session-id>.md` in the project root with a `Files:`
+  section naming that one path, say so in one line, make the edit, and let
+  the close record it as handmade work. The consent is the user's repeated
+  direction recorded as one path in a file, which is a different thing from
+  Claude asking and being waved through — the denial itself is unchanged. A
+  deliverable the user asked for is not a temporary file: under the same door
+  it goes to `workshop/`, and while it sits in the scratchpad the message
+  names the full path.
 
 - **When capturing something mid-skill, close by who raised it.** User raised it →
   ask "anything else?" before resuming. Claude noticed it → confirm and resume,
@@ -508,11 +529,14 @@ answer from one of those two routes rather than from your own confidence, which
 is what keeps the trigger a question about the subject rather than a judgment
 about your own certainty.
 
-**And in the other direction: a sentence written into a document asserting what a
-tool can do, or what an outside surface permits, is a claim about the world, so
-run the read that would verify it before writing it — and where no such read
-exists, write it as intended rather than as fact.** The same question, asked of
-your own writing: what would answer this? A capability sentence composed from a
+**And in the other direction: a sentence handed to the user — in chat or in a
+document — asserting what a tool can do, or what an outside surface permits, is
+a claim about the world, so run the read that would verify it before writing
+it. Where no such read exists, write it as intended rather than as fact in a
+document; in chat, where the surface cannot be seen, say it as a guess and give
+the fallback in the same sentence — and where a route that works has already
+been given, add no unverified second route.** The same question, asked of your
+own writing: what would answer this? A capability sentence composed from a
 design discussion reads exactly like a verified one, and is corrected only when
 something fails against it.
 
@@ -955,21 +979,26 @@ real and equally bad; neither warning may be louder than the other. (How a
     carries on past the thing it was proving has no point anyone can check it
     against;
   - where a step has the user edit text Claude drafted, writing that draft to a
-    `.txt` file whose location the step names, then reading it back only when
-    they say to, asking whether there is anything else, and repeating until
-    they say they are finished. `.txt` is what the desktop side panel opens for
-    editing, with a save button, so the user decides when their edits land —
-    and editing the text directly is what stops co-authored work collapsing
-    into Claude work the user describes changes to.
+    `.txt` file in the session scratchpad — unless the item's Files line names
+    a project path for it — with the step naming which, then reading it back
+    only when they say to, asking whether there is anything else, and
+    repeating until they say they are finished. `.txt` is what the desktop
+    side panel opens for editing, with a save button, so the user decides when
+    their edits land — and editing the text directly is what stops co-authored
+    work collapsing into Claude work the user describes changes to. The
+    scratchpad is the default because every run may write it and it sits
+    outside the repository.
 
 The `[freeform]` tag names **work done by hand rather than by /next** — because it
 is large, or because it characteristically cannot run inside a run. Its main job
 is telling the close what kind of work it is looking at. **Before its first
 edit, a freeform session working a queued item writes a scope file —
 `_freeform-<session-id>.md` in the project root, with a `Files:` section
-listing the paths the item's instructions name — and reports it in one line.**
-The safety check reads that file and permits the listed paths for this session;
-without it, edits outside the standing planning surface are refused.
+listing paths — and reports it in one line.** The list comes from the item's
+instructions, or from the user's repeated direction in any no-build session,
+one path at a time. The safety check reads that file and permits the listed
+paths for this session; without it, edits outside the standing planning
+surface are refused.
 
 **Most freeform work never passes through /plan at all.** The user and Claude do
 it by hand in a chat of its own, and /done reads the resulting edits as their
@@ -1488,8 +1517,10 @@ this adds is the offer.
 ## Reading a whole file before reasoning over it
 
 **Page the whole queue before any queue-wide reasoning, and the same for any
-file whose *whole* content the reasoning depends on.** A read that stopped short
-is named plainly rather than reasoned from quietly. **Check this at the read rather
+file whose *whole* content the reasoning depends on** — this file and the
+procedure docs among them, which can exceed what one read returns, so a read
+of one is finished only when the tool reports no further page. A read that
+stopped short is named plainly rather than reasoned from quietly. **Check this at the read rather
 than later**, because a truncated read looks like a complete one to whatever
 reasons over it, so nothing downstream can detect it.
 

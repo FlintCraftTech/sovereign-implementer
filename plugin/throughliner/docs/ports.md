@@ -39,7 +39,9 @@ both directions.
 **No register of who runs which flavour is kept.** Maintaining a list of other
 people's projects is a standing obligation this project cannot keep accurate,
 and being absent from such a list would read as disapproval. The flavour is
-something a port declares about itself.
+something a port declares about itself. It describes what the port does now,
+not what it promises for later: a port that changes how it works simply
+changes its declaration, with nobody to ask.
 
 ## Keeping up
 

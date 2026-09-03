@@ -222,7 +222,10 @@ one — the existing entry is the record, not a duplicate.
 
 **Close each `[user]` item on one of the three outcomes — done, deferred, or not
 reached — read off the run's own trail** (done.md's outcome block, and next.md's
-walk-through branch, carry the definitions).
+walk-through branch, carry the definitions). **On the done arm, remove the item
+from Processed with the queue mover**, running first the observable check that
+done-plan.md's Completed `[user]` items step names; deferred and not reached
+leave the item in place.
 
 If a built item carried a red flag, note in this entry that it carried one and
 that it was cleared — the carry-through, since the substantive clearing record was

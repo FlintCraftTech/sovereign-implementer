@@ -24,9 +24,18 @@ itself.
 
 ## Route by session shape  [SILENT]
 
-Check for **this session's** build working file, `_build-<session-id>.md` — not
-any other session's, which belongs to a build running in another chat.
-**The check is automatic: route on what you find, silently.**
+**First arm: this chat has already closed.** Where this conversation already
+holds its own close — the entry written and the commit made — a second `/done`
+is the post-close tail, not a second close: file what it finds through the
+three-way triage, append what happened to this session's existing entry as a
+marked tail, commit nothing, and say so in one line. Where the tail is worth
+committing now, name the route: open a fresh chat and run `/done` there, where
+the no-build close commits handmade work as a session of its own.
+
+Otherwise check for **this session's** build working file,
+`_build-<session-id>.md` — not any other session's, which belongs to a build
+running in another chat. **The check is automatic: route on what you find,
+silently.**
 
 **Run every judgment step the routed sub-doc calls for, whatever the user says
 about committing.** "Just commit" asks for the close to be quick, not for its
@@ -658,7 +667,8 @@ session-start backfill remains as the safety net for a fill this step missed.
 Every sub-doc's final step points here, adding only its flavor delta.
 
 **Content line for this turn: it states the queue situation as the next
-planning session would present it, and the continuations — more planning, or a
+planning session would present it, any cycle whose turn is due — named whether
+or not a capture was filed for it — and the continuations — more planning, or a
 build — as statements of fact, and nothing else.** Neither continuation is
 assumed or recommended over the other: a user may plan as many times as they
 want until enough is queued to justify a build, so which comes next is theirs,
@@ -668,8 +678,9 @@ and this turn's job is to leave them holding the facts that decide it.
 
 ```
 advisory FILED       ->  the closing message carries ONE line naming it and
-                         pointing at the queue, and nothing else from the
-                         ladder below. The advisory already says what to do
+                         pointing at the queue, plus any due cycle by name,
+                         and nothing else from the ladder below. The advisory
+                         already says what to do
                          next; restating it in chat duplicates the record.
                          The overlap scan still runs — and what it finds is
                          written INTO the advisory before it is filed rather
@@ -735,7 +746,8 @@ inviting either.
 **A session makes exactly one commit, and the tail makes none.** That is the
 whole shape, and everything below follows from it. The close commits; work
 arriving afterwards is written to the working tree and left there, to be carried
-by the next close. No amendment commit, no delta commit, no second close.
+by the next close. No amendment commit, no delta commit, no second close — and
+a second `/done` is the tail, not a close.
 
 ```
 the close                ->  ONE commit. Everything the session did.

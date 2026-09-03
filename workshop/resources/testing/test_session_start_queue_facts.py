@@ -111,10 +111,38 @@ def test_the_real_marker_still_splits_the_section():
           repr(facts))
 
 
+def test_waiting_to_be_planned_is_the_fourth_number():
+    """[queue-facts-zero-reads-as-empty]: a project whose whole queue is
+    unprocessed read as an empty slate because the line named cleared, held
+    and blockers only. The count of Unprocessed entries is the fourth number,
+    emitted even when zero, and takes no part in the floor derivation."""
+    # The tester's shape: 0 cleared, 0 held, 3 waiting.
+    d, path = queue_file(
+        processed="",
+        unprocessed=("#### One [one]\nR.\n#### Two [two]\nR.\n"
+                     "#### Three [three]\nR.\n"),
+    )
+    facts = hook._queue_dependency_facts(path)
+    shutil.rmtree(d, ignore_errors=True)
+    check("0 cleared, 0 held, 3 waiting to be planned",
+          facts is not None and facts[0] == 0 and facts[1] == 0
+          and facts[-1] == 3,
+          repr(facts))
+
+    # All zero: the count is still a computed zero, never absent.
+    d, path = queue_file(processed="", unprocessed="")
+    facts = hook._queue_dependency_facts(path)
+    shutil.rmtree(d, ignore_errors=True)
+    check("an empty queue reads 0 waiting, not a missing field",
+          facts is not None and len(facts) == 8 and facts[-1] == 0,
+          repr(facts))
+
+
 if __name__ == "__main__":
     print("test_session_start_queue_facts.py")
     test_marker_text_in_prose_does_not_move_the_line()
     test_the_real_marker_still_splits_the_section()
+    test_waiting_to_be_planned_is_the_fourth_number()
     print()
     if _failures:
         print(f"{len(_failures)} failure(s): " + ", ".join(_failures))

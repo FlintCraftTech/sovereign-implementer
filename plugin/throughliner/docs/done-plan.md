@@ -71,7 +71,10 @@ committed as their own clean record.
 the session didn't make are most likely the user's expected work. Run `git status
 --porcelain`, and where what changed isn't self-evident, look. Confirm with the
 user that these are theirs and meant to be saved. **Read them as expected work
-rather than a broken repo, and leave them intact.**
+rather than a broken repo, and leave them intact.** Where a scope file
+(`_freeform-<session-id>.md`) is present at the close with no queue item behind
+it, read it as the record of what the user directed through the scope-lock's
+door, and name those paths in the entry.
 
 **2. Decide LOG granularity by judgment.**
 
@@ -262,7 +265,8 @@ readiness check of its own. Narrate it when a `[user]` item moves above the mark
 A `[user]` item never entered a build working file, so it isn't ticked and closed
 like a build. This is the close that records it and removes it from Processed, so
 a finished item doesn't strand in the queue and get re-presented by the next
-/next. It runs both as a close of its own and inside a planning close.
+/next. It runs as a close of its own, inside a planning close, and — for the
+removal — inside a build close.
 
 **Identify completed items from what the session can already see.**
 

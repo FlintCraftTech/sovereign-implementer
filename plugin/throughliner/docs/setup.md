@@ -255,11 +255,32 @@ plain statement, so nobody is left thinking the mail is now private.
 offer, never a halt. Where the project is one flat repository, say in two or
 three sentences what the nested shape is (the product in a subfolder with its
 own clean repository, the method's documents tracked privately in the outer
-one, the close committing both) and that converting means creating the inner
-repository and moving the product's files into its subfolder. On a yes, plan
-the conversion with the user file by file; on anything else, drop it — the
-flat shape keeps working exactly as before, and the offer returns once more
-only at the moment the project goes public.
+one, the close committing both) and which of the two conversions this project
+gets: where the repository has no remote, the product's files move into a new
+inner repository (the **split**); where it already has one, that repository is
+already the product's and is kept whole as the inner, with the private outer
+created around it (the **wrap**). On a yes, plan the conversion with the user
+file by file, opening the plan by reading `git remote` to choose the arm; on
+anything else, drop it — the flat shape keeps working exactly as before, and
+the offer returns once more only at the moment the project goes public.
+
+```
+split  (no remote)   ->  create the product subfolder and its repository; move
+                         the product's files in; the method's documents stay
+                         where they are and are tracked by the outer
+wrap   (has a remote) ->  create the outer folder one level up, with its own
+                         repository and no remote; move the existing checkout
+                         into it as the product subfolder, untouched; move the
+                         method's documents and working material up into the
+                         outer and track them there; leave the inner's own
+                         ignore rules alone — the documents were ignored there
+                         and are now absent
+```
+
+Both arms then write the Visibility line the nested scaffold writes. The wrap
+rewrites no history: nothing private was ever committed to the inner, and
+everything public — the remote, releases, anyone's pins — keeps pointing at the
+same repository.
 
 **2. Retire REGISTRY.md if present**  [SILENT] when it holds only what the old
 setup put there; [BRIEF, PROMPT] when the user has written into it. No longer
@@ -565,7 +586,30 @@ is accepted writes the same Visibility line the scaffold writes**, replacing
 whatever the flat answer was.
 
 **Keep-private option**  [BRIEF, PROMPT]. Offer once, as part of scaffolding.
-**The offer forks by project shape, and the fork is the first thing to read:**
+
+**SAID FIRST — the whole of the first message is these four lines**, in this
+shape, with the ask in the fixed formula:
+
+```
+The planning documents — the spec, the queue and the session records — stay
+out of the repository.                                 # the recommendation, as
+                                                       # a statement
+They hold the project's plans, reasoning and history — the most personal
+material the method produces — and keeping them out is the only complete
+protection if the project is ever published.           # one sentence of why
+**Keep them private?**                                 # the bold ask, last
+```
+
+In a nested project the first line says instead that they are tracked in the
+outer repository, which never gets a remote. Nothing else goes in that message:
+not the per-document combinations, not what the choice keeps and changes, not
+the mailbox. Those are HELD below — what Claude reads to answer, and what it
+says after the yes.
+
+**HELD — Claude's own reading, and what follows the answer.**
+
+**The offer forks by project shape, and the fork is the first thing Claude
+reads:**
 
 ```
 NESTED project   ->  propose TRACKED-IN-THE-OUTER: the documents are tracked
@@ -597,19 +641,18 @@ QUEUE.md   what to work on next, and the reasoning behind each piece
 LOG/       what happened, session by session
 ```
 
-**Ask it as ONE question with three answers, not as three questions.** "All of
-them, none, or just some — and if some, which?" A private queue with a public
-history is the combination someone most plausibly wants, and a bundled choice
-makes it unreachable rather than merely un-defaulted.
+**It is ONE question with three answers, never three questions.** The yes takes
+all three; a user who names a document gets just that combination — a private
+queue with a public history is the one someone most plausibly wants, and a
+bundled choice would make it unreachable rather than merely un-defaulted. The
+combinations are said only when the user names a document.
 
-Say what it costs and what it buys, in one short exchange, and **state the trade
-once rather than once per document**: these documents hold the project's plans,
-its reasoning and its session history, which is the most personal material the
-method produces; keeping them out of the repository is the only complete
-protection if it is ever published.
+**The trade is stated once, in the one sentence of why above**, never once per
+document.
 
-**State what the private configuration keeps, and what it still changes.** Both
-in the same short exchange, at the one moment the choice is being made:
+**After the yes, the report is one line naming which paths went into
+`.gitignore` — and then what the private configuration keeps, what it changes
+and its limit**, which describe what the choice does rather than what to choose:
 
 ```
 KEPT     Claude still writes to these first and reports what landed. Before
@@ -680,6 +723,12 @@ with acceptance as the default:
 user accepts (the default)  ->  write "outputStyle": "Throughliner Brevity"
                                 into the project's .claude/settings.local.json
                                 (creating the file if absent, merging if not)
+the write is refused        ->  say in one line that the app is asking
+                                permission for that file, and retry once on
+                                the user's word; refused again -> the decline
+                                outcome below. A first write to a project's
+                                settings file ordinarily prompts, so a refusal
+                                is common and is not a decline.
 user declines               ->  say nothing further; every session opening
                                 will carry one short line noting the style is
                                 not enabled
@@ -842,9 +891,13 @@ the LOG entry /done writes at close.
 - From here, two commands carry the work: **/plan** to think and organise, and
   **/next** to build the next thing on the list. Run /plan whenever planning is
   needed, and /next once per item as you work down the queue.
-- However a session goes, end it the same way: **/done** to record what happened,
-  then **/clear** to start fresh. The habit that matters: **always /done before
-  /clear**, so each session is saved before the context resets.
+- However a session goes, end it with **/done**, which records what happened
+  and saves it. After that the conversation can be cleared: **/clear** wipes
+  the conversation on screen and touches none of the project's files, which is
+  what makes it safe once /done has run — the next session starts fresh and
+  reads everything back from the files. Say the order in words rather than
+  stacking the two commands in one sentence, and point at the FAQ entry on why
+  every session ends with /done for the longer answer.
 
 ## The self-hosting seed  [BRIEF, PROMPT]
 

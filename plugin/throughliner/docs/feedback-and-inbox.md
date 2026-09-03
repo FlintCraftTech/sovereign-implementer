@@ -236,7 +236,12 @@ to another project — anything that leaves this machine.
 
 **Written in the same turn, because the exact wording exists at that moment and
 nothing later reconstructs it.** No second copy of the content: the line points at
-the text, exactly as `LOG/index.md` points at entries.
+the text, exactly as `LOG/index.md` points at entries. **Where the Throughliner
+state server is registered for the project, the line is written with its
+`append_sent_line` tool**, which stamps the date and time, composes the line and
+appends it at the end of the file — a Discord message id, where there is one,
+lands after the destination; where the server is not registered, an edit
+appending at the end of the file stays the route.
 
 **A pointer claiming the text is on file verbatim is written only after the
 place it names is confirmed to hold that text** — the write-verify-point rule in

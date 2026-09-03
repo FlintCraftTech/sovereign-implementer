@@ -1,14 +1,18 @@
 #!/usr/bin/env python3
-"""Throughliner state — an MCP server answering four live questions, plus one
-structured write.
+"""Throughliner state — an MCP server answering four live questions, plus two
+structured writes.
 
-Slices one and two of the MCP helper. Slice one is the four read-only tools,
+Slices one to three of the MCP helper. Slice one is the four read-only tools,
 which proved the plumbing — a server registered, trusted, connected, its tools
 reachable from a session — with no risk that a bug in the plumbing costs a
 file. Slice two adds the first write, `file_capture`, which starts where the
 writes are most frequent: filing a capture. It refuses only what is checkably
 wrong, echoing the reason so the retry is instant, and appends to the bottom
 of Unprocessed and nowhere else, so placement cannot go wrong by construction.
+Slice three adds `append_sent_line`, which composes one outbound-register line
+from its fields and appends it at the end of `INBOX/sent.md` — the one file
+with no history to restore from, where an edit anchored on whatever a session
+last read has landed a line out of order.
 
 **Every tool wraps a calculation or a write path existing code already
 performs.** Nothing here invents an answer or a second write mechanism: the
@@ -56,7 +60,7 @@ for _stream in (sys.stderr, sys.stdout, sys.stdin):
 
 PROTOCOL_VERSION = "2024-11-05"
 SERVER_NAME = "throughliner-state"
-SERVER_VERSION = "0.2.0"
+SERVER_VERSION = "0.3.0"
 
 # This file sits at <plugin-root>/mcp/server.py, so the plugin root is its
 # grandparent. Derived rather than hardcoded, per the working conventions.
@@ -420,6 +424,69 @@ def tool_file_capture(arguments):
            % (heading, slug)
 
 
+INTENTS = ("for completion", "for continuation")
+
+
+def tool_append_sent_line(arguments):
+    """Compose one register line from its fields and append it at the end of
+    INBOX/sent.md, changing nothing else.
+
+    The register is append-only by design and has no git history, so a line
+    written by an edit anchored on a stale read can land above the end and
+    never be noticed. This is the safe append path: the date and time are
+    stamped from the clock, the line is composed in the canonical shape, the
+    file is made to end on a newline first, and one line goes on the end.
+    It refuses only what is checkably wrong, echoing the reason.
+    """
+    root = project_root()
+    inbox = os.path.join(root, "INBOX")
+    register = os.path.join(inbox, "sent.md")
+
+    fields = {}
+    for name in ("destination", "intent", "claim", "pointer", "message_id"):
+        value = arguments.get(name)
+        fields[name] = value.strip() if isinstance(value, str) else ""
+
+    problems = []
+    for name in ("destination", "intent", "claim", "pointer"):
+        if not fields[name]:
+            problems.append("%s is missing." % name)
+    if fields["intent"] and fields["intent"] not in INTENTS:
+        problems.append("intent must be exactly 'for completion' or "
+                        "'for continuation', not %r." % fields["intent"])
+    for name, value in fields.items():
+        if "\n" in value or "\r" in value:
+            problems.append("%s contains a line break — a register line is "
+                            "one line." % name)
+    if not os.path.isdir(inbox):
+        problems.append("this project has no INBOX/ folder — the mailbox is "
+                        "not scaffolded, so there is no register to append to.")
+
+    if problems:
+        return "Refused — nothing was written:\n" + \
+               "\n".join("- " + p for p in problems)
+
+    stamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
+    head = fields["destination"]
+    if fields["message_id"]:
+        head += " — message id `%s`" % fields["message_id"]
+    line = "- %s — %s — %s — %s — %s" % (
+        stamp, head, fields["intent"], fields["claim"], fields["pointer"])
+
+    created = not os.path.isfile(register)
+    with open(register, "a+", encoding="utf-8", newline="") as f:
+        f.seek(0, os.SEEK_END)
+        if f.tell() > 0:
+            f.seek(f.tell() - 1)
+            last = f.read(1)
+            if last not in ("\n", "\r"):
+                f.write("\n")
+        f.write(line + "\n")
+
+    return "%s the register line at the end of INBOX/sent.md:\n%s" % (
+        "Created INBOX/sent.md and wrote" if created else "Appended", line)
+
+
 TOOLS = [
     {
         "name": "queue_checkpoint_counts",
@@ -532,6 +599,55 @@ TOOLS = [
             },
         },
         "handler": tool_file_capture,
+    },
+    {
+        "name": "append_sent_line",
+        "description":
+            "Append one line to the project's outbound register, "
+            "INBOX/sent.md, for a send or post that has just been approved. "
+            "Takes the line's fields — destination, intent, claim, pointer, "
+            "and an optional Discord message id — stamps the date and time "
+            "from the clock, composes the canonical line and appends it at "
+            "the end of the file, changing nothing else. Refuses a missing "
+            "field, an intent other than 'for completion' or 'for "
+            "continuation', a line break inside a field, or a project with "
+            "no INBOX/ folder, echoing the reason. Creates sent.md where "
+            "INBOX/ exists and the file does not.",
+        "inputSchema": {
+            "type": "object",
+            "required": ["destination", "intent", "claim", "pointer"],
+            "properties": {
+                "destination": {
+                    "type": "string",
+                    "description":
+                        "Where it went: the channel, forum, project or "
+                        "person, in the register's own words.",
+                },
+                "intent": {
+                    "type": "string",
+                    "enum": ["for completion", "for continuation"],
+                    "description":
+                        "Whether the item was handed over for completion "
+                        "(which can close it) or for continuation.",
+                },
+                "claim": {
+                    "type": "string",
+                    "description":
+                        "What the text claimed, in one clause, read off the "
+                        "approved text as it stands.",
+                },
+                "pointer": {
+                    "type": "string",
+                    "description": "Where the text lives.",
+                },
+                "message_id": {
+                    "type": "string",
+                    "description":
+                        "The Discord message or topic id, where there is one.",
+                },
+            },
+        },
+        "handler": tool_append_sent_line,
     },
 ]
 

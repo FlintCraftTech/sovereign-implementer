@@ -31,6 +31,9 @@ supply. urllib does everything needed here.
 
     POST   /channels/{channel_id}/messages              send
     POST   /channels/{forum_id}/threads                 create a forum topic
+    POST   /channels/{channel_id}/messages/{message_id}/threads
+                                                        start a thread on a message
+                                                        (send --thread-on)
     PATCH  /channels/{channel_id}/messages/{message_id} edit (own messages only)
     DELETE /channels/{channel_id}/messages/{message_id} delete one
     GET    /channels/{channel_id}/messages              list, newest first
@@ -417,6 +420,45 @@ def send(token, channel, body_path, attach=None):
     return message
 
 
+def send_in_thread_on(token, channel, message_id, body_path):
+    """Post body_path as a message in the thread hanging off one message.
+
+    Where no thread exists on that message yet, one is started — named for the
+    message's own first line, which for a rezip entry is the build's heading —
+    and the text goes in as the thread's first message. Where a thread already
+    exists (Discord refuses a second one, error code 160004), the text is posted
+    into it instead. A thread started from a message carries that message's id
+    as its own, which is also what makes the existing-thread case addressable.
+    Returns (thread_id, message, created).
+    """
+    channel_id = resolve_channel(token, channel)
+    text = read_text(body_path)
+    check_length(text)
+
+    created = False
+    try:
+        parent = request(token, "GET",
+                         "/channels/%s/messages/%s" % (channel_id, message_id))
+        first_line = (parent.get("content") or "").strip().splitlines()
+        name = (first_line[0] if first_line else "Testing outcomes").strip("# ")
+        # Discord caps a thread name at 100 characters.
+        name = (name[:97] + "...") if len(name) > 100 else name or "Testing outcomes"
+        thread = request(
+            token, "POST",
+            "/channels/%s/messages/%s/threads" % (channel_id, message_id),
+            body={"name": name})
+        thread_id = thread["id"]
+        created = True
+    except DiscordError as error:
+        if "160004" not in str(error):
+            raise
+        thread_id = message_id
+
+    message = request(token, "POST", "/channels/%s/messages" % thread_id,
+                      body={"content": text})
+    return thread_id, message, created
+
+
 def create_forum_topic(token, channel, title, body_path, attach=None):
     """Open a new topic in a forum channel, with its opening message.
 
@@ -761,6 +803,12 @@ def main(argv=None):
                              "forum named by --channel, with the body as its "
                              "opening message. Omit it to post an ordinary "
                              "message.")
+    p_send.add_argument("--thread-on", metavar="MESSAGE_ID",
+                        help="post the body into the thread under that "
+                             "message in --channel, starting the thread "
+                             "(named for the message's first line) where none "
+                             "exists yet — the rezip entry's outcomes thread. "
+                             "Not combinable with --title or attachments.")
     p_send.add_argument("--attach", help="optional file to attach")
     p_send.add_argument("--attach-archived-zip", metavar="VERSION", nargs="?",
                         const="", default=None,
@@ -836,6 +884,18 @@ def main(argv=None):
         token = read_token(args.project_root)
 
         if args.command == "send":
+            if args.thread_on:
+                if args.title or args.attach or args.attach_archived_zip is not None:
+                    raise DiscordError(
+                        "--thread-on posts text only: drop --title and the "
+                        "attachment options.")
+                thread_id, message, created = send_in_thread_on(
+                    token, args.channel, args.thread_on, args.body)
+                print("%s thread %s under message %s in #%s — message id %s"
+                      % ("Started" if created else "Posted into existing",
+                         thread_id, args.thread_on, args.channel,
+                         message["id"]))
+                return 0
             attachment = args.attach
             if args.attach_archived_zip is not None:
                 attachment = archived_plugin_zip(

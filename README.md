@@ -1,5 +1,7 @@
 # Throughliner
 
+![Throughliner](throughliner-icon-badge.png)
+
 A Claude Code plugin that lets you build the project you have in mind — an app, a website, a tool, whatever you're making — without writing code yourself. You describe what you want; Claude builds it — and the plugin keeps the work organised across sessions so nothing drifts or gets lost.
 
 **What makes it different: your intent keeps running the project whatever Claude remembers.** Claude Code now carries some memory of its own between sessions — private notes it keeps lossily, on no schedule you control, and never shows you. The throughline is different in kind: a structured record of *why*, vouched by you, carried alongside the work itself — so any session, including a fresh one, still builds your project the way you meant instead of guessing from your code or from Claude's own unvouched notes.

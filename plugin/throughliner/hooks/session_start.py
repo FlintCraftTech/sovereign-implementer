@@ -771,7 +771,7 @@ def _queue_dependency_facts(queue_path):
     """The queue's dependency shape, or None if unreadable.
 
     Returns (cleared, held, blockers_in_unprocessed, waiting, dead,
-    date_held, date_passed):
+    date_held, date_passed, waiting_to_be_planned):
       cleared  — items in Processed above the cleared-to-run marker; the work
                  /next can pick up right now.
       held     — items in Processed below it; each names a blocker.
@@ -789,6 +789,12 @@ def _queue_dependency_facts(queue_path):
                 — those whose date has arrived. A date is the one holding fact
                   that resolves itself, so this is the whole lift signal for it:
                   nobody confirms anything, and no wake-up capture is needed.
+      waiting_to_be_planned
+                — entries in Unprocessed: captures no planning pass has
+                  weighed yet. The one number that describes a project whose
+                  whole queue is unprocessed, so "0 cleared" no longer reads
+                  as an empty slate ([queue-facts-zero-reads-as-empty]).
+                  Plays no part in /plan's floor derivation.
 
     Why the slugs are emitted and not just the counts. Naming the items is what
     saves the reader the re-derivation: a count says something is waiting, a
@@ -912,7 +918,7 @@ def _queue_dependency_facts(queue_path):
     waiting = [(h, b) for h, b in held_pairs if b in unprocessed_slugs]
     dead = [(h, b) for h, b in held_pairs if b not in known]
     return (cleared, held, blockers_in_unprocessed, waiting, dead,
-            date_held, date_passed)
+            date_held, date_passed, len(unprocessed_slugs))
 
 
 CYCLES_DOC = "CYCLES.md"
@@ -1329,7 +1335,9 @@ def _behaviour_rules_directive(plugin_root):
         f"READ {path} IN FULL NOW, before your first reply and before running any "
         "skill. This is not optional and it is not conditional — there is no "
         "trigger that would later remind you to fetch them, so a session that "
-        "skips this runs ungoverned for its whole life.\n"
+        "skips this runs ungoverned for its whole life. The file may be longer "
+        "than one read returns; the read is complete only when the tool reports "
+        "no further page.\n"
         "SELF-CHECK: the file you open carries `docset: current` in its frontmatter. If "
         "it isn't there or doesn't match, tell the user plainly that the rules "
         "could not be loaded and name what you found instead — do "
@@ -1738,14 +1746,15 @@ def main() -> int:
     dependency_facts = _queue_dependency_facts(queue_path)
     if dependency_facts is not None:
         (cleared, held, blockers_unprocessed, waiting, dead,
-         date_held, date_passed) = dependency_facts
+         date_held, date_passed, to_plan) = dependency_facts
         facts = (
             f"[Throughliner] Queue dependency facts: {cleared} item"
             f"{'' if cleared == 1 else 's'} cleared to run, {held} held below the "
             f"line, {blockers_unprocessed} of those blockers still sitting in "
-            "Unprocessed. Facts, not instructions — /plan derives the session's "
-            "throughput floor from them and says the number out loud; other "
-            "skills can ignore them."
+            f"Unprocessed, {to_plan} capture{'' if to_plan == 1 else 's'} "
+            "waiting to be planned. Facts, not instructions — /plan derives the "
+            "session's throughput floor from the first three and says the "
+            "number out loud; other skills can ignore them."
         )
         # Name the resolved pairs, not just the counts. The graph is already
         # built above; discarding it made every reader rebuild it by hand.

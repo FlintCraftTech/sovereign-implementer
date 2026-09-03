@@ -791,8 +791,11 @@ the *move* is what's skipped.
 
 **Derive N from the dependency facts session_start supplies.**
 The hook emits one line at every session start: how many items are cleared to
-run, how many are held below the line, and how many of those blockers are still
-sitting in Unprocessed. Those are the inputs.
+run, how many are held below the line, how many of those blockers are still
+sitting in Unprocessed, and how many captures are waiting to be planned. The
+first three are the inputs; the fourth is present so an all-unprocessed queue
+reads as work not yet planned rather than as empty, and plays no part in the
+derivation.
 
 ```
 N = (blockers still in Unprocessed) + (1 if nothing is cleared to run)
@@ -963,6 +966,9 @@ without reading the turn to locate it.
 **Write the ask as one fixed formula every time — "Do <the recommendation>?", or
 as near as grammar allows.** A varied ask makes the reader work out what is being
 asked before they can answer it; a constant one is recognised rather than parsed.
+Where the turn delivers alternatives, the ask is still single — the
+asked-singly clause of the inversion rule in skill-nonspecific-rules.md
+governs, including the one fixed lead-in a genuine open choice takes.
 
 **The turn covers ONE decidable part, and the test is whether the user could
 plausibly agree to one part and reject another.** Where they could, that is that
@@ -1002,11 +1008,18 @@ stated, the entry cannot move into Processed.
 
 Naming files alone is not passing. An item that can't pass both limbs gets
 sharpened further in the interview, or skip-to-deferred with its design progress
-written into its prose. Those two are the only routes open to it — **except that
-where a limb cannot be stated because the answer is not yet known, the route is
-doing the research now, in this session, under the resolve-now rule; and
-"research X, then change Y" is named at this check as a research item wearing a
-build's shape, which the check must not pass.**
+written into its prose. Those two are the only routes open to it.
+
+**The general limb, keyed on the rests-on line: an item whose design rests on
+an external fact carrying no date it was last verified fails the check until
+that read is done here, at the decision step, where trying is free.** It
+reaches every kept item — a build as much as a walkthrough step — because an
+unread fact cannot be dated, so an undated rest is the mechanical tell. An
+item whose whole deliverable is such a fact is the read itself: it is done
+now and never queued. A genuinely volatile fact needs no exception: the read
+is performed once here, proving the source reachable and recording what it
+found, so a build-time or drive-time re-read refreshes a known answer rather
+than fetches an unknown one.
 
 **Third limb: where an item repeals or rewords a specific sentence or value, grep
 its distinctive words across the project before writing the Files line.** A
@@ -1097,7 +1110,9 @@ elsewhere — with the date each was last checked.** An assumption written into 
 item reads exactly like a verified one, and goes stale silently; dated on the
 item, a premise that has aged is visible where the work is, rather than only
 when something fails against it. Most kept items grow by about a line, which is
-the cost, paid at every keep.
+the cost, paid at every keep. **A rest without a date is what the buildability
+check's general limb reads**: it means the fact has not been checked, and the
+item does not clear until it is.
 
 **Write them for a reader with less of the project in view than you have, and
 possibly less capability.** The session that builds this did not sit through the
@@ -1135,13 +1150,7 @@ settles on" names a file and a purpose and supplies no decision, which is what
 the limb asks for. **Prose that schedules a design decision into the build fails
 the same way, however carefully phrased** — "to be settled at the start of the
 build rather than during it" reads as care about sequencing and does the
-opposite, because the start of the build is still the build. **A walkthrough
-step whose content depends on an external fact not yet read fails the same
-way — the read happens here, at the decision step, where trying is free.** A
-genuinely volatile fact needs no exception: the decision step still performs
-the read once, proving the source reachable and recording what it found, so a
-drive-time re-read refreshes a known answer rather than fetches an unknown
-one.
+opposite, because the start of the build is still the build.
 
 **The disposal is a split, not a refusal.** The open question becomes its own
 small item and the large one is held against it by slug. Most of such an item is
@@ -1359,7 +1368,9 @@ sharpen it here.
 article — ask once: "do you potentially want to edit the draft?"* On a yes,
 write the item's drafting steps in the co-authored-draft shape (the `.txt`
 handed to the side panel, read back on their word — the walkthrough sub-rule
-in skill-nonspecific-rules.md, which stays canonical there).
+in skill-nonspecific-rules.md, which stays canonical there), and have the
+draft step name where the draft lives: the session scratchpad by default, or
+a project path only where the item's Files line names one.
 
 **Run the THOROUGH capability check here — this is its site.** Restate the
 question as *what would answer this?* **before** searching, then name the tool

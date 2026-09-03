@@ -129,7 +129,9 @@ than rewrite, under a heading that says what it is:
 is recorded by the close when it runs, so say that and file only the captures.
 
 **Nothing is committed here.** The tail rides the next close's commit. Say so when
-reporting, so the user is not left thinking the record is saved.
+reporting, so the user is not left thinking the record is saved. A second
+`/done` typed in a chat that has already closed reaches this same tail rather
+than a second close — done.md's router carries that arm.
 
 **Where a candidate is genuinely both** — work that was done AND revealed more to
 do — write both, each carrying its own half: the tail records what happened, the
@@ -155,6 +157,16 @@ inside a build or a planning run interrupts that work and returns it; the
 hand-back is a return, not a close, and nothing has to be restarted — the skill's
 instructions are still in the conversation.
 
+**Content line for the hand-back turn — three things, in this order:** what was
+filed, named; that running /done — named in words — is what records and commits
+it; and the resumed work's own pending question, put back in bold as the
+message's last line, so the message ends on the ask the user was in the middle
+of. Where nothing was running, the third is absent and the message ends on the
+second.
+
 **Recommend nothing else.** This skill exists partly because close machinery
 accumulating at the end of a chat pulls the whole chat toward ending. A /rescan
 that finishes by suggesting the close would rebuild that pull at a new site.
+Naming the command that commits the captures is a fact about where they go,
+stated the way the close's own Recommend-next turn states its continuations,
+and is not a recommendation.

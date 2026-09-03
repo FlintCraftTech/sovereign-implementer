@@ -35,3 +35,12 @@ announced yet, not that questions aren't welcome: just ask in chat.
 - **Why did my build run stop before finishing the list?** — the cleared-to-run
   line you set at planning, and the `Runs alone` marker that gives risky work a
   run of its own. [faq.md](faq.md)
+- **Can I keep my planning documents out of the repository, and does undo still
+  work?** — the per-document choice setup proposes, the saved copies that keep
+  undo working, and the one thing that changes. [faq.md](faq.md)
+- **What is a ritual, and how is it different from a cycle?** — a step list you
+  fire with a word versus recurring work with a rhythm, and how one becomes the
+  other. [faq.md](faq.md)
+- **What does planning tell me when held work comes back?** — what the lift
+  says about the work's assumptions, and why the wait ending is not the same as
+  the assumption holding. [faq.md](faq.md)

@@ -577,9 +577,14 @@ walkthrough in QUEUE.md**; where an item carries none, halt on it rather than
 inventing steps. Walking one through does **not** end
 the run — it's the last pass of a run whose Claude work is already done.
 
-**Open the item's record, then give the first concrete step and wait.** The
-record comes first: open the item's LOG entry file under its slug when the
-drive starts, and append each action as it happens. **Opening it also gets one
+**Open the item's record, add the item's files to the run's scope, then give the
+first concrete step and wait.** The record comes first: open the item's LOG
+entry file under its slug when the drive starts, and append each action as it
+happens. **Before the first step is driven, append every path on the item's
+Files line to the working file's Files section, and say so in one clause** — a
+`[user]` item never enters the working file, so without this the scope-lock
+refuses the paths the walk-through itself writes, mid-drive, in front of a
+user waiting on a step. **Opening it also gets one
 line in the working file's Run-level section, written then** — the record
 belongs to the run rather than to any build item, and without the line a
 crashed session's working file positively suggests the drive never started. A walk-through

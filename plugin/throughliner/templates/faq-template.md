@@ -125,7 +125,9 @@ built, what's still open — and commits. Until it runs, the work may exist in
 your files but the reasoning behind it isn't on the record anywhere. So finish
 every session with it.
 
-Then start a fresh chat, either with `/clear` or a new conversation. This isn't
+Then start a fresh chat, either with `/clear` or a new conversation. `/clear`
+wipes the conversation on screen and touches none of your project's files —
+which is exactly why it is safe once `/done` has run. This isn't
 tidiness. Every message in a conversation takes up room in Claude's context
 window, and a long session fills it; once it's full, earlier details start
 slipping — instructions get fuzzy, scope drifts, mistakes creep in. A fresh
@@ -295,3 +297,40 @@ folders other work depends on, so it always gets a run of its own. If a run
 stops earlier than you expected, check where your line sits and whether the
 next item carries that marker — both stops are the system honouring what was
 set up, not a fault.
+
+## Can I keep my planning documents out of the repository, and does undo still work?
+
+Yes to both. Setup proposes keeping your spec, your queue and your session
+records out of the repository — they hold your plans, your reasoning and your
+history, which is the most personal material the method produces, and keeping
+them untracked is the only complete protection if the project is ever
+published. You accept that, or choose to track them instead, and the choice is
+per document. What still works: Claude writes to those files first and tells
+you what landed, exactly as before, because before each change the plugin
+saves a copy of the previous version into a local folder that is itself kept
+out of the repository. A deleted queue item can be put back from there. What
+changes: the close cannot read its own work back from the file's history, so
+it records the session from what it remembers, and those saved copies live on
+this machine only — a lost disk loses them.
+
+## What is a ritual, and how is it different from a cycle?
+
+Both live in your cycles doc. A cycle is recurring work with a rhythm — a
+weekly release, a posting cadence — and the method works out when its next
+turn is due and puts that turn into your queue. A ritual is a step list with
+no rhythm: you save a procedure you repeat, give it a firing word, and it runs
+when you say the word and never otherwise. Your session opening names each
+ritual you have with its word. Ask in planning to save a repeated procedure as
+a ritual and it is written down with you there; if it later turns out to have
+a rhythm, it becomes a cycle by gaining a cadence.
+
+## What does planning tell me when held work comes back?
+
+Work waits below the ready line for one of two reasons, another queue item or
+a date, and planning checks each one at its opening. When something lifts, the
+turn offering it says what that work's design was assuming and whether
+anything has confirmed it since — read from the item's own note of the outside
+facts it rests on, or said plainly where it recorded none. A capture that was
+set aside until a date gets the same treatment when the date passes. The
+point: the wait being over says nothing about whether the thing waited for
+turned out as assumed, and this is the one moment anyone looks.

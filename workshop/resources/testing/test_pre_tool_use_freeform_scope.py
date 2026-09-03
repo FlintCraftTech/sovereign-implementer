@@ -120,6 +120,28 @@ def main():
         repr(drive_edit(d2, scope_path)),
     )
 
+    # 5. The user's door ([post-close-lock-blocks-user-work]): a scope file
+    # with a Files: list and NO queue item behind it extends the list — the
+    # hook reads the file and consults no queue. The project here has no
+    # QUEUE.md at all, which is the strongest form of "no queue item".
+    d3 = make_project(scope_files=["CLAUDE.md"])
+    assert not os.path.exists(os.path.join(d3, "QUEUE.md"))
+    check(
+        "scope file with no queue item still extends the list (the user's door)",
+        decision(drive_edit(d3, os.path.join(d3, "CLAUDE.md"))) == "allow",
+        repr(drive_edit(d3, os.path.join(d3, "CLAUDE.md"))),
+    )
+
+    # 5b. The no-build denial names the door.
+    d4 = make_project(scope_files=None)
+    denied = drive_edit(d4, os.path.join(d4, "CLAUDE.md"))
+    check(
+        "the no-build denial message names the scope-file door",
+        decision(denied) == "deny"
+        and "_freeform-<session-id>.md" in denied.get("permissionDecisionReason", ""),
+        repr(denied),
+    )
+
     if _failures:
         print(f"\n{len(_failures)} FAILURE(S)")
         return 1
