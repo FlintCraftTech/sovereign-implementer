@@ -394,15 +394,10 @@ built (every Claude-work item ticked, any `[user]` item walked through):
 2. say what remains — nothing recorded yet, and done work can be tightened
    before closing
 3. end on a statement, naming any command in words and keeping it clear of
-   the sentence's end — a completion message that ends on a command string,
-   at the end of a long finished piece of work, gets acted on as an
-   instruction. The user reaches for the close themselves.
+   the sentence's end. The user reaches for the close themselves.
 ```
 
-**The completion message carries those two things and stops there** — the LOG
-entries /done writes are the single session record, and recording happens only
-at the close, which is why nothing further is recommended here, another build
-included.
+**The completion message carries those two things and stops there.**
 
 Tightening means refining done work; anything new routes through the existing
 paths.

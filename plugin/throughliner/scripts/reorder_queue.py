@@ -395,6 +395,35 @@ def write_verified(queue_path, new_lines, absent=(), present=()):
                 % (slug, section))
 
 
+STAMP_RE = re.compile(r"^Filed \d{4}-\d{2}-\d{2} \d{2}:\d{2}, stamped by the "
+                      r"(capture|queue) tool\.\s*$")
+# The lines a capture may end on after its prose: the parsed fields. A stamp
+# goes before the first of them, so it stays the last prose line.
+FIELD_LINE_RE = re.compile(
+    r"^(Blocked by|Not before|Cycle|Red flag|Runs alone)\b")
+
+
+def stamp_filed_at(body_lines):
+    """Add a filed-at stamp, read from the clock, where the body carries none.
+
+    The capture tool stamps every capture it files; this route — the one the
+    always-loaded rules name — stamped nothing, so a planning session filing
+    thirty captures through it wrote every time by hand, counted up from the
+    opening. A body already carrying either tool's stamp is returned as it is.
+    """
+    if any(STAMP_RE.match(l.strip()) for l in body_lines):
+        return body_lines
+    import datetime
+    eol = '\r\n' if body_lines and body_lines[0].endswith('\r\n') else '\n'
+    stamp = "Filed %s, stamped by the queue tool.%s" % (
+        datetime.datetime.now().strftime("%Y-%m-%d %H:%M"), eol)
+    insert_at = len(body_lines)
+    # Walk back over trailing field lines so the stamp lands before them.
+    while insert_at > 1 and FIELD_LINE_RE.match(body_lines[insert_at - 1].strip()):
+        insert_at -= 1
+    return body_lines[:insert_at] + [stamp] + body_lines[insert_at:]
+
+
 def append_item(queue_path, section, body_path):
     """Append one new entry at the bottom of a named section.
 
@@ -469,6 +498,8 @@ def append_item(queue_path, section, body_path):
 
     if not body_lines[-1].endswith('\n'):
         body_lines[-1] += '\n'
+    if section == 'Unprocessed':
+        body_lines = stamp_filed_at(body_lines)
     new_blocks = blocks + [(new_slug, body_lines)]
 
     # The marker keeps its anchor, so an append to Processed lands BELOW the

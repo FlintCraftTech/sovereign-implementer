@@ -96,6 +96,43 @@ def run(root):
     return items, digest.render(items, root, os.path.join(root, "QUEUE.md"))
 
 
+# --- a migration-written build block is surfaced until planning checks it -----
+
+def test_migration_written_block_on_a_cleared_item_is_reported():
+    """A block the format migration wrote under an existing item carries a line
+    saying so; a cleared item still carrying it never passed the buildability
+    check ([migration-marks-unvetted-build-blocks]). Reported as a placement
+    contradiction; a held item or a capture carrying the same line is not."""
+    marked = (
+        "#### Migrated item [migrated]\nRationale.\n" + BLOCK +
+        "Build block written by the format migration on 2026-09-01, not yet "
+        "checked at planning\n"
+    )
+    plain = "#### Checked item [checked]\nRationale.\n" + BLOCK
+    held = (
+        "#### Held migrated item [heldm]\nRationale.\n" + BLOCK +
+        "Build block written by the format migration on 2026-09-01, not yet "
+        "checked at planning\nBlocked by: [checked]\n"
+    )
+    root = project(processed=marked + plain, unprocessed="")
+    # Move the held one below the marker by rewriting the file.
+    path = os.path.join(root, "QUEUE.md")
+    with open(path, "r", encoding="utf-8") as f:
+        text = f.read()
+    text = text.replace(MARKER + "\n", MARKER + "\n\n" + held)
+    with open(path, "w", encoding="utf-8") as f:
+        f.write(text)
+    _, out = run(root)
+    shutil.rmtree(root, ignore_errors=True)
+    check("the cleared migrated item is reported",
+          "[migrated] is cleared but its build block was written by a migration "
+          "and never checked" in out, out)
+    check("the checked item is not reported",
+          "[checked] is cleared but" not in out, out)
+    check("the held migrated item is not reported",
+          "[heldm] is cleared but" not in out, out)
+
+
 # --- the readiness marker is a line, never a substring ------------------------
 
 def test_marker_text_in_prose_does_not_move_the_line():
@@ -1007,6 +1044,7 @@ def test_unreadable_not_before_says_so():
 
 if __name__ == "__main__":
     print("test_queue_digest.py")
+    test_migration_written_block_on_a_cleared_item_is_reported()
     test_marker_text_in_prose_does_not_move_the_line()
     test_line_count_and_median_print()
     test_median_absent_on_an_empty_section()

@@ -80,12 +80,40 @@ LEGACY_FORMAT_EPOCH_FILE = ".si-format-epoch"
 LEGACY_VERSION_FILE = ".si-version"
 VERSION_FILE = ".throughliner-version"
 
-# A placeholder counts only in hash position: an entry heading line
-# ("## [HASH] — title") or the start of an index line ("- [HASH] — text").
-# Body prose may mention the token literally and must never match — the
-# pattern anchors on line shape, not on today's file layout, so the LOG
-# structure can change without reworking this.
-_HASH_POSITION = re.compile(r"^(?P<prefix>#{1,6}\s+|-\s+)\[HASH\](?P<sep>\s+[—–-]\s+)")
+# A placeholder counts only in hash position: the token before the first
+# " — " on an entry heading line ("## <hash> — title") or at the start of an
+# index line ("- <hash> — text"). The SLOT is matched, not the word: any token
+# there that is not a 7-to-40-character hex string is a placeholder, so
+# `[COMMIT_HASH]` and `PENDING` are read exactly as `[HASH]` is. Eight
+# `[COMMIT_HASH]` tokens once sat unfilled for twelve days because the word was
+# matched instead. Body prose may mention any token literally and must never
+# match — the pattern anchors on line shape, and a "- " line counts as an
+# index line only inside an index file, since a record's own bullets take the
+# same shape.
+_HASH_SLOT = re.compile(r"^(?P<prefix>#{1,6}\s+|-\s+)(?P<token>\S+)(?P<sep>\s+[—–-]\s+)")
+_HEX_HASH = re.compile(r"^[0-9a-f]{7,40}$")
+
+
+def _placeholder_in_slot(line, is_index_file, is_legacy_log=False):
+    """The slot match where `line` carries a placeholder in hash position,
+    else None. A record's title heading counts in any LOG file; a "- " line
+    only in an index file. A real hash in the slot is not a placeholder."""
+    match = _HASH_SLOT.match(line)
+    if not match:
+        return None
+    prefix = match.group("prefix")
+    if prefix.startswith("-") and not is_index_file:
+        return None
+    # A record's title is its level-1 heading; the legacy combined logs
+    # (log.md, log-v*.md) title each entry at level 2. Deeper headings are a
+    # record's own sections ("## Result — …") and never carry a hash.
+    if prefix.startswith("#"):
+        level = len(prefix.strip())
+        if level > 2 or (level == 2 and not is_legacy_log):
+            return None
+    if _HEX_HASH.match(match.group("token")):
+        return None
+    return match
 
 # A placeholder written OUTSIDE hash position can never resolve, and until this
 # check existed nothing could see it: the backfill skips the line, so the entry
@@ -94,23 +122,25 @@ _HASH_POSITION = re.compile(r"^(?P<prefix>#{1,6}\s+|-\s+)\[HASH\](?P<sep>\s+[—
 # will ever fill.
 #
 # Deliberately narrow, matching only the two shapes that are unambiguously a
-# MISPLACED hash rather than writing about one:
+# MISPLACED hash rather than writing about one — with the token read as a
+# placeholder SHAPE (a bracketed word, or a bare all-caps word such as PENDING)
+# rather than the literal word `[HASH]`:
 #     **Commit:** [HASH]        a field whose value is the token
-#     [HASH]                    the token alone on its line
+#     [COMMIT_HASH]             the token alone on its line
 #
 # Prose that discusses the token is correct writing and must never match —
 # several entries do it, including the one about hash placeholders. Any
 # backticked occurrence is prose by definition and is excluded before these
 # patterns are tried. Getting this wrong in the other direction would build the
 # cry-wolf failure this check was written to replace.
-_HASH_AS_FIELD_VALUE = re.compile(r"^\*{0,2}[A-Za-z][A-Za-z ]{0,29}:\*{0,2}\s*\[HASH\]\s*$")
-_HASH_ALONE = re.compile(r"^\s*\[HASH\]\s*$")
+_PLACEHOLDER_TOKEN = r"(?:\[[A-Za-z_ -]+\]|[A-Z][A-Z_]{2,})"
+_HASH_AS_FIELD_VALUE = re.compile(
+    r"^\*{0,2}[A-Za-z][A-Za-z ]{0,29}:\*{0,2}\s*" + _PLACEHOLDER_TOKEN + r"\s*$")
+_HASH_ALONE = re.compile(r"^\s*" + _PLACEHOLDER_TOKEN + r"\s*$")
 
 
 def _hash_is_misplaced(line):
     """True where this line carries a placeholder that can never resolve."""
-    if "[HASH]" not in line:
-        return False
     if "`" in line:
         return False
     return bool(_HASH_AS_FIELD_VALUE.match(line) or _HASH_ALONE.match(line))
@@ -211,7 +241,8 @@ def backfill_log_hashes(cwd):
                     content = f.read()
             except (OSError, UnicodeDecodeError):
                 continue
-            if any(_HASH_POSITION.match(line)
+            if any(_placeholder_in_slot(line, name.startswith("index"),
+                                        name.startswith("log"))
                    for line in content.splitlines()):
                 stranded.append(name)
         if not stranded:
@@ -249,8 +280,10 @@ def backfill_log_hashes(cwd):
         changed = False
         file_flagged = False
         misplaced_flagged = False
+        is_index_file = name.startswith("index")
+        is_legacy_log = name.startswith("log")
         for i, line in enumerate(lines):
-            match = _HASH_POSITION.match(line)
+            match = _placeholder_in_slot(line, is_index_file, is_legacy_log)
             if not match:
                 if (
                     not misplaced_flagged
@@ -269,7 +302,8 @@ def backfill_log_hashes(cwd):
                 # own entry (not committed yet). But if this entry file is
                 # already committed, it should have resolved — flag it.
                 if not file_flagged and _file_is_committed(cwd, relpath):
-                    unresolved_committed.append(name)
+                    unresolved_committed.append(
+                        "%s (%s)" % (name, match.group("token")))
                     file_flagged = True
                 continue
             lines[i] = (
@@ -541,8 +575,10 @@ def _is_hash_backfill_diff(cwd, relpath):
             added.append(line[1:])
     if not removed or len(removed) != len(added):
         return False
+    base = os.path.basename(relpath)
     for old, new in zip(removed, added):
-        was = _HASH_POSITION.match(old)
+        was = _placeholder_in_slot(old, base.startswith("index"),
+                                   base.startswith("log"))
         now = _HASH_FILLED.match(new)
         if not was or not now:
             return False
@@ -930,6 +966,24 @@ CYCLE_CADENCE_RE = re.compile(r"^\s*\*{0,2}Cadence\s*:\*{0,2}\s*(.+?)\s*$",
 # A ritual's field: the word that fires it, standing where a cadence would be.
 CYCLE_TRIGGER_RE = re.compile(r"^\s*\*{0,2}Trigger\s*:\*{0,2}\s*(.+?)\s*$",
                               re.IGNORECASE)
+# A chained cycle's two extra fields. Anchor names a weekday (and a time of
+# day, which is read for the user and not computed on); Chain is a numbered
+# list whose items each name a ritual by [slug] and a lead in days before the
+# anchor, or say they are the anchor itself.
+CYCLE_ANCHOR_RE = re.compile(r"^\s*\*{0,2}Anchor\s*:\*{0,2}\s*(.+?)\s*$",
+                             re.IGNORECASE)
+CYCLE_CHAIN_RE = re.compile(r"^\s*\*{0,2}Chain\s*:\*{0,2}\s*(.*?)\s*$",
+                            re.IGNORECASE)
+CHAIN_ITEM_SPLIT_RE = re.compile(r"(?:^|\s)\d+\.\s+")
+CHAIN_SLUG_RE = re.compile(r"\[([a-z0-9][a-z0-9-]*)\]")
+CHAIN_LEAD_RE = re.compile(
+    r"\b(\d+|one|two|three|four|five|six|seven|eight|nine|ten)\s+days?\s+"
+    r"before\s+the\s+anchor", re.IGNORECASE)
+CHAIN_IS_ANCHOR_RE = re.compile(r"\bthe\s+anchor\b(?!\s*\))", re.IGNORECASE)
+WEEKDAYS = ["monday", "tuesday", "wednesday", "thursday", "friday",
+            "saturday", "sunday"]
+NUMBER_WORDS = {"one": 1, "two": 2, "three": 3, "four": 4, "five": 5,
+                "six": 6, "seven": 7, "eight": 8, "nine": 9, "ten": 10}
 ISO_DATE_IN_TEXT_RE = re.compile(r"\d{4}-\d{2}-\d{2}")
 # What ends a wrapped Cadence: or Observable: — the next labelled field, a list
 # item, or a blank line (checked separately). Deliberately broad on the label:
@@ -981,11 +1035,33 @@ def _parse_cycles_doc(cwd):
                        "description": heading.group(1).strip(),
                        "cadence": None,
                        "observable": None,
-                       "trigger": None}
+                       "trigger": None,
+                       "anchor": None,
+                       "chain": None}
             cycles.append(current)
             pending = None
             continue
         if current is None:
+            continue
+
+        # The chain is a numbered list rather than a sentence, so it absorbs
+        # its list items (which would otherwise end a pending field) until the
+        # first blank line.
+        if pending == "chain":
+            if not line.strip():
+                pending = None
+                continue
+            current["chain"] = "%s %s" % (current["chain"], line.strip())
+            continue
+        chain = CYCLE_CHAIN_RE.match(line)
+        if chain and current["chain"] is None:
+            current["chain"] = chain.group(1)
+            pending = "chain"
+            continue
+        anchor = CYCLE_ANCHOR_RE.match(line)
+        if anchor and current["anchor"] is None:
+            current["anchor"] = anchor.group(1)
+            pending = "anchor"
             continue
 
         observable = CYCLE_OBSERVABLE_RE.match(line)
@@ -1048,6 +1124,92 @@ def cycles_facts(cwd):
         out.append((entry["slug"], entry["description"], entry["cadence"],
                     observable, max(dates) if dates else None))
     return out
+
+
+def _parse_chain(text):
+    """The rituals a Chain: field names, each with its lead in days.
+
+    Returns a list of (ritual_slug, lead_days_or_None). An item naming no
+    ritual (a step that is the ordinary /plan and /next) is skipped; an item
+    naming a ritual but no lead travels with None, so the report can say the
+    lead is not stated rather than guessing one.
+    """
+    out = []
+    for item in CHAIN_ITEM_SPLIT_RE.split(text or ""):
+        slug = CHAIN_SLUG_RE.search(item)
+        if not slug:
+            continue
+        lead = CHAIN_LEAD_RE.search(item)
+        if lead:
+            word = lead.group(1).lower()
+            days = int(word) if word.isdigit() else NUMBER_WORDS[word]
+        elif CHAIN_IS_ANCHOR_RE.search(item):
+            days = 0
+        else:
+            days = None
+        out.append((slug.group(1), days))
+    return out
+
+
+def _anchor_weekday(text):
+    """The weekday index (Monday = 0) an Anchor: field names, or None."""
+    lowered = (text or "").lower()
+    for index, name in enumerate(WEEKDAYS):
+        if name in lowered:
+            return index
+    return None
+
+
+def cycle_chains(cwd, today=None):
+    """Each chained cycle's next anchor date and the due date of every ritual
+    in its chain, computed from the calendar.
+
+    Returns None where the project has no cycles doc, otherwise a list of
+    dicts: slug, anchor (the field as written), anchor_date (an ISO date, the
+    next occurrence of the anchor's weekday on or after today), and rituals —
+    a list of (ritual_slug, due_date_or_None). A cycle with no Chain: field is
+    not listed. Dates only, never a verdict: whether a ritual whose date has
+    arrived still needs running is read from the record by the skill.
+    """
+    entries = _parse_cycles_doc(cwd)
+    if entries is None:
+        return None
+    if today is None:
+        today = datetime.date.today()
+    out = []
+    for entry in entries:
+        if _is_ritual(entry) or not entry["chain"]:
+            continue
+        weekday = _anchor_weekday(entry["anchor"])
+        anchor_date = None
+        if weekday is not None:
+            anchor_date = today + datetime.timedelta(
+                days=(weekday - today.weekday()) % 7)
+        rituals = []
+        for ritual_slug, lead in _parse_chain(entry["chain"]):
+            due = None
+            if anchor_date is not None and lead is not None:
+                due = (anchor_date - datetime.timedelta(days=lead)).isoformat()
+            rituals.append((ritual_slug, due))
+        out.append({"slug": entry["slug"],
+                    "anchor": entry["anchor"],
+                    "anchor_date": anchor_date.isoformat() if anchor_date else None,
+                    "rituals": rituals})
+    return out
+
+
+def rituals_due_on(cwd, today=None):
+    """The (cycle_slug, ritual_slug) pairs whose computed due date is today.
+
+    A date fact from cycle_chains(); the skill still reads the record for a
+    completed turn since the previous anchor before filing anything.
+    """
+    if today is None:
+        today = datetime.date.today()
+    chains = cycle_chains(cwd, today) or []
+    iso = today.isoformat()
+    return [(chain["slug"], ritual) for chain in chains
+            for ritual, due in chain["rituals"] if due == iso]
 
 
 def rituals_facts(cwd):
@@ -1812,6 +1974,18 @@ def main() -> int:
                 else:
                     part += "; no observable line"
                 described.append(part)
+            # A chained cycle also reports its next anchor date and each
+            # ritual's computed due date — dates, never a verdict on whether
+            # the ritual still needs running.
+            for chain in cycle_chains(cwd) or []:
+                rituals = ", ".join(
+                    "[%s] due %s" % (ritual, due or "no lead stated")
+                    for ritual, due in chain["rituals"])
+                described.append(
+                    "[%s] chain — anchor %s, next %s; rituals: %s"
+                    % (chain["slug"], chain["anchor"] or "not stated",
+                       chain["anchor_date"] or "weekday not read",
+                       rituals or "none named"))
             context_parts.append(
                 "[Throughliner] Cycles on file (%d): %s. Facts, not verdicts — "
                 "the hook reports what each definition says and what its "

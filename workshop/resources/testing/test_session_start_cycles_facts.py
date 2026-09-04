@@ -192,8 +192,72 @@ def test_a_doc_with_no_definitions_reports_empty():
           facts == [], repr(facts))
 
 
+CHAINED = """# CYCLES
+
+## Weekly release [weekly-release]
+
+**Cadence:** weekly on Wednesday, declared by the user.
+
+**Anchor:** Wednesday morning. Every lead below counts back from it.
+
+**Chain:** the rituals of one turn, in order, each with its lead:
+1. **Maintenance sweep [maintenance-sweep]** — due by the first session on or
+   after Monday (two days before the anchor). Its findings land in Unprocessed.
+2. **Findings processed and built** — by Tuesday's sessions. No ritual of its
+   own.
+3. **Rezip [rezip]** — the build that carries the subtraction.
+4. **Release [release]** — the anchor. Refuses while step 2 is incomplete.
+
+**Observable:** the published date of the latest GitHub release.
+
+## Rezip [rezip]
+Trigger: the word "rezip".
+
+## Release [release]
+Trigger: the word "release".
+"""
+
+
+def test_a_chain_is_computed_for_each_weekday():
+    """The live chain: sweep Monday, release Wednesday, nothing any other day.
+
+    Dates only — the hook never says whether a ritual whose date arrived still
+    needs running; the skill reads the record for that.
+    """
+    import datetime
+    d = project(CHAINED)
+    chains = hook.cycle_chains(d, datetime.date(2026, 9, 3))  # a Thursday
+    check("one chained cycle is read", chains is not None and len(chains) == 1,
+          repr(chains))
+    if chains:
+        chain = chains[0]
+        check("the anchor's next date is the coming Wednesday",
+              chain["anchor_date"] == "2026-09-09", repr(chain))
+        rituals = dict(chain["rituals"])
+        check("the sweep is due two days before the anchor",
+              rituals.get("maintenance-sweep") == "2026-09-07", repr(rituals))
+        check("the release is due on the anchor",
+              rituals.get("release") == "2026-09-09", repr(rituals))
+        check("a ritual with no lead reports none rather than a guess",
+              "rezip" in rituals and rituals["rezip"] is None, repr(rituals))
+        check("the step naming no ritual is not listed",
+              len(chain["rituals"]) == 3, repr(chain["rituals"]))
+    expected = {0: ["maintenance-sweep"], 1: [], 2: ["release"], 3: [], 4: [],
+                5: [], 6: []}
+    monday = datetime.date(2026, 9, 7)
+    for offset in range(7):
+        day = monday + datetime.timedelta(days=offset)
+        due = [ritual for _cycle, ritual in hook.rituals_due_on(d, day)]
+        check("due on %s: %s" % (day.strftime("%A"), expected[offset] or "nothing"),
+              due == expected[offset], repr(due))
+    plain = hook.cycle_chains(project(DEMO), datetime.date(2026, 9, 3))
+    check("a cycle with no chain is not listed", plain == [], repr(plain))
+    shutil.rmtree(d, ignore_errors=True)
+
+
 if __name__ == "__main__":
     print("test_session_start_cycles_facts.py")
+    test_a_chain_is_computed_for_each_weekday()
     test_a_doc_produces_a_definition_per_cycle()
     test_a_wrapped_field_reads_whole()
     test_a_blank_line_ends_a_field()

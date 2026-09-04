@@ -114,8 +114,9 @@ them at the **end** of the block so the stops that need the user batch together.
 
 **Two exceptions, and the default holds everywhere else:**
 
-- leave the line where it stands where a build item genuinely depends on its
-  outcome — a real dependency wins;
+- leave a `[user]` item that names, by slug, the builds depending on it ahead of
+  those builds — a build run walks it before building them, and every other
+  build first;
 - leave an `[audit]` that reads a tool item's output sitting immediately after
   that item.
 

@@ -649,6 +649,19 @@ def contradictions(items, root=""):
             # judgment the decision step makes, not something a delimiter test
             # can answer.
 
+            # A build block the format migration wrote under an existing item
+            # carries a line saying it was never checked at planning; a cleared
+            # item still carrying it has never passed the buildability check.
+            if item["cleared"] and any(
+                    "written by the format migration" in p
+                    and "not yet checked at planning" in p
+                    for p in item["prose"]):
+                found.append(
+                    f"[{slug}] is cleared but its build block was written by a "
+                    "migration and never checked — re-run the buildability "
+                    "check before a run builds it"
+                )
+
             files_line = item["files_line"]
             if files_line is not None:
                 for phrase in NO_FILES_PHRASES:
@@ -1108,26 +1121,9 @@ def whats_next(items, root, queue_path, skip=(), picked=0, today=None):
 
     Returns (rung number, rung name, item) or (None, why not, None).
     """
-    import datetime
     ages = first_seen(root, queue_path)
-    today = today or datetime.date.today().isoformat()
     cycle_slugs = _cycle_definition_slugs(root)
-
-    pool = []
-    for item in items:
-        if item["section"] != "Unprocessed":
-            continue
-        if item["slug"] and item["slug"] in skip:
-            continue
-        # A capture bows out while a date holds it or a named entry is open —
-        # both mean "do not OFFER this again", which is what a pick does.
-        if item["not_before"] and item["not_before"] > today:
-            continue
-        if any(_entry_open(items, ref) for ref in item["blocked_by"]):
-            continue
-        if item["cycle"] and item["cycle"] in cycle_slugs:
-            continue
-        pool.append(item)
+    pool = offerable(items, root, skip=skip, today=today)
 
     if not pool:
         return None, "nothing in Unprocessed is offerable right now", None
@@ -1179,6 +1175,38 @@ def whats_next(items, root, queue_path, skip=(), picked=0, today=None):
         if long_ones:
             return 5, "alternating — this pick must be a long entry", long_ones[0]
     return 5, "alternating — oldest first", by_age[0]
+
+
+def offerable(items, root, skip=(), today=None):
+    """The Unprocessed entries a pick may offer right now — the pass-overs
+    applied in one place.
+
+    A capture bows out while a date holds it, while a named blocker is still an
+    open entry, or while a live cycle definition claims it as material; a slug
+    the session set aside is passed over too. This is the one implementation
+    of the pass-over: `whats_next` picks from it, and the checkpoint-counts
+    tool counts it, so the two can never disagree about what is presentable.
+    """
+    import datetime
+    today = today or datetime.date.today().isoformat()
+    cycle_slugs = _cycle_definition_slugs(root)
+
+    pool = []
+    for item in items:
+        if item["section"] != "Unprocessed":
+            continue
+        if item["slug"] and item["slug"] in skip:
+            continue
+        # A capture bows out while a date holds it or a named entry is open —
+        # both mean "do not OFFER this again", which is what a pick does.
+        if item["not_before"] and item["not_before"] > today:
+            continue
+        if any(_entry_open(items, ref) for ref in item["blocked_by"]):
+            continue
+        if item["cycle"] and item["cycle"] in cycle_slugs:
+            continue
+        pool.append(item)
+    return pool
 
 
 def _entry_open(items, slug):

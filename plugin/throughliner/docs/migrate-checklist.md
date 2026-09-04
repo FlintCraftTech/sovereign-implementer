@@ -164,6 +164,16 @@ decision history is a judgment, which is the whole reason the split is authored
 at the decision step rather than computed by a script. A migration doing it silently
 would make exactly the call the design reserves for a moment the user is present.
 
+**Any block a migration does write under an existing item carries one more
+line beneath it:** `Build block written by the format migration on YYYY-MM-DD,
+not yet checked at planning`, the date read from the clock. The queue digest
+lists a cleared item still carrying that line among its placement
+contradictions, and the decision step removes the line once the buildability
+check has run on the item. A block written without the line is
+indistinguishable from one the decision step checked — which is how one project
+found six unbuildable items in a cleared region of seventeen, item by item, at
+build time.
+
 **Record a refusal where one was made.** A recorded "X was rejected because Y"
 belongs in the item, because a build that cannot see why an option was rejected
 proposes it again and stops to ask.

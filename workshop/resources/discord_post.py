@@ -356,6 +356,37 @@ def permissions(token):
     return out
 
 
+CHANNEL_TYPES = {0: "text", 2: "voice", 4: "category", 5: "announcement",
+                 13: "stage", 15: "forum", 16: "media"}
+
+
+def channels(token):
+    """Every channel in every guild, with its type, marking the ones that carry
+    no permission overwrites of their own.
+
+    A pure read. It exists because `permissions` lists only channels carrying
+    overwrites — a channel created on the defaults inherits its roles'
+    permissions and is absent from that listing — so a guide checked against
+    `permissions` alone could miss a channel entirely. This is the complete
+    list, and the announced-claims sweep checks the orientation post against it.
+    """
+    out = []
+    for guild in request(token, "GET", "/users/@me/guilds") or []:
+        rows = []
+        for channel in request(
+                token, "GET", "/guilds/%s/channels" % guild["id"]) or []:
+            rows.append({
+                "name": channel.get("name", channel["id"]),
+                "id": channel["id"],
+                "type": CHANNEL_TYPES.get(channel.get("type"),
+                                          "type %s" % channel.get("type")),
+                "no_overwrites": not channel.get("permission_overwrites"),
+            })
+        rows.sort(key=lambda r: (r["type"] == "category", r["name"]))
+        out.append({"guild": guild.get("name", guild["id"]), "channels": rows})
+    return out
+
+
 def threads(token):
     """Every open forum topic the bot can see, grouped by its parent forum.
 
@@ -878,6 +909,12 @@ def main(argv=None):
         "threads",
         help="read-only: every open forum topic, with its id, grouped by forum")
 
+    sub.add_parser(
+        "channels",
+        help="read-only: every channel with its type and id, marking the ones "
+             "that carry no permission overwrites of their own — the complete "
+             "list, where `permissions` shows only channels with overwrites.")
+
     args = parser.parse_args(argv)
 
     try:
@@ -979,6 +1016,16 @@ def main(argv=None):
             if found:
                 print("%d item(s) since %s." % (len(found), args.since))
 
+        elif args.command == "channels":
+            for guild in channels(token):
+                print("=== %s === (%d channels)"
+                      % (guild["guild"], len(guild["channels"])))
+                for row in guild["channels"]:
+                    print("  #%s — %s — id %s%s"
+                          % (row["name"], row["type"], row["id"],
+                             "  [no overwrites of its own]"
+                             if row["no_overwrites"] else ""))
+            return 0
         elif args.command == "permissions":
             for guild in permissions(token):
                 print("=== %s ===" % guild["guild"])

@@ -70,6 +70,7 @@ early turns the signal off while the problem stands.
 - `--- Plan session here: ` — a positional queue marker, retired with the old readiness model
 - `Blocks:` — a queue field, retired in favour of `Blocked by:` on the held item
 - `Depends on:` — a queue field, retired in favour of `Blocked by:` on the held item
+- `Rezip entry:` — the close's required line with its three arms (ready / not yet / none), retired 2026-09-04; the test-rezips entry posts at the Rezip ritual's steps 11 to 15, and the close keeps one arm for an archived entry never posted
 - `session-break line` — a manual run bound, retired 2026-08-11; the readiness line is the run bound
 - `Wind-down re-scan (/plan's)` — /plan's own full re-scan, retired 2026-08-12; done.md's file-only version runs at every close whatever the session type
 - `Step 3: Close out` — /plan's close-out phase, retired 2026-08-12; /done is the only close, and the work-cycle block at plan.md's opening is what now names it

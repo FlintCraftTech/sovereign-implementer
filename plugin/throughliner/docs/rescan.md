@@ -77,12 +77,12 @@ of re-reading it is re-reading, not duplicate items.
 
 **Run the memory-limit machinery as done.md's wind-down re-scan states it —
 that section is the canonical copy, and this skill applies it at this scan's
-own depth.** It carries the artifact cross-check with its two-count example,
-the asymmetry that makes the check warn and never give an all-clear, the
-fixed limit sentence with its say-it-as-written rule, the no-proxy rule, and
-the files-disagree wording. Read them there and apply them here — the one
-difference is depth: this scan reaches back to the stopping point above,
-which on a first run is the whole conversation.
+own depth.** It carries the runs-in-view check — which runs the files prove
+happened, read against the runs still visible in the conversation — the one
+sentence that reports what the check found, the asymmetry that keeps that
+sentence from ever adding an all-clear, and the no-proxy rule. Read them there
+and apply them here — the one difference is depth: this scan reaches back to
+the stopping point above, which on a first run is the whole conversation.
 
 ## Step 2: File what you find  [BRIEF]
 

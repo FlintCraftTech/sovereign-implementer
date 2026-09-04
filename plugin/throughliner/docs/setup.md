@@ -224,6 +224,14 @@ no marker file
 **Read the epoch from the marker rather than inferring it from the documents** —
 inferring guesses about files users legitimately hand-edit.
 
+**Where a conversion writes a build block — or any instruction text — under an
+existing queue item, it writes one more line beneath it:**
+`Build block written by the format migration on YYYY-MM-DD, not yet checked at planning`,
+the date read from the clock. A migration runs hands-off, and the buildability check
+needs the user present; the line is what lets the queue digest surface a
+cleared item nobody has checked, and the decision step removes it once the
+check is run.
+
 Showing each conversion before writing it is the general write-first test
 applied, not an exception to it: a project being adopted or migrated may not be
 a committed git repo, so its old documents may not be recoverable once
@@ -277,10 +285,7 @@ wrap   (has a remote) ->  create the outer folder one level up, with its own
                          and are now absent
 ```
 
-Both arms then write the Visibility line the nested scaffold writes. The wrap
-rewrites no history: nothing private was ever committed to the inner, and
-everything public — the remote, releases, anyone's pins — keeps pointing at the
-same repository.
+Both arms then write the Visibility line the nested scaffold writes.
 
 **2. Retire REGISTRY.md if present**  [SILENT] when it holds only what the old
 setup put there; [BRIEF, PROMPT] when the user has written into it. No longer
@@ -613,12 +618,11 @@ reads:**
 
 ```
 NESTED project   ->  propose TRACKED-IN-THE-OUTER: the documents are tracked
-                     in the outer repository, which never gets a remote, so
-                     they are private by architecture and undo, history and
-                     the close's read-back all work from ordinary git. The
-                     per-document `.gitignore` remains available for the one
-                     honest case — a document the user wants out of even the
-                     local history — with the same costs stated below.
+                     in the outer repository, the shape stated under "Git
+                     repositories — the nested shape" above. The per-document
+                     `.gitignore` remains available for a document the user
+                     wants out of even the local history, with the same costs
+                     stated below.
 FLAT project     ->  propose PRIVATE-via-gitignore, as follows.
 ```
 

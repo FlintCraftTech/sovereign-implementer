@@ -39,6 +39,7 @@ import io
 import json
 import os
 import re
+import subprocess
 import sys
 import tempfile
 
@@ -60,7 +61,7 @@ for _stream in (sys.stderr, sys.stdout, sys.stdin):
 
 PROTOCOL_VERSION = "2024-11-05"
 SERVER_NAME = "throughliner-state"
-SERVER_VERSION = "0.3.0"
+SERVER_VERSION = "0.4.0"
 
 # This file sits at <plugin-root>/mcp/server.py, so the plugin root is its
 # grandparent. Derived rather than hardcoded, per the working conventions.
@@ -130,12 +131,19 @@ def tool_queue_checkpoint_counts(_arguments):
     ready = [i for i in processed if i["cleared"]]
     held = [i for i in processed if not i["cleared"]]
     unprocessed = [i for i in items if i["section"] == "Unprocessed"]
+    # The presentable count comes from the digest's own pass-over code — the
+    # same function `--next` picks from — so the checkpoint number and the
+    # pick can never disagree. Raw and presentable both have a reader: the
+    # opening's "captures waiting" line reads the raw count.
+    presentable = digest.offerable(items, root)
 
     return "\n".join([
         "Ready to build (Processed, above the cleared-to-run line): %d"
         % len(ready),
         "Held below the line: %d" % len(held),
-        "Left to process (Unprocessed): %d" % len(unprocessed),
+        "captures waiting: %d (raw) · left to process: %d (presentable — "
+        "minus those dated out, owned by a cycle, or held behind an open "
+        "blocker)" % (len(unprocessed), len(presentable)),
         "",
         "Counts only. What to do with them is planning work.",
     ])
@@ -192,6 +200,19 @@ def tool_cycles_state(_arguments):
         lines.append("  observable: %s" % (observable or "(none stated)"))
         if last_date:
             lines.append("  latest date in that observable: %s" % last_date)
+        lines.append("")
+
+    # A chained cycle: its next anchor date and each ritual's computed due
+    # date, from the hook's own calendar arithmetic. Dates, not verdicts —
+    # whether a ritual whose date has arrived still needs running is read from
+    # the record by the skill.
+    chains = getattr(hooks, "cycle_chains", None)
+    for chain in (chains(root) if chains else []) or []:
+        lines.append("[%s] chain — anchor %s, next %s" % (
+            chain["slug"], chain["anchor"] or "not stated",
+            chain["anchor_date"] or "weekday not read"))
+        for ritual, due in chain["rituals"]:
+            lines.append("  [%s] due %s" % (ritual, due or "no lead stated"))
         lines.append("")
 
     rituals = hooks.rituals_facts(root)
@@ -487,6 +508,182 @@ def tool_append_sent_line(arguments):
         "Created INBOX/sent.md and wrote" if created else "Appended", line)
 
 
+HOLD_LINE_RE = re.compile(r"^(Blocked by|Not before):.*$", re.MULTILINE)
+
+
+def _run_mover(args, cwd):
+    """Run reorder_queue.py as a subprocess and return (ok, its stderr).
+
+    The mover's refusals exit via die(); running it as its own process keeps
+    those out of the server and hands the refusal text back as this tool's
+    answer, the same shape file_capture gets by catching SystemExit.
+    """
+    script = os.path.join(PLUGIN_ROOT, "scripts", "reorder_queue.py")
+    proc = subprocess.run([sys.executable, script] + list(args), cwd=cwd,
+                          capture_output=True, encoding="utf-8",
+                          errors="replace")
+    return proc.returncode == 0, (proc.stderr or proc.stdout or "").strip()
+
+
+def tool_hold_entry(arguments):
+    """Write a `Blocked by:` or `Not before:` hold onto one queue entry,
+    refusing at the door what the lint would only flag afterwards.
+
+    Fields in, the canonical line out. The recorded harm this closes: an
+    unbracketed blocker slug once made a consumer's item permanently
+    unliftable with nothing reporting it. A work item above the readiness
+    line is moved to the top of the held region in the same call; a capture
+    gains the field only, a capture's hold being a bow-out rather than a move.
+    """
+    root = project_root()
+    queue = _queue_path(root)
+    mover = _mover()
+    digest = _digest()
+    if mover is None or digest is None:
+        return "Cannot write: reorder_queue.py or queue_digest.py is not " \
+               "where this server expects it (%s)." % PLUGIN_ROOT
+    if not os.path.isfile(queue):
+        return "Cannot write: no QUEUE.md at %s." % queue
+
+    slug = (arguments.get("slug") or "").strip().strip("[]")
+    blocked_by = arguments.get("blocked_by") or []
+    if isinstance(blocked_by, str):
+        blocked_by = [s.strip() for s in blocked_by.split(",") if s.strip()]
+    blocked_by = [s.strip().strip("[]") for s in blocked_by if s.strip()]
+    not_before = (arguments.get("not_before") or "").strip()
+
+    problems = []
+    if not slug:
+        problems.append("slug is missing — the entry the hold is written on.")
+    if blocked_by and not_before:
+        problems.append("both blocked_by and not_before were given — a hold "
+                        "is one or the other.")
+    if not blocked_by and not not_before:
+        problems.append("neither blocked_by nor not_before was given — "
+                        "nothing to write.")
+
+    items = digest.parse(queue)
+    by_slug = {}
+    for item in items:
+        if item["slug"]:
+            by_slug.setdefault(item["slug"], []).append(item)
+    if slug and slug not in by_slug:
+        problems.append("slug %r names no entry in the queue." % slug)
+    elif slug and len(by_slug[slug]) > 1:
+        problems.append("slug %r matches %d entries — two items sharing a "
+                        "slug is itself a fault; fix that first."
+                        % (slug, len(by_slug[slug])))
+    for b in blocked_by:
+        if b == slug:
+            problems.append("blocked_by names the entry itself.")
+        elif b not in by_slug:
+            problems.append("blocked_by names [%s], which is not an entry in "
+                            "the queue — a blocker must resolve to a real "
+                            "entry." % b)
+    if not_before:
+        try:
+            date = datetime.date.fromisoformat(not_before)
+        except ValueError:
+            problems.append("not_before %r is not a real date — YYYY-MM-DD."
+                            % not_before)
+        else:
+            if date <= datetime.date.today():
+                problems.append("not_before %s is already past — a spent "
+                                "date holds nothing." % not_before)
+    if problems:
+        return "Refused — nothing was written:\n" + \
+               "\n".join("- " + p for p in problems)
+
+    item = by_slug[slug][0]
+    section = item["section"]
+    new_line = ("Blocked by: %s" % ", ".join("[%s]" % b for b in blocked_by)
+                if blocked_by else "Not before: %s" % not_before)
+
+    # Read the entry's block to find an existing hold line of either kind,
+    # which is replaced rather than doubled.
+    with open(queue, "r", encoding="utf-8", newline="") as f:
+        queue_lines = f.read().splitlines(keepends=True)
+    block = "".join(queue_lines[item["first_line"] - 1:item["last_line"]])
+    old = None
+    for match in HOLD_LINE_RE.finditer(block):
+        old = match.group(0)
+        break
+
+    if old is not None:
+        if block.count(old) != 1:
+            return "Refused — nothing was written:\n- the entry's existing " \
+                   "hold line occurs more than once in its block."
+        # Replace through the mover's in-item edit, in-process: the old string
+        # is unique in the block (checked above) and the replacement is
+        # byte-literal.
+        captured = io.StringIO()
+        try:
+            with contextlib.redirect_stderr(captured), \
+                    contextlib.redirect_stdout(captured):
+                mover.replace_in_item(queue, slug, old, new_line, section)
+        except SystemExit:
+            return "Refused by the queue tool — nothing was written:\n" + \
+                   captured.getvalue().strip()
+        action = "Replaced the entry's %s line with" % old.split(":")[0]
+    else:
+        # Append as the block's last line: the block ends on the entry's
+        # last line, so the old string is that line and the new is it plus
+        # the hold. The last line is made unique by including the line
+        # before it where needed.
+        block_lines = block.splitlines(keepends=True)
+        tail = ""
+        for line in reversed(block_lines):
+            tail = line + tail
+            if block.count(tail) == 1:
+                break
+        # Match the file's own line ending, so a CRLF queue does not gain a
+        # lone LF line.
+        eol = "\r\n" if "\r\n" in block else "\n"
+        if not tail.endswith("\n"):
+            replacement = tail + eol + new_line + eol
+        else:
+            replacement = tail + new_line + eol
+        captured = io.StringIO()
+        try:
+            with contextlib.redirect_stderr(captured), \
+                    contextlib.redirect_stdout(captured):
+                mover.replace_in_item(queue, slug, tail, replacement, section)
+        except SystemExit:
+            return "Refused by the queue tool — nothing was written:\n" + \
+                   captured.getvalue().strip()
+        action = "Wrote"
+
+    where = "in %s" % section
+    moved = ""
+    if section == "Processed" and item["cleared"]:
+        # A cleared work item with a hold belongs below the readiness line, at
+        # the top of the held region. The mover's --move keeps the marker's
+        # position when the moved item was its anchor.
+        held = [i for i in items if i["section"] == "Processed"
+                and not i["cleared"] and i["slug"]]
+        if held:
+            args = [queue, "Processed", "--move", slug, "BEFORE", held[0]["slug"]]
+        else:
+            args = [queue, "Processed", "--move", slug, "BOTTOM"]
+        ok, report = _run_mover(args, root)
+        if not ok:
+            return ("%s the hold line on [%s] %s:\n%s\nBut the move below the "
+                    "cleared-to-run line was refused by the queue tool, so "
+                    "the entry still sits above it:\n%s"
+                    % (action, slug, where, new_line, report))
+        moved = ("\nMoved [%s] from above the cleared-to-run line to the top "
+                 "of the held region — it crossed the line." % slug)
+        where = "in Processed, now below the line"
+    elif section == "Unprocessed":
+        where = "in Unprocessed (a capture's hold is a bow-out, so it stays " \
+                "where it is)"
+    else:
+        where = "in Processed, below the line where it already sat"
+
+    return "%s the hold line on [%s] %s:\n%s%s" % (
+        action, slug, where, new_line, moved)
+
+
 TOOLS = [
     {
         "name": "queue_checkpoint_counts",
@@ -648,6 +845,44 @@ TOOLS = [
             },
         },
         "handler": tool_append_sent_line,
+    },
+    {
+        "name": "hold_entry",
+        "description":
+            "Write a hold onto one queue entry: a `Blocked by:` line naming "
+            "one or more entries, or a `Not before:` date — exactly one of "
+            "the two. Composes the canonical line, replaces an existing hold "
+            "line of either kind rather than doubling it, and moves a work "
+            "item that sat above the cleared-to-run line to the top of the "
+            "held region in the same call; a capture gains the field only. "
+            "Refuses a slug naming no entry, both or neither field, a blocker "
+            "that is not a real entry, the entry naming itself, an unreal "
+            "date, or a date already past, echoing the reason. A date on a "
+            "capture still needs the user's approval, which no tool can check.",
+        "inputSchema": {
+            "type": "object",
+            "required": ["slug"],
+            "properties": {
+                "slug": {
+                    "type": "string",
+                    "description": "The entry the hold is written on.",
+                },
+                "blocked_by": {
+                    "type": "array",
+                    "items": {"type": "string"},
+                    "description":
+                        "Slugs of the entries this one waits on. Each must "
+                        "be a real entry in either section.",
+                },
+                "not_before": {
+                    "type": "string",
+                    "description":
+                        "YYYY-MM-DD, a future date the entry must not be "
+                        "built (work item) or offered again (capture) before.",
+                },
+            },
+        },
+        "handler": tool_hold_entry,
     },
 ]
 

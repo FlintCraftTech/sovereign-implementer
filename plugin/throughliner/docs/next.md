@@ -241,7 +241,11 @@ present, read `CYCLES.md` and compute each cycle's due-ness from the observable
 its definition names — filing ONE capture in Unprocessed under the cycle's slug
 where a turn is due and no open capture with that slug exists, and nothing
 otherwise — then name each cycle as due or not in one line, whether or not
-anything was filed. It folds into the pre-flight's single narration like every
+anything was filed. Where a cycle carries a chain, due-ness is per ritual: a
+ritual is due when its computed date on the cycles line has arrived and no
+completed turn of this cycle is recorded since the previous anchor, and the
+capture names that ritual in its heading, under the cycle's slug; a cycle with
+no chain is unchanged. It folds into the pre-flight's single narration like every
 other check here. Filing only: what to do with the capture stays planning work.
 A project with no cycles doc gets no line and pays nothing here.
 
@@ -462,10 +466,13 @@ deleted, because it may hold the only record of what that session did.
 
 ## Step 3: Work the run
 
-Two passes: **build all the Claude-work items first, then walk the user through
-the `[user]` items.** This is what lets a `[user]` item be walked through without
-terminating the run — the Claude work is all built regardless of where the
-`[user]` item sat in the queue order.
+**Build every Claude-work item that depends on no `[user]` item first; then, in
+queue order, walk each `[user]` item whose prose names builds by slug and build
+the ones it names; then walk the `[user]` items naming nothing.** A build named
+by a `[user]` item is skipped in the first pass and built after its walk. The
+dependency is read from the `[user]` item's own prose — the known-ordering rule
+already writes it there by slug — and nothing new is written on the item. This
+is what lets a `[user]` item be walked through without terminating the run.
 
 ```
 build item (no tag)  ->  read and follow next-build.md
@@ -580,22 +587,13 @@ the run — it's the last pass of a run whose Claude work is already done.
 **Open the item's record, add the item's files to the run's scope, then give the
 first concrete step and wait.** The record comes first: open the item's LOG
 entry file under its slug when the drive starts, and append each action as it
-happens. **Before the first step is driven, append every path on the item's
-Files line to the working file's Files section, and say so in one clause** — a
-`[user]` item never enters the working file, so without this the scope-lock
-refuses the paths the walk-through itself writes, mid-drive, in front of a
-user waiting on a step. **Opening it also gets one
-line in the working file's Run-level section, written then** — the record
-belongs to the run rather than to any build item, and without the line a
-crashed session's working file positively suggests the drive never started. A walk-through
-legitimately has Claude doing real work — running a reinstall, bumping a
-version, pruning a cache — and none of it has any other home: a `[user]` item
-never enters the build working file, so without this the work exists only in
-conversation and a crash loses it entirely, leaving a working file that
-positively suggests it never happened. The item itself stays in QUEUE.md
-untouched, so nothing is stranded, and a crash mid-walk-through leaves a
-partial entry saying exactly what was done. The close then finds an entry
-already started rather than writing one fresh.
+happens — a reinstall run, a version bumped, a cache pruned. **Before the first
+step is driven, append every path on the item's Files line to the working
+file's Files section, and say so in one clause.** **Write one line in the
+working file's Run-level section when the record is opened.** The item itself
+stays in QUEUE.md untouched, so nothing is stranded, and a crash mid-walk-through
+leaves a partial entry saying exactly what was done. The close then finds an
+entry already started rather than writing one fresh.
 
 **Present every `[user]` item the pass reaches.** No item is set aside before it
 has had its own turn, and nothing is filtered out of the pass in advance on a

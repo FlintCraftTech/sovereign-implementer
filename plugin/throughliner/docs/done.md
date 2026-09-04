@@ -24,13 +24,14 @@ itself.
 
 ## Route by session shape  [SILENT]
 
-**First arm: this chat has already closed.** Where this conversation already
-holds its own close — the entry written and the commit made — a second `/done`
-is the post-close tail, not a second close: file what it finds through the
-three-way triage, append what happened to this session's existing entry as a
-marked tail, commit nothing, and say so in one line. Where the tail is worth
-committing now, name the route: open a fresh chat and run `/done` there, where
-the no-build close commits handmade work as a session of its own.
+**First arm: this chat has already closed** [BRIEF]. Where this conversation
+already holds its own close — the entry written and the commit made — a second
+`/done` is the post-close tail, not a second close: file what it finds through
+the three-way triage, append what happened to this session's existing entry as
+a marked tail, and commit nothing. The one line carries which files were
+appended to, that nothing was committed, and where the fresh-chat route leads:
+open a fresh chat and run `/done` there, where the no-build close commits
+handmade work as a session of its own.
 
 Otherwise check for **this session's** build working file,
 `_build-<session-id>.md` — not any other session's, which belongs to a build
@@ -414,7 +415,11 @@ own close. Where the doc exists, read it and compute each cycle's due-ness
 from the observable its definition names — filing ONE capture in Unprocessed
 under the cycle's slug where a turn is due and no open capture with that slug
 exists, and nothing otherwise — then say in one line which cycles are due and
-which are not, filed or not. Filing only: routing stays planning work. A
+which are not, filed or not. Where a cycle carries a chain, due-ness is per
+ritual: a ritual is due when its computed date on the cycles line has arrived
+and no completed turn of this cycle is recorded since the previous anchor, and
+the capture names that ritual in its heading, under the cycle's slug; a cycle
+with no chain is unchanged. Filing only: routing stays planning work. A
 project with no cycles doc pays nothing here.
 
 Before committing, re-read that stretch of the chat and surface candidate
@@ -447,44 +452,31 @@ and a contested item is dropped or reworked one at a time.
 Add them to this session's LOG entry's "Routed to Captures:" line as a
 working-tree edit riding this commit.
 
-**State this sentence, as written, the first time this session says it; where the
-session has already stated it, restate the operative fact in one clause instead —
-"again, only what was still in view".** The full sentence teaches the limit and
-the clause carries it; a session that repeats the whole lesson three times is
-spending the user's attention on something they were told at the first statement.
+**Run the memory check first, and say one sentence — never two — reporting what
+it found.** The check reads what the artifacts prove ran: a queue diff (`git
+diff HEAD -- QUEUE.md`, or the snapshot folder where the queue is untracked)
+showing entries deleted, moved or kept means a planning run; a build working
+file's ticks mean a build run. It then looks for each such run's invocation and
+opening lines in the conversation.
 
-> I can't tell whether any of our earlier conversation has dropped out of view,
-> so this is what I could still see rather than a guarantee I've caught
-> everything.
+```
+a run the files prove happened is    ->  "Earlier parts of our conversation have
+  missing from the conversation          dropped out of view — the files show a
+                                         <planning | build> run I can no longer
+                                         see."
+every run the files record is        ->  "Every run the files record is still in
+  still in view                          view."
+```
 
-**Cross-check the conversation against the durable artifacts on disk, and where
-they disagree say so louder than the sentence above.** This re-scan looks back
-over the same conversation with the same blind spot, so it carries the same
-check. The build working file lists exactly which items were ticked, and `git
-diff HEAD -- QUEUE.md` is already how this close recovers what a planning
-session did — so thirty items ticked against six visible in the conversation is
-two counts disagreeing rather than a judgement about memory:
+**The asymmetry is a rule for Claude, not a sentence for the user.** A run
+missing from view is positive evidence that earlier material dropped out; a run
+still in view proves only that stretch, and a discussion that touched no file
+leaves nothing to check against. So the report says what the check found and
+never adds that nothing was lost.
 
-> The files say more happened in this chat than I can still see — [what
-> disagrees]. Earlier parts of our conversation have dropped out of view, so
-> this look-back is missing whatever was in them.
-
-**The asymmetry is the safety property and is never softened.** Absent artifacts
-are positive evidence that earlier material dropped out of view. Present
-artifacts prove only that the recent stretch is intact and say nothing about the
-earliest, which is what this reaches for. **So it warns and never gives an
-all-clear** — "I can see everything, so nothing was lost" is a false guarantee at
-the one moment the user is relying on this to be complete.
-
-**Say it as written rather than conveying its sense**, and **name the limit in
-the sentence's own terms — what was still in view — and stop there.** Session
-length, duration and message count are observable proxies for compaction rather
-than the thing itself, and each invites the user to discount the result by a
-factor that is fictional.
-
-**The limit on the fix, stated rather than implied:** a fixed sentence is harder
-to improve on than an intent, but nothing prevents a session rewording it and no
-check will catch that. This reduces the odds; it does not close the hole.
+**Name no proxy.** Session length, duration and message count are observable
+proxies for compaction rather than the thing itself, and each invites the user
+to discount the result by a factor that is fictional.
 
 One thing to state, not fix: a fresh-chat /done has none of the session's
 thinking in view, so there is nothing to re-scan.

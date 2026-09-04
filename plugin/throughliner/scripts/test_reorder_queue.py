@@ -16,6 +16,7 @@ reproduces deterministically from a fixture, so it gets one.
 """
 
 import os
+import re
 import subprocess
 import sys
 import tempfile
@@ -309,7 +310,63 @@ def test_named_move_across_the_line_still_reports_and_succeeds():
               "crossed the readiness line" in output, f"got: {output}")
 
 
+def test_append_stamps_an_unstamped_capture():
+    """A capture appended without a stamp gains one, read from the clock, as
+    the last prose line — before any field lines.
+
+    The capture tool stamped every capture it filed; this route stamped none,
+    and a planning session that filed everything through it wrote 34 clock
+    times by hand, each counted up from the opening ([invented-clock-times-in-
+    planning-writes]).
+    """
+    mod = _load_module()
+    body = ["#### A capture [zeta]\n", "Its rationale.\n",
+            "Blocked by: [alpha]\n"]
+    out = mod.stamp_filed_at(list(body))
+    check("an unstamped body gains exactly one stamp line",
+          len(out) == 4 and sum(1 for l in out if "stamped by the queue tool" in l) == 1,
+          repr(out))
+    check("the stamp lands before the field lines",
+          out[2].startswith("Filed ") and out[3] == "Blocked by: [alpha]\n",
+          repr(out))
+    check("the stamp carries a clock time",
+          re.match(r"^Filed \d{4}-\d{2}-\d{2} \d{2}:\d{2}, stamped by the queue tool\.\n$",
+                   out[2]) is not None, repr(out[2]))
+
+    # End to end through --append: the stamp is in the file.
+    with tempfile.TemporaryDirectory() as tmp:
+        path = os.path.join(tmp, "QUEUE.md")
+        with open(path, "w", encoding="utf-8") as f:
+            f.write(FIXTURE)
+        body_path = os.path.join(tmp, "body.md")
+        with open(body_path, "w", encoding="utf-8") as f:
+            f.write("#### Another capture [eta]\nRationale for eta.\n")
+        result = subprocess.run(
+            [sys.executable, SCRIPT, path, "--append", "Unprocessed",
+             "--body", body_path],
+            capture_output=True, text=True, encoding="utf-8", errors="replace")
+        with open(path, "r", encoding="utf-8") as f:
+            after = f.read()
+        check("--append succeeds", result.returncode == 0, result.stderr.strip())
+        check("the appended capture carries the queue tool's stamp",
+              "Rationale for eta.\nFiled " in after and
+              "stamped by the queue tool." in after, after[-300:])
+
+
+def test_append_leaves_a_stamped_capture_alone():
+    """A body already carrying the capture tool's stamp is unchanged."""
+    mod = _load_module()
+    body = ["#### A capture [zeta]\n", "Its rationale.\n",
+            "Filed 2026-09-02 14:35, stamped by the capture tool.\n",
+            "Cycle: [weekly-release]\n"]
+    out = mod.stamp_filed_at(list(body))
+    check("a body with the capture tool's stamp is returned as it is",
+          out == body, repr(out))
+
+
 if __name__ == "__main__":
+    test_append_stamps_an_unstamped_capture()
+    test_append_leaves_a_stamped_capture_alone()
     print("test_reorder_queue")
     test_side_of_marker_report()
     test_report_agrees_with_file()
