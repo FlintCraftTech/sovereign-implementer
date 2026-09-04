@@ -5,6 +5,8 @@ and enough of the finding to decide whether to open it, ending in the filename �
 the same contract `LOG/index.md` states for itself, and for the same reason: a
 session should be able to tell what a file answers without opening it.
 
+- **Claude Code's security guidance, read 2026-09-03 — no risk list to comply with; prompt injection is the one named threat, and `/security-review` is the affordable weekly pass** — the guidance page describes the permission model, built-in protections, prompt-injection safeguards and two best-practice lists; the scanner plugin page describes a multi-agent scan needing a paid plan and `python3` on the PATH. Settles that the red-flag scope lacks prompt injection through observed content, and that the maintenance sweep's security pass uses `/security-review`. Re-read each sweep turn. Carries a frame assessment → `claude-code-security-guidance.md`
+
 - **Self-hosting onboarding (standing line, opened 2026-08-31).** The accretion point for what a person — porter, consumer, or between — needs to become self-hosting on Throughliner; first data point is the OpenCode assessment pack, with the Egnatia-OC injection as the live experiment. Add findings here, work stays in the queue → self-hosting-onboarding.md
 - **Claude Code MCP registration (2026-08-31).** A project attaches a local stdio server via `.mcp.json` at the project root, supported in the desktop app, gated by a one-time trust dialog; a plugin can bundle one via `plugin.json`'s `mcpServers`, so dogfood-here-then-promote needs no change to the server itself. Read from official docs, untested → claude-code-mcp-registration.md
 
