@@ -19,6 +19,7 @@ Four parts, in use order: admission, eviction, distribution, wording.
 competes with nothing; a freestanding rule competes with everything. A change
 that cannot name a parent is either new territory or, far more often, a
 refinement whose parent was never looked for.
+— and grep the sibling documents for the rule before writing it; where a sibling already carries it, the rule lifts to their common parent, conditioned on what the copies differ by, and those copies are what the eviction step names.
 
 **Then write it as a subordinate unit of that parent, and ship it in that form
 if it holds.** Freestanding is the fallback, not the default. It is genuinely

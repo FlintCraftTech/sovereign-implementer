@@ -483,6 +483,27 @@ def test_delete_reports_inbound_citations():
     )
 
 
+def test_delete_skips_cycle_lines_in_the_citation_note():
+    """A `Cycle:` line names a cycle definition, not the deleted capture.
+
+    Deleting a spent [tips-posting] turn capture once listed all twenty-five
+    candidates in the tips pool as citing it, because each carries
+    `Cycle: [tips-posting]`. A prose citation must still be reported.
+    """
+    text = build_queue(
+        "#### Unrelated cleared work [gamma]\nRationale.\n\n" + MARKER + "\n",
+        "#### Tips turn due [tips-posting]\nRationale.\n\n"
+        "#### Tip candidate one [tip-one]\nProse.\nCycle: [tips-posting]\n\n"
+        "#### Tip candidate two [tip-two]\nProse.\nCycle: [tips-posting]\n\n"
+        "#### Talks about the turn [delta]\nSee [tips-posting] for why.\n",
+    )
+    rc, err, _ = run(text, "--delete", "tips-posting", "Unprocessed")
+    check("delete with cycle lines: exits 0", rc == 0, err)
+    check("cycle lines are not reported as citations",
+          "[tip-one]" not in err and "[tip-two]" not in err, err)
+    check("a prose citation is still reported", "[delta]" in err, err)
+
+
 def test_delete_reports_nothing_when_uncited():
     """The other half — a report that fires on every delete is one people skip."""
     text = build_queue(
@@ -519,6 +540,7 @@ def main():
         test_move_section_after_last_cleared_reports_below,
         test_move_section_top_reports_above,
         test_delete_reports_inbound_citations,
+        test_delete_skips_cycle_lines_in_the_citation_note,
         test_delete_reports_nothing_when_uncited,
         test_replace_in_fires,
         test_replace_in_refuses_non_unique,

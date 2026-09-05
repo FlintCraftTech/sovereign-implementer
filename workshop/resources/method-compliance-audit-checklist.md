@@ -14,18 +14,20 @@ Run every lens over each doc in scope. One read of the doc serves them all. Find
 
 ## State the axis before you start, and it is the parent axis
 
-**An audit compares a doc against its parent, never against its sibling.** Say which axis you are running on before the first read, and if it is not the parent axis, argue for the one you have chosen.
+**An audit compares a doc against its parent; it compares siblings only for a rule one parent rule would replace.** Say which axis you are running on before the first read, and if it is not the parent axis, argue for the one you have chosen.
 
 ```
 parent axis     done-build.md vs done.md; next-audit.md vs next.md; any
-   (right)      sub-doc vs skill-nonspecific-rules.md. Finds a child restating
+                sub-doc vs skill-nonspecific-rules.md. Finds a child restating
                 what its parent already carries — genuine duplication, because
                 the child is loaded WITH the parent and the reader has both.
 
 sibling axis    done-build.md vs done-audit.md, next-build.md vs next-audit.md.
-   (wrong)      Finds WORDING similarity between docs that are parallel by
-                design, so near-identical phrasing is the expected state rather
-                than the defect.
+                Finds the same RULE in two or more siblings where one rule at
+                their common parent, conditioned, would replace the copies
+                (Lens 8, Across siblings). WORDING similarity alone is not a
+                finding: docs parallel by design phrase alike, and near-identical
+                phrasing between them is the expected state.
 ```
 
 **The worked instance, which is why this is not a stylistic preference.** An audit once reported `done-build.md` and `next.md` carrying the same rule in near-identical words. True as text, wrong as a finding: `next.md` guards *presenting* a run, `done-build.md` guards *writing a size cap into the note for the next session*, and no session reads both. Two holes, two plugs, one wording. The finding was refused at processing weeks later, with both docs untouched. On the parent axis it would never have been produced, since neither doc is the other's parent.
@@ -140,6 +142,8 @@ Covers what the mechanical near-duplicate matcher cannot see: **two passages doi
 **Across levels.** For each rule in the always-loaded files, ask which lower-level doc owns the same ground — the parent-axis method the 2026-08-22 style-dedup audits used — and file a capture where both state the rule rather than one stating and the other pointing.
 
 **Within one file.** The merge rule's own test applies: two accounts of the same thing under different headings file as a merge candidate.
+
+**Across siblings.** Where the same rule appears in two or more sibling documents, or a finding or report proposes it for another sibling, the finding proposes one rule at the lowest common parent, conditioned on what the copies differ by, and names every copy it repeals. The where-each-site-fires sentence is what separates this from the parallel-by-design case: copies guarding different moments that no single session reaches are two plugs, not one rule. The instance: the rests-on requirement lived in plan.md's decision step and in next.md, and a report proposed it for SPEC sentences as a third sibling; the always-loaded claim-about-the-world rule was the common parent, and one conditioned rule there replaced the copies.
 
 **Stated limit:** the lens compares rules naming the same mechanism. A duplication paraphrased past shared vocabulary stays unread — the same residual the contradictions lens states.
 

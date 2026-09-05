@@ -126,8 +126,101 @@ def test_no_log_directory_is_not_pending():
     shutil.rmtree(root, ignore_errors=True)
 
 
+def test_nested_project_reads_both_histories():
+    """A nested project's rule corpus straddles two repositories.
+
+    The outer holds CLAUDE.md and LOG/; the inner holds the shipped docs. Both
+    histories carry rule-bearing commits, and the dispositions for both sit in
+    the outer's LOG. Run from the outer, the check must find both commits and
+    match each to its disposition — before this, run from either repository it
+    saw half the corpus.
+    """
+    outer = tempfile.mkdtemp(prefix="rule-signals-nested-")
+    git(outer, "init", "-q")
+    git(outer, "config", "user.email", "t@example.com")
+    git(outer, "config", "user.name", "T")
+    os.makedirs(os.path.join(outer, "LOG"))
+    inner = os.path.join(outer, "product")
+    os.makedirs(inner)
+    git(inner, "init", "-q")
+    git(inner, "config", "user.email", "t@example.com")
+    git(inner, "config", "user.name", "T")
+
+    # The inner: a baseline commit, then a commit touching a shipped doc.
+    with open(os.path.join(inner, "README.md"), "w", encoding="utf-8") as f:
+        f.write("product\n")
+    git(inner, "add", "README.md")
+    git(inner, "commit", "-q", "-m", "baseline")
+    baseline = subprocess.run(["git", "rev-parse", "--short", "HEAD"], cwd=inner,
+                              capture_output=True, text=True).stdout.strip()
+    docs = os.path.join(inner, "plugin", "throughliner", "docs")
+    os.makedirs(docs)
+    with open(os.path.join(docs, "plan.md"), "w", encoding="utf-8") as f:
+        f.write("A rule-bearing file.\n")
+    git(inner, "add", "-A")
+    git(inner, "commit", "-q", "-m", "inner rule commit")
+    inner_sha = subprocess.run(["git", "rev-parse", "--short", "HEAD"], cwd=inner,
+                               capture_output=True, text=True).stdout.strip()
+
+    # The outer: CLAUDE.md with the Visibility line naming the inner, then a
+    # second commit touching it (rule-bearing in the outer).
+    claude = os.path.join(outer, "CLAUDE.md")
+    with open(claude, "w", encoding="utf-8") as f:
+        f.write("# Project\n\nVisibility: nested — the outer repository holds "
+                "the documents; the inner repository (`product/`) holds only "
+                "the product.\n")
+    with open(os.path.join(outer, ".gitignore"), "w", encoding="utf-8") as f:
+        f.write("product/\n")
+    git(outer, "add", "CLAUDE.md", ".gitignore")
+    git(outer, "commit", "-q", "-m", "outer first commit")
+    with open(claude, "a", encoding="utf-8") as f:
+        f.write("\n- **A rule.**\n")
+    git(outer, "add", "CLAUDE.md")
+    git(outer, "commit", "-q", "-m", "outer rule commit")
+    outer_sha = subprocess.run(["git", "rev-parse", "--short", "HEAD"], cwd=outer,
+                               capture_output=True, text=True).stdout.strip()
+
+    # Dispositions for both, in the outer's LOG.
+    with open(os.path.join(outer, "LOG", "2026-09-05-inner.md"), "w",
+              encoding="utf-8") as f:
+        f.write(f"# {inner_sha} — inner session\n\nRule gate: run — admitted.\n")
+    with open(os.path.join(outer, "LOG", "2026-09-05-outer.md"), "w",
+              encoding="utf-8") as f:
+        f.write(f"# {outer_sha} — outer session\n\nRule gate: run — admitted.\n")
+
+    check("the inner is found from the Visibility line",
+          signals.inner_root(outer) == inner, repr(signals.inner_root(outer)))
+    commits, err = rule_commits(outer, baseline)
+    shas = {c["sha"] for c in commits}
+    check("both repositories' rule-bearing commits are read",
+          err is None and shas == {inner_sha, outer_sha}, f"{err!r} {shas!r}")
+    check("the outer's root commit, which imported CLAUDE.md, owes no "
+          "disposition", len(commits) == 2, repr([c["subject"] for c in commits]))
+    born = signals.signal_born(outer)
+    check("each commit matches its disposition in the outer's LOG",
+          not born["firing"], born["message"])
+    total, per_file = signals.count_statements(
+        outer, ["CLAUDE.md", "plugin/throughliner/docs/plan.md"])
+    check("corpus files are read from whichever repository holds them",
+          set(per_file) == {"CLAUDE.md", "plugin/throughliner/docs/plan.md"},
+          repr(per_file))
+    shutil.rmtree(outer, ignore_errors=True)
+
+
+def test_flat_project_has_no_inner():
+    root = tempfile.mkdtemp(prefix="rule-signals-flat-")
+    os.makedirs(os.path.join(root, "LOG"))
+    check("a flat project reports no inner repository",
+          signals.inner_root(root) is None)
+    check("a flat project reads one repository",
+          [l for l, _ in signals.repos(root)] == ["outer"])
+    shutil.rmtree(root, ignore_errors=True)
+
+
 if __name__ == "__main__":
     print("test_rule_signals")
+    test_nested_project_reads_both_histories()
+    test_flat_project_has_no_inner()
     test_placeholder_entry_suppresses_the_freshest_commit()
     test_backfilled_entry_restores_normal_behaviour()
     test_placeholder_only_counts_in_a_heading()

@@ -101,11 +101,15 @@ The work cycle. Every piece of work travels the same loop.
 - **Shape every message the same way:**
   - leading with the decision — the one thing the user must see or act on —
     with reasoning and alternatives offered on request, not front-loaded;
-  - rendering the single user-facing ask in bold, phrased as a question, at
-    the end of the message — naming any command it offers in words rather than
-    as a slash string, and keeping that command clear of the sentence's end, since
-    the app lifts a trailing slash command into the composer where one
-    keystroke sends it;
+  - where the message offers the user something or needs their decision,
+    making that offer its one ask — in bold, phrased as a question, at the end
+    of the message — and where there is nothing to decide, ending on the
+    outcome with no ask manufactured; naming any command the ask offers in
+    words rather than as a slash string, and keeping that command clear of the
+    sentence's end, since the app lifts a trailing slash command into the
+    composer where one keystroke sends it; subject to the close's
+    recommend-next step in done.md, which names no command and ends on
+    statements;
   - giving one item per message when the user's next action depends on the
     prior one, per `[SEQUENCE]` below — in every multi-part exchange, inside
     skills and out, with no exemption for items that seem short;
@@ -519,12 +523,18 @@ steps and conversation outside skills.
 
 ## Research and evidence filing
 
-**Offer readily — the bar is low, since the user can decline.**
+**Run a bounded read and report what it found; offer before anything that fans
+out or leaves the machine.** A web search, a documentation fetch, a file read —
+none has an effect outside this machine, so each is run rather than offered. An
+offer is made before anything that spawns an agent, fans several lookups out at
+once, or leaves the machine; the subagent rule under Tool use is the named
+fan-out case.
 
 **Trigger: what would answer this — and is the approach itself valid for the
 situation?** Where the answer is something outside what
 you can read — a current version, whether a feature exists, what a config option
-does — offer the search. Where it is a choice the user owns, ask them. Take the
+does — run the search and report what it found. Where it is a choice the user
+owns, ask them. Take the
 answer from one of those two routes rather than from your own confidence, which
 is what keeps the trigger a question about the subject rather than a judgment
 about your own certainty.
@@ -540,6 +550,12 @@ own writing: what would answer this? A capability sentence composed from a
 design discussion reads exactly like a verified one, and is corrected only when
 something fails against it.
 
+**A written sentence that rests on an outside fact or a condition names that
+fact or condition, with the date it was last checked, wherever the sentence
+lives** — as the rests-on line on a work item, and in a SPEC sentence's own
+words. The repeal grep at the decision step is what reaches the sentences that
+named the thing.
+
 **It bites hardest in a `[user]` walkthrough**, where a step asserting what
 someone else's website, app or service allows is handed to a no-code developer
 to perform with nobody to ask. Where the surface can be tested harmlessly — a
@@ -550,18 +566,19 @@ the read, and it goes into the walkthrough as its first step.
 computed field, a timestamp, or the record — in chat as much as in anything
 written.** A date, "yesterday", "this morning", "twenty minutes ago", "tonight":
 each is a claim about the world, and each is read rather than recalled. The
-sources: the session opening's date-and-time line — which carries the clock's
-time as well as the date, so a same-day relative-time claim ("this morning")
-has a source finer than a day — the queue digest's passed or ahead figures, a
-record's own date field, and where none exists, the clock, read by a command at
-the moment of writing. A clock time written into a record is read from the
-clock at the moment of writing, by a command; the opening's time line is a
-source for the date and for a same-day relative claim, never a base to count up
-from.
+sources for a date: the queue digest's passed or ahead figures, a record's own
+date field, and where none exists, the clock, read by a command at the moment
+of writing. The source for a relative time word is the clock read in the turn
+that says it — a clock command, or the newest timestamp in view (a capture's
+filed-at stamp, a register line); the session opening's date-and-time line is
+one such reading, current at the opening and no later. A clock time written
+into a record is read from the clock at the moment of writing, by a command;
+the opening's line is never a base to count up from.
 
 ```
 a source exists      ->  read it, and say the time
-no source exists     ->  state the event without a time — "agreed earlier",
+a relative time word ->  read the clock in this turn, then say it
+no reading           ->  state the event without a time — "agreed earlier",
                          "in a previous session, per its record"
 a non-date criterion ->  state the criterion and check the world against it.
                          "Today", "tomorrow", "later" are for a criterion that
@@ -595,7 +612,7 @@ hole.
 **Reach for a CLI tool before handing over a GUI walkthrough.** Two halves, both
 must fire: (1) *consider* whether a tool would let you do the task instead of
 talking the user through it — OCR, image/PDF conversion, file manipulation, data
-extraction often have one; (2) *offer a search* when a suitable tool plausibly
+extraction often have one; (2) *run a search* when a suitable tool plausibly
 exists but you're unsure which.
 
 Guards: name the candidate tool and what it does before using it; downloads,
@@ -640,9 +657,10 @@ anything asking whether the approach fits the situation at all, and a finding
 that was never valid reads exactly like one that was:
 
 ```
-TIME RANGE     does it cover the range the product addresses — and where the
-               range was never stated, say so, because that is a gap in SPEC
-               rather than in the research
+TIME RANGE     where the product addresses a period, does the finding cover
+               it; a product with no period answers "not applicable" in one
+               word. Where the product has a period that SPEC never stated,
+               say so — that is a gap in SPEC rather than in the research
 PEOPLE         does it apply to the people involved: users, decision-makers,
                whoever the product actually serves
 FRESHNESS      is the subject amended on a cycle, or fresh enough that it
@@ -981,6 +999,9 @@ real and equally bad; neither warning may be louder than the other. (How a
     where no visible route exists, and the step then says what appears on
     screen when it works, so a misfire is still diagnosable — a shortcut may
     ride alongside a click path as an aside;
+  - where a step needs a fixture — something with a stated property to act
+    on — stating the property it must have, with any file named as one that
+    had it when the step was written;
   - where a step verifies something, listing the claims it checks, so the user
     knows what a pass covered rather than only that it passed;
   - ending at the item's own observable, with cleanup after the test filed as

@@ -122,9 +122,32 @@ def _sentence_span(message, start, end):
     return left, right
 
 
+def _strip_quoted(message):
+    """The message with blockquoted lines and fenced code blocks blanked.
+
+    A capture report is never inside a blockquote or a code fence; a quoted
+    draft, a specimen or a pasted post always is. Lines are replaced with
+    empty strings rather than removed, so nothing else shifts.
+    """
+    out = []
+    in_fence = False
+    for line in message.splitlines(keepends=True):
+        stripped = line.lstrip()
+        if stripped.startswith("```"):
+            in_fence = not in_fence
+            out.append("\n" if line.endswith("\n") else "")
+            continue
+        if in_fence or stripped.startswith(">"):
+            out.append("\n" if line.endswith("\n") else "")
+            continue
+        out.append(line)
+    return "".join(out)
+
+
 def _claimed_slugs(message):
     """Slugs the message claims to have just written. Possibly empty."""
     found = set()
+    message = _strip_quoted(message)
     for pattern in CLAIM_PATTERNS:
         for match in pattern.finditer(message):
             groups = [g for g in match.groups() if g]

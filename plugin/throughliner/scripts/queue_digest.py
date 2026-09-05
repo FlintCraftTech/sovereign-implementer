@@ -1096,7 +1096,42 @@ def incoming_citations(items):
     return counts
 
 
-def whats_next(items, root, queue_path, skip=(), picked=0, today=None):
+def medians_for(items, root, queue_path, medians=None):
+    """The two medians a pick ranks against, and where they came from.
+
+    Returns (median_lines, median_first_seen, source). With `medians` given
+    — the pair the opening printed, `(lines, date)` — those are used and the
+    source reads "passed in"; otherwise both are recomputed from the section
+    as it stands now, and the source says so. The ladder promises the two
+    sets are fixed when the run opens, so a pass that recomputes them at every
+    pick drifts from that promise silently: entries leave the section as they
+    are processed, the medians fall, and entries the opening excluded become
+    long. The source line is what makes a forgotten argument visible.
+    """
+    if medians:
+        return medians[0], medians[1], "passed in"
+    ages = first_seen(root, queue_path)
+    in_section = [i for i in items if i["section"] == "Unprocessed"]
+    return (median_lines(in_section), median_first_seen(in_section, ages),
+            "recomputed from the file now; pass --medians to hold the "
+            "opening's")
+
+
+def parse_medians(text):
+    """`<lines>,<YYYY-MM-DD>` -> (int, str), or None where it does not parse."""
+    if not text:
+        return None
+    parts = text.split(",", 1)
+    try:
+        lines = int(parts[0].strip())
+    except (ValueError, IndexError):
+        return None
+    date = parts[1].strip() if len(parts) > 1 and parts[1].strip() else None
+    return (lines, date)
+
+
+def whats_next(items, root, queue_path, skip=(), picked=0, today=None,
+               medians=None):
     """Which rung the ladder falls to, and that rung's top item.
 
     Answers the one question a pick actually asks, so re-deriving it costs a
@@ -1147,9 +1182,7 @@ def whats_next(items, root, queue_path, skip=(), picked=0, today=None):
         return 3, ("unblock potential — %d other entries cite it"
                    % counts[cited[0]["slug"]]), cited[0]
 
-    in_section = [i for i in items if i["section"] == "Unprocessed"]
-    med_lines = median_lines(in_section)
-    med_age = median_first_seen(in_section, ages)
+    med_lines, med_age, _source = medians_for(items, root, queue_path, medians)
 
     def is_long(item):
         return med_lines is not None and entry_lines(item) >= med_lines
@@ -1234,11 +1267,18 @@ def _cycle_definition_slugs(root):
     return slugs
 
 
-def render_whats_next(items, root, queue_path, skip=(), picked=0):
-    """The scoped answer: the rung, the item, its line number, its text."""
-    rung, why, item = whats_next(items, root, queue_path, skip, picked)
+def render_whats_next(items, root, queue_path, skip=(), picked=0,
+                      medians=None):
+    """The scoped answer: the rung, the item, its line number, its text —
+    and which medians it ranked against, with their source."""
+    med_lines, med_age, source = medians_for(items, root, queue_path, medians)
+    medians_line = "medians: %s lines, %s — %s" % (
+        med_lines if med_lines is not None else "none",
+        med_age if med_age else "no date", source)
+    rung, why, item = whats_next(items, root, queue_path, skip, picked,
+                                 medians=(med_lines, med_age))
     if item is None:
-        return "Next: nothing — %s." % why
+        return "Next: nothing — %s.\n%s" % (why, medians_line)
 
     try:
         with open(queue_path, "r", encoding="utf-8") as handle:
@@ -1251,6 +1291,7 @@ def render_whats_next(items, root, queue_path, skip=(), picked=0):
         "Rung %d: %s" % (rung, why),
         "Next: [%s] — %s" % (item["slug"] or "NO-SLUG", item["heading"]),
         "Starts at line %d of %s" % (item["first_line"], queue_path),
+        medians_line,
         "",
         text,
     ]
@@ -1262,6 +1303,7 @@ def main(argv):
     scoped = False
     skip = []
     picked = 0
+    medians = None
     path = None
 
     index = 0
@@ -1272,6 +1314,9 @@ def main(argv):
         elif token == "--skip":
             index += 1
             skip = [s for s in args[index].split(",") if s] if index < len(args) else []
+        elif token == "--medians":
+            index += 1
+            medians = parse_medians(args[index]) if index < len(args) else None
         elif token == "--picked":
             index += 1
             try:
@@ -1284,7 +1329,8 @@ def main(argv):
 
     if path is None:
         print("usage: queue_digest.py <QUEUE.md path> "
-              "[--next [--skip slug,slug] [--picked N]]", file=sys.stderr)
+              "[--next [--skip slug,slug] [--picked N] "
+              "[--medians <lines>,<YYYY-MM-DD>]]", file=sys.stderr)
         return 1
     try:
         items = parse(path)
@@ -1295,7 +1341,8 @@ def main(argv):
     # item cites can be opened without asking for a second argument.
     root = os.path.dirname(os.path.abspath(path))
     if scoped:
-        print(render_whats_next(items, root, path, tuple(skip), picked))
+        print(render_whats_next(items, root, path, tuple(skip), picked,
+                                medians=medians))
     else:
         print(render(items, root, path))
     return 0

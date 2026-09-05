@@ -222,6 +222,11 @@ Advisory: not needed — <why>
 - file the advisory itself as a capture at the top of Unprocessed, worded as
   advice, where the Recommend-next step made a *concrete* recommendation — a
   generic one files nothing, and the disposition line says which;
+- **where this close is a planning close and its wind-down look-back filed one
+  or more captures, the advisory names them by slug as what to open on**, in
+  addition to any recommendation it carries — so the next planning session
+  opens on them rather than meeting them in queue order; the disposition line
+  above is unchanged;
 - **where the reserved slot already holds a spent advisory, replace it**: delete
   the spent note and file this close's own in the freed slot, with the new note
   saying it replaced one. The reserved slug must be unique — filing alongside a
@@ -443,7 +448,9 @@ Saying so is what gives them the chance to; a capture alone leaves the item to
 be built as it stands.
 
 **Show the candidate set as ONE numbered message before anything is written**
-[PROMPT].
+[PROMPT], **opening by naming itself as the close's standing look-back over the
+conversation** — in the user's words, before what it found — so the step reads
+as the rule it is rather than as an improvised idea.
 **End the message with what each answer does: "Say go to file them all, or
 contest by number."** Numbering explains contesting on its own; "go" explains
 nothing unless the sentence says it files the whole set. The writes then land,

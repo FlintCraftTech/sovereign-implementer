@@ -798,6 +798,44 @@ def test_whats_next_cycle_pass_over_and_due_rung():
     shutil.rmtree(root, ignore_errors=True)
 
 
+def test_whats_next_holds_the_openings_medians_when_passed():
+    """The ladder fixes both medians at the opening; a pick that recomputes
+    them drifts from that promise silently.
+
+    Two entries, one long. With the medians recomputed from the file, the
+    long one qualifies for the alternating rung's long pick; with the opening's
+    medians passed in — here a length no entry reaches — nothing is long and
+    the pick falls to oldest-first. The output names which it used.
+    """
+    root = project(
+        unprocessed=(
+            "#### A short entry [short]\nOne line.\n"
+            "\n"
+            "#### A long entry [long]\nLine.\nLine.\nLine.\nLine.\nLine.\n"
+            "Line.\nLine.\n"
+        ),
+    )
+    queue = os.path.join(root, "QUEUE.md")
+    items = digest.parse(queue)
+    _, _, recomputed = digest.whats_next(items, root, queue, picked=1)
+    _, _, held = digest.whats_next(items, root, queue, picked=1,
+                                   medians=(100, None))
+    check("recomputed medians make the long entry the long pick",
+          recomputed["slug"] == "long", repr(recomputed["slug"]))
+    check("the opening's medians change the pick",
+          held["slug"] != recomputed["slug"], repr(held["slug"]))
+    out = digest.render_whats_next(items, root, queue, picked=1)
+    check("the output names recomputed medians",
+          "medians:" in out and "recomputed" in out, out)
+    out = digest.render_whats_next(items, root, queue, picked=1,
+                                   medians=(100, "2026-09-04"))
+    check("the output names passed-in medians",
+          "medians: 100 lines, 2026-09-04 — passed in" in out, out)
+    check("the argument parses", digest.parse_medians("7,2026-09-04")
+          == (7, "2026-09-04") and digest.parse_medians("x") is None)
+    shutil.rmtree(root, ignore_errors=True)
+
+
 def test_whats_next_respects_a_capture_bowing_out():
     """`Not before:` on a capture means do not OFFER it again, which is what a
     pick does."""
@@ -1076,6 +1114,7 @@ if __name__ == "__main__":
     test_whats_next_answers_only_the_pick()
     test_whats_next_rung_changes_when_the_queue_changes_beneath_it()
     test_whats_next_cycle_pass_over_and_due_rung()
+    test_whats_next_holds_the_openings_medians_when_passed()
     test_whats_next_respects_a_capture_bowing_out()
     test_incoming_citations_are_computed_not_guessed()
     test_copied_finding_flags_the_item_as_resting_on_a_snapshot()

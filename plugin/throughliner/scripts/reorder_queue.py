@@ -664,7 +664,10 @@ def delete_item(queue_path, slug, section):
             continue
         if current is None or current in seen_headings:
             continue
-        if re.match(r'^Blocked by:', line.strip(), re.I):
+        # A `Cycle:` line names a cycle DEFINITION of the same slug as a
+        # cycle's turn capture, never the capture — so deleting a spent turn
+        # capture must not list the whole pool as citing it.
+        if re.match(r'^(Blocked by|Cycle):', line.strip(), re.I):
             continue
         if ('[%s]' % slug) in line:
             seen_headings.add(current)

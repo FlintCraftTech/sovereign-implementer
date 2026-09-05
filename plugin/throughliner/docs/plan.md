@@ -81,10 +81,12 @@ gets built first — through discussion, not silently.
     product now.
   - **Staleness is a defect, not clutter.** A SPEC sentence describing a
     mechanism the project no longer has is wrong rather than merely surplus, and
-    it is corrected at the moment it is noticed rather than filed for later.
+    it is corrected at the moment it is noticed rather than filed for later; and
+    a sentence resting on a condition or an outside fact names it in its own
+    words, per the always-loaded rule.
 
   **No ceiling and no size measure, deliberately** — a true sentence about a
-  live feature cannot be evicted, so these three rules are about what goes in
+  live feature cannot be evicted, so these rules are about what goes in
   and whether it is still true, never about how long the document is.
 - **/plan resolves what it can in-session; capture is only for what it can't.**
 
@@ -134,6 +136,9 @@ capture instead ONLY when /plan genuinely can't resolve it this session:
   why, like any other ordering judgment. If later cleared work genuinely depends on
   the freeform fix landing first, that is an ordinary `Blocked by: [slug]`
   relationship — no new mechanism.
+  - a walk-through whose step runs setup is filed freeform, its prose saying
+    it runs in a chat of its own, because setup refuses while a build is in
+    progress.
 
 - **`Runs alone` marks work that is ready to build but must not share a run.**
   Write it on its own line in the item's block, alongside `Blocked by:` and the
@@ -256,7 +261,7 @@ re-printing the whole digest:**
 
 ```
 python <plugin-root>/scripts/queue_digest.py <QUEUE.md path> --next \
-    [--skip <slug,slug>] [--picked <N>]
+    [--skip <slug,slug>] [--picked <N>] [--medians <lines>,<YYYY-MM-DD>]
 ```
 
 It answers only *what is next* — which rung the ladder fell to, that rung's top
@@ -265,8 +270,12 @@ magnitude larger and answers a question nobody asked at a pick. Pass `--skip`
 for the entries set aside this session and `--picked` for how many picks have
 been made, since the ladder alternates on that parity — both are session state
 the script cannot see, and without them it answers the wrong pick the moment
-anything is skipped. Re-print the whole digest when the whole picture is what
-you need.
+anything is skipped. Pass `--medians` with the two medians the opening printed
+— the section's median entry length and median filing date — since without
+them the script recomputes both from the file as it now stands and the
+long-and-old group stops shrinking; the output names the medians it used and
+whether they were passed in or recomputed. Re-print the whole digest when the
+whole picture is what you need.
 
 **Then read the `LOG/index.md` lines newer than the most recent planning
 session's record** — found by that record's body fields rather than its
@@ -895,8 +904,8 @@ to.
 
 **As part of the interview, ask what would answer this item's open questions.**
 Where the answer is something outside what you can read — a current version,
-whether a feature exists, what a tool actually does — offer the search or run
-the command, here, with the user present. Where it is a choice they own, ask.
+whether a feature exists, what a tool actually does — run it, here, and report
+what it found. Where it is a choice they own, ask.
 
 **Once the user has taken an item, presenting it and beginning to work it is one
 beat** — the summary and the analysis arrive together, and the wait that follows
@@ -1128,13 +1137,11 @@ what the design RESTS ON, and when each was      # the external facts, one
 
 **The rests-on line names the external facts the design assumes — a tool's
 capability, what an outside surface permits, a version, a finding filed
-elsewhere — with the date each was last checked.** An assumption written into an
-item reads exactly like a verified one, and goes stale silently; dated on the
-item, a premise that has aged is visible where the work is, rather than only
-when something fails against it. Most kept items grow by about a line, which is
-the cost, paid at every keep. **A rest without a date is what the buildability
-check's general limb reads**: it means the fact has not been checked, and the
-item does not clear until it is.
+elsewhere — with the date each was last checked**, under the always-loaded
+rule that a sentence resting on an outside fact or a condition names it
+wherever it lives (skill-nonspecific-rules.md, Research and evidence filing).
+**A rest without a date is what the buildability check's general limb reads**:
+it means the fact has not been checked, and the item does not clear until it is.
 
 **Write them for a reader with less of the project in view than you have, and
 possibly less capability.** The session that builds this did not sit through the
@@ -1170,7 +1177,16 @@ settles on" names a file and a purpose and supplies no decision, which is what
 the limb asks for. **Prose that schedules a design decision into the build fails
 the same way, however carefully phrased** — "to be settled at the start of the
 build rather than during it" reads as care about sequencing and does the
-opposite, because the start of the build is still the build.
+opposite, because the start of the build is still the build. Two things the
+clause tells apart:
+- a decision — anything where two reasonable sessions would produce different
+  work — made at planning;
+- a tunable constant — a single value inside otherwise fully described work,
+  which the item states, saying what it was derived from or that it was not,
+  and naming what would settle it — chosen at planning and revisable once seen.
+A lookup falls on the same test: one whose result cannot change the work's
+shape is a constant the build reads; one whose result could change the design
+is a decision.
 
 **The disposal is a split, not a refusal.** The open question becomes its own
 small item and the large one is held against it by slug. Most of such an item is
@@ -1499,8 +1515,12 @@ with the command above, rather than hand-placing it into Processed.
 
 ```
 python <plugin-root>/scripts/queue_digest.py <QUEUE.md path> --next \
-    [--skip <slug,slug>] [--picked <N>]
+    [--skip <slug,slug>] [--picked <N>] [--medians <lines>,<YYYY-MM-DD>]
 ```
+
+Pass `--medians` with the two medians the opening printed, since without them
+the script recomputes both from the file now and the long-and-old group stops
+shrinking; read the output's medians line to see which it used.
 
 If the raw capture had no slug, give it one now. Report "moved to Processed as
 [slug]" only after the move reported success.

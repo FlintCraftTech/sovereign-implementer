@@ -259,8 +259,37 @@ def test_hedge_paragraph_around_a_shipped_citation_still_passes():
     shutil.rmtree(root, ignore_errors=True)
 
 
+def test_claim_inside_a_blockquote_does_not_block():
+    """A quoted draft showing what Claude says mid-run is not a filing report.
+
+    The instance: a tips draft quoted "moved [login-form] below the cleared
+    line" in a blockquote, and the check blocked the turn for an item that
+    does not exist. The same sentence as plain prose must still fire.
+    """
+    root = project()
+    code, out = run(root, "Here is the draft:\n\n> I moved [login-form] below "
+                          "the cleared line.\n\nSay yes to post it.")
+    check("a claim inside a blockquote does not block",
+          not blocked(out, code), out)
+    code, out = run(root, "I moved [login-form] below the cleared line.")
+    check("the same claim as plain prose still blocks", blocked(out, code), out)
+    shutil.rmtree(root, ignore_errors=True)
+
+
+def test_claim_inside_a_fence_does_not_block():
+    """A specimen inside a code fence is not a filing report either."""
+    root = project()
+    code, out = run(root, "The specimen reads:\n\n```\nI filed [login-form] "
+                          "to Unprocessed.\n```\n\nNothing was written.")
+    check("a claim inside a code fence does not block",
+          not blocked(out, code), out)
+    shutil.rmtree(root, ignore_errors=True)
+
+
 if __name__ == "__main__":
     print("test_stop_hook")
+    test_claim_inside_a_blockquote_does_not_block()
+    test_claim_inside_a_fence_does_not_block()
     test_cited_shipped_slug_does_not_block()
     test_filing_claim_with_no_heading_and_no_log_entry_still_blocks()
     test_placeholder_slugs_from_a_specimen_do_not_block()

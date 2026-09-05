@@ -266,8 +266,9 @@ own clean repository, the method's documents tracked privately in the outer
 one, the close committing both) and which of the two conversions this project
 gets: where the repository has no remote, the product's files move into a new
 inner repository (the **split**); where it already has one, that repository is
-already the product's and is kept whole as the inner, with the private outer
-created around it (the **wrap**). On a yes, plan the conversion with the user
+already the product's and is kept whole as the inner, the opened folder
+becoming the private outer with the checkout's contents moved down into the
+product subfolder (the **wrap**). On a yes, plan the conversion with the user
 file by file, opening the plan by reading `git remote` to choose the arm; on
 anything else, drop it — the flat shape keeps working exactly as before, and
 the offer returns once more only at the moment the project goes public.
@@ -276,16 +277,24 @@ the offer returns once more only at the moment the project goes public.
 split  (no remote)   ->  create the product subfolder and its repository; move
                          the product's files in; the method's documents stay
                          where they are and are tracked by the outer
-wrap   (has a remote) ->  create the outer folder one level up, with its own
-                         repository and no remote; move the existing checkout
-                         into it as the product subfolder, untouched; move the
-                         method's documents and working material up into the
-                         outer and track them there; leave the inner's own
-                         ignore rules alone — the documents were ignored there
-                         and are now absent
+wrap   (has a remote) ->  keep the opened folder as the outer, with its own
+                         repository and no remote; create the product
+                         subfolder inside it; move every file and folder of
+                         the checkout, `.git` included, down into that
+                         subfolder BY EXPLICIT NAME — never a loop or a glob;
+                         bring the method's documents and working material
+                         back to the top and track them in the outer; leave
+                         the inner's own ignore rules alone — the documents
+                         were ignored there and are now absent
 ```
 
-Both arms then write the Visibility line the nested scaffold writes.
+Any local path that pointed at the checkout — a marketplace registration, an
+MCP registration, a permission rule — now points one level too high and is
+re-pointed as part of the plan, read from the walk-through's ripple list
+before the move.
+
+Both arms then write the Visibility line the nested scaffold writes, naming
+the opened folder as the outer.
 
 **2. Retire REGISTRY.md if present**  [SILENT] when it holds only what the old
 setup put there; [BRIEF, PROMPT] when the user has written into it. No longer
@@ -696,6 +705,19 @@ and the licence question travels with that offer rather than sitting in the
 interview. **The offer may set up the repository and may never represent the
 contents as screened** — not publishing these documents is the only complete
 protection.
+
+**Cloud-sync folder, said once**  [SILENT] when no name matches; [BRIEF] when
+one does. Read the project's absolute path for these folder names,
+case-insensitive: `OneDrive`, `My Drive`, `Google Drive`, `Dropbox`,
+`iCloud Drive`, `iCloudDrive`. Where one is present, say three things in one
+short paragraph, as things to be aware of and never as things to fix:
+generated output and a sync client can collide — a build tool unable to delete
+files it just wrote is the shape; on Windows the sync root's added depth eats
+the 260-character path budget; and setting the client to mirror files locally
+rather than stream them on demand reduces the collision without removing it.
+The path alone is the check — no environment variable is read — and the step
+says nothing where no name matches. Scaffolding only; the top-up does not carry
+it to existing projects.
 
 **Whichever arm the fork lands in, the proposed configuration is what a user
 who says nothing about it ends up with — private via the ignore in a flat

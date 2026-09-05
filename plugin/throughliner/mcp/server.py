@@ -169,9 +169,10 @@ def tool_queue_next_pick(arguments):
         picked = int(arguments.get("picked") or 0)
     except (TypeError, ValueError):
         picked = 0
+    medians = digest.parse_medians(str(arguments.get("medians") or ""))
 
     return digest.render_whats_next(items, root, path, skip=skip,
-                                    picked=picked)
+                                    picked=picked, medians=medians)
 
 
 def tool_cycles_state(_arguments):
@@ -699,12 +700,23 @@ TOOLS = [
         "description":
             "Which item the ordering ladder picks next, which rung it fell "
             "to, where that item starts in QUEUE.md, and the item's own text. "
-            "Optionally takes the slugs set aside this session and how many "
+            "Optionally takes the slugs set aside this session, how many "
             "picks have already been made, which the ladder's alternating "
-            "rung needs.",
+            "rung needs, and the two medians the opening printed, so the "
+            "long-and-old groups stay fixed for the pass instead of being "
+            "recomputed at every pick. The output names the medians it used "
+            "and whether they were passed in or recomputed.",
         "inputSchema": {
             "type": "object",
             "properties": {
+                "medians": {
+                    "type": "string",
+                    "description":
+                        "The opening's two medians as `<lines>,<YYYY-MM-DD>` "
+                        "— the section's median entry length and median "
+                        "filing date. Omitted, both are recomputed from the "
+                        "file now and the output says so.",
+                },
                 "skip": {
                     "type": "array",
                     "items": {"type": "string"},

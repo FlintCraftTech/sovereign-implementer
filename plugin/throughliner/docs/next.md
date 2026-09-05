@@ -689,6 +689,10 @@ more. No experiment, no search, no stopping. (The heavy version, where the
 command is actually run, belongs at /plan's decision step, where the walkthrough is
 authored and the user is in the room.)
 
+**A step that names a file for a stated property has that file checked against
+the property before the step is given**; where the file no longer has it, the
+step goes out with the property and no file, and the user picks one.
+
 **Run the hand-over checkpoint before a step goes out** — the three-question
 read-back in skill-nonspecific-rules.md: the words, whether a tool could do it
 instead, and whether every file named is linked. The user is about to act on

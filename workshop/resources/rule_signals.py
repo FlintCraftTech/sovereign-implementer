@@ -87,7 +87,14 @@ a second script is two things that must agree about the file's shape and will
 drift.
 
 Usage:
-    python resources/rule_signals.py [project root]
+    py throughliner/workshop/resources/rule_signals.py [project root]
+
+Run it from the OUTER repository — the folder the app opens, where LOG/ and
+CLAUDE.md live. In a nested project the checks read two histories: the outer's
+for CLAUDE.md and the self-authoring files, the inner's (the product subfolder)
+for the shipped docs. Each commit's touched paths are matched against the
+trigger set relative to its own repository; LOG entries are read from the outer
+alone. A flat project has one repository and reads exactly as before.
 """
 
 import os
@@ -226,6 +233,82 @@ GROWTH_NOTE = (
     "count measures that."
 )
 
+# --- Two repositories ----------------------------------------------------
+#
+# A nested project (setup's split or wrap) keeps the method's documents in the
+# outer repository and the product in an inner one. The rule corpus straddles
+# them: CLAUDE.md and LOG/ in the outer, plugin/throughliner/docs/ in the
+# inner, workshop/ wherever it currently sits. Every read below that used to
+# assume one root now resolves each file to the repository that holds it, and
+# every git read runs in the repository the commit belongs to.
+
+VISIBILITY_INNER_RE = re.compile(r"inner repository \(`([^`]+?)/?`\)")
+
+
+def inner_root(root):
+    """The product subfolder in a nested project, or None for a flat one.
+
+    Read from the project CLAUDE.md's Visibility line, which names the inner
+    in backticks; failing that, the one immediate subfolder holding a `.git`.
+    Two candidates and no Visibility line is ambiguous, and None is returned
+    rather than a guess.
+    """
+    claude = os.path.join(root, "CLAUDE.md")
+    try:
+        with open(claude, "r", encoding="utf-8") as f:
+            for line in f:
+                if not line.startswith("Visibility:"):
+                    continue
+                m = VISIBILITY_INNER_RE.search(line)
+                if m:
+                    cand = os.path.join(root, m.group(1))
+                    if os.path.isdir(os.path.join(cand, ".git")):
+                        return cand
+    except OSError:
+        pass
+    found = []
+    try:
+        for name in os.listdir(root):
+            p = os.path.join(root, name)
+            if (not name.startswith(".") and os.path.isdir(p)
+                    and os.path.isdir(os.path.join(p, ".git"))):
+                found.append(p)
+    except OSError:
+        return None
+    return found[0] if len(found) == 1 else None
+
+
+def repos(root):
+    """(label, path) for every repository whose history the checks read."""
+    out = [("outer", root)]
+    inner = inner_root(root)
+    if inner:
+        out.append(("inner", inner))
+    return out
+
+
+def locate(root, rel):
+    """(repository path, rel) for a corpus file — the outer where it holds
+    the file, else the inner; the outer by default where neither does, so a
+    missing file reads as missing in one place rather than two."""
+    if os.path.exists(os.path.join(root, rel)):
+        return root, rel
+    inner = inner_root(root)
+    if inner and os.path.exists(os.path.join(inner, rel)):
+        return inner, rel
+    return root, rel
+
+
+def _has_commit(repo, sha):
+    try:
+        out = subprocess.run(["git", "cat-file", "-e", sha + "^{commit}"],
+                             cwd=repo, capture_output=True, text=True,
+                             timeout=20)
+    except (OSError, subprocess.SubprocessError):
+        return False
+    return out.returncode == 0
+
+
 # A structural rule-statement: a bullet, a bolded lead-in, or a line inside a
 # typed block. Counted by structure, never by judgment.
 BULLET_RE = re.compile(r"^\s*[-*]\s+\S")
@@ -270,7 +353,7 @@ def count_statements(root, files=None):
     total = 0
     per_file = {}
     for rel in (ALWAYS_LOADED if files is None else files):
-        path = os.path.join(root, rel)
+        path = os.path.join(*locate(root, rel))
         try:
             with open(path, "r", encoding="utf-8") as f:
                 text = f.read()
@@ -298,10 +381,11 @@ def _count_at_rev(root, ref, files, strict=False):
     """
     total = 0
     for rel in files:
+        repo, rel = locate(root, rel)
         try:
             out = subprocess.run(
                 ["git", "show", "%s:%s" % (ref, rel)],
-                cwd=root, capture_output=True, text=True, timeout=20,
+                cwd=repo, capture_output=True, text=True, timeout=20,
             )
         except (OSError, subprocess.SubprocessError):
             return None
@@ -439,31 +523,36 @@ def signal_audit_lag(root):
         m = re.match(r"^(\d{4}-\d{2}-\d{2})", boundary)
         since = m.group(1) if m else None
 
-    cmd = ["git", "log", "--format=%H%x00%s", "--name-only"]
-    if since:
-        cmd += ["--since", since]
-    else:
-        cmd += [DISPOSITION_BASELINE + "..HEAD"]
-    try:
-        out = subprocess.run(cmd, cwd=root, capture_output=True, text=True,
-                             timeout=20)
-    except (OSError, subprocess.SubprocessError):
-        out = None
-    if out is None or out.returncode != 0:
-        return {"stage": "AUDIT_LAG", "firing": False, "value": 0,
-                "slug": "compliance-audit-lag",
-                "message": "git unavailable; AUDIT-LAG not computed."}
+    commits, files = [], set()
+    for _label, repo in repos(root):
+        cmd = ["git", "log", "--format=%H%x00%s", "--name-only"]
+        if since:
+            cmd += ["--since", since]
+        elif _has_commit(repo, DISPOSITION_BASELINE):
+            cmd += [DISPOSITION_BASELINE + "..HEAD"]
+        # A repository without the baseline and without a boundary date is
+        # read whole: in a nested project that is the outer, whose history
+        # postdates the obligation entirely.
+        try:
+            out = subprocess.run(cmd, cwd=repo, capture_output=True,
+                                 text=True, timeout=20)
+        except (OSError, subprocess.SubprocessError):
+            out = None
+        if out is None or out.returncode != 0:
+            return {"stage": "AUDIT_LAG", "firing": False, "value": 0,
+                    "slug": "compliance-audit-lag",
+                    "message": "git unavailable; AUDIT-LAG not computed."}
 
-    commits, files, current_sha = [], set(), None
-    for line in out.stdout.splitlines():
-        if "\x00" in line:
-            sha, _subject = line.split("\x00", 1)
-            current_sha = sha[:7]
-        elif line.strip() and current_sha is not None:
-            if any(line.startswith(p) for p in RULE_BEARING):
-                if current_sha not in commits:
-                    commits.append(current_sha)
-                files.add(line.strip())
+        current_sha = None
+        for line in out.stdout.splitlines():
+            if "\x00" in line:
+                sha, _subject = line.split("\x00", 1)
+                current_sha = sha[:7]
+            elif line.strip() and current_sha is not None:
+                if any(line.startswith(p) for p in RULE_BEARING):
+                    if current_sha not in commits:
+                        commits.append(current_sha)
+                    files.add(line.strip())
 
     return {
         "stage": "AUDIT_LAG",
@@ -554,36 +643,56 @@ def _rule_bearing_commits(root):
     before the commit changes what the close's step means, for the same result
     this skip gets more cheaply.
     """
-    try:
-        out = subprocess.run(
-            ["git", "log", "-30", "--format=%H%x00%s", "--name-only",
-             DISPOSITION_BASELINE + "..HEAD"],
-            cwd=root, capture_output=True, text=True, timeout=20,
-        )
-    except (OSError, subprocess.SubprocessError):
-        return None, "git unavailable"
-    if out.returncode != 0:
+    all_repos = repos(root)
+    with_baseline = [r for _l, r in all_repos if _has_commit(r, DISPOSITION_BASELINE)]
+    if not with_baseline:
         # An unknown baseline is the likely cause — a shallow clone, or the
         # constant edited to a hash this repository doesn't carry. Say so
         # rather than silently falling back to the whole history, which would
         # re-report everything the baseline exists to exclude.
         return None, "git log failed (is %s in this repository?)" % DISPOSITION_BASELINE
 
-    commits, current = [], None
-    for line in out.stdout.splitlines():
-        if "\x00" in line:
-            sha, subject = line.split("\x00", 1)
-            current = {"sha": sha[:7], "full": sha, "subject": subject, "hits": False}
-            commits.append(current)
-        elif line.strip() and current is not None:
-            if any(line.startswith(p) for p in RULE_BEARING):
-                current["hits"] = True
+    pending = _backfill_pending(root)
+    commits = []
+    for _label, repo in all_repos:
+        # The repository carrying the baseline is read from it; a repository
+        # without it — the outer of a nested project, created after the
+        # obligation — is read whole, since every commit in it postdates it.
+        rng = [DISPOSITION_BASELINE + "..HEAD"] if repo in with_baseline else []
+        try:
+            out = subprocess.run(
+                ["git", "log", "-30", "--format=%H%x00%P%x00%s", "--name-only"] + rng,
+                cwd=repo, capture_output=True, text=True, timeout=20,
+            )
+        except (OSError, subprocess.SubprocessError):
+            return None, "git unavailable"
+        if out.returncode != 0:
+            return None, "git log failed in %s" % repo
 
-    # `git log` returns newest first, so commits[0] is HEAD. Skipped only while
-    # a placeholder is outstanding, so a repository with every heading
-    # backfilled is checked exactly as before.
-    if commits and _backfill_pending(root):
-        commits = commits[1:]
+        found, current = [], None
+        for line in out.stdout.splitlines():
+            if "\x00" in line:
+                sha, parents, subject = line.split("\x00", 2)
+                # A root commit creates the repository and imports files that
+                # already existed — the outer of a wrap — so it authors no
+                # rule and owes no disposition. Its file list is skipped too.
+                if not parents.strip():
+                    current = None
+                    continue
+                current = {"sha": sha[:7], "full": sha, "subject": subject,
+                           "hits": False, "repo": repo}
+                found.append(current)
+            elif line.strip() and current is not None:
+                if any(line.startswith(p) for p in RULE_BEARING):
+                    current["hits"] = True
+
+        # `git log` returns newest first, so found[0] is that repository's
+        # HEAD. Skipped only while a placeholder is outstanding, so a project
+        # with every heading backfilled is checked exactly as before. Per
+        # repository, because a nested close makes one commit in each.
+        if found and pending:
+            found = found[1:]
+        commits.extend(found)
 
     return [c for c in commits if c["hits"]], None
 
@@ -727,7 +836,7 @@ def signal_contradicted(root):
         # artifacts that do not in fact disagree.
         if not kinds or kinds != {"not needed"}:
             continue
-        delta = _count_delta_at(root, commit["full"])
+        delta = _count_delta_at(root, commit["full"], commit.get("repo", root))
         if delta is not None and delta > 0:
             flagged.append((commit["sha"], delta))
 
@@ -754,16 +863,23 @@ def signal_contradicted(root):
     }
 
 
-def _count_delta_at(root, rev):
+def _count_delta_at(root, rev, repo=None):
     """Always-loaded statement count at `rev` minus the count at its parent.
 
     Returns None where either side can't be read — a first commit, a file that
     didn't exist yet, an unreadable blob. Reuses the same counter MEASURED
     uses via `git show <rev>:<path>`, so there is no second counting logic to
-    drift.
+    drift. `repo` is the repository the commit belongs to; only the corpus
+    files that repository holds are counted, since a commit in one repository
+    cannot have changed a file in the other.
     """
-    before = _count_at_rev(root, rev + "^", ALWAYS_LOADED)
-    after = _count_at_rev(root, rev, ALWAYS_LOADED)
+    repo = repo or root
+    files = [rel for rel in ALWAYS_LOADED
+             if os.path.normcase(locate(root, rel)[0]) == os.path.normcase(repo)]
+    if not files:
+        return None
+    before = _count_at_rev(root, rev + "^", files)
+    after = _count_at_rev(root, rev, files)
     if before is None or after is None:
         return None
     return after - before
@@ -790,7 +906,7 @@ def signal_maintained(root, threshold=0.82):
     """
     statements = []
     for rel in ALWAYS_LOADED:
-        path = os.path.join(root, rel)
+        path = os.path.join(*locate(root, rel))
         try:
             with open(path, "r", encoding="utf-8") as f:
                 lines = f.read().splitlines()
@@ -833,7 +949,7 @@ def signal_maintained(root, threshold=0.82):
 
 def load_retired_terms(root):
     """Terms recorded as retired. Source data, not derived state."""
-    path = os.path.join(root, RETIRED_TERMS_FILE)
+    path = os.path.join(*locate(root, RETIRED_TERMS_FILE))
     terms = []
     # Only read under the "## The list" heading. The file explains its own
     # format above that point, and the format example is a line of exactly the
@@ -962,7 +1078,8 @@ def signal_repealed(root):
     produces a visible signal. No number, no calendar.
     """
     terms = load_retired_terms(root)
-    if not terms and not os.path.isfile(os.path.join(root, RETIRED_TERMS_FILE)):
+    retired_path = os.path.join(*locate(root, RETIRED_TERMS_FILE))
+    if not terms and not os.path.isfile(retired_path):
         # A missing list is a footing failure, not a clean result. The old
         # behaviour returned a no-list line grouped with the passes, which
         # read as clean while one of the five checks had not run at all —
@@ -983,7 +1100,8 @@ def signal_repealed(root):
                   "CLAUDE.md", "SPEC.md"]
     hits = []
     for rel in scan_roots:
-        base = os.path.join(root, rel)
+        base_repo, rel = locate(root, rel)
+        base = os.path.join(base_repo, rel)
         files = []
         if os.path.isfile(base):
             files = [base]
@@ -995,15 +1113,16 @@ def signal_repealed(root):
                     if n.endswith((".md", ".py"))
                 )
         for path in files:
-            if os.path.abspath(path) == os.path.abspath(
-                    os.path.join(root, RETIRED_TERMS_FILE)):
+            if os.path.abspath(path) == os.path.abspath(retired_path):
                 continue
             try:
                 with open(path, "r", encoding="utf-8") as f:
                     lines = f.read().splitlines()
             except OSError:
                 continue
-            rel_path = os.path.relpath(path, root).replace("\\", "/")
+            # Relative to the repository that holds the file, so the archival
+            # paths match in a nested project exactly as in a flat one.
+            rel_path = os.path.relpath(path, base_repo).replace("\\", "/")
             if _is_archival(rel_path):
                 continue
             seen = set()
