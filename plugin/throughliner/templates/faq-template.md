@@ -334,3 +334,16 @@ facts it rests on, or said plainly where it recorded none. A capture that was
 set aside until a date gets the same treatment when the date passes. The
 point: the wait being over says nothing about whether the thing waited for
 turned out as assumed, and this is the one moment anyone looks.
+
+## Can I move a queue item while a build is running?
+
+Yes, by saying so. A build run never rearranges your queue on its own
+initiative, but an instruction from you goes through: tell it to skip an item,
+hold one until something else lands, or move one to the bottom, and Claude
+makes the move with the queue tool, says so in one line, and carries on
+building. Nothing pauses and nothing is re-confirmed, because the instruction
+was yours. You can check by opening QUEUE.md and finding the item where you sent
+it, and the move is written into the session's record at the close. Two limits:
+Claude never guesses a move you did not ask for and never offers one mid-run —
+that waits for planning — and deleting an item is a separate decision a run
+will not make on the fly, so ask for a delete at planning instead.

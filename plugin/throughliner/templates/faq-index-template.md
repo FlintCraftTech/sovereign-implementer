@@ -44,3 +44,5 @@ announced yet, not that questions aren't welcome: just ask in chat.
 - **What does planning tell me when held work comes back?** — what the lift
   says about the work's assumptions, and why the wait ending is not the same as
   the assumption holding. [faq.md](faq.md)
+- **Can I move a queue item while a build is running?** — what to say, what
+  Claude does and says back, and the two things a run will not do. [faq.md](faq.md)
