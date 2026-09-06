@@ -1,5 +1,7 @@
 # Claude Code's security guidance, as read on 2026-09-03
 
+**Re-read 2026-09-06 at the maintenance-sweep turn.** Two additions since the first read, neither bearing on the red-flag scope or on how a session handles untrusted content: the guidance page now names sandbox `denyRead` rules as a way to restrict what read-only Bash commands may read, and notes that trust verification is disabled under the `-p` flag and is held per session when Claude Code starts in the home directory; the scanner page now says a Pro plan can turn dynamic workflows on from `/config`, and that Fable's safety classifiers may downgrade some scan steps to Opus. The `python3`-on-PATH prerequisite is unchanged, so the scanner still does not run on this machine.
+
 **Subject:** what Anthropic's own documentation says about Claude Code security, read so the method's red-flag screen and its weekly maintenance sweep can be checked against it. Two pages read on 2026-09-03: `https://code.claude.com/docs/en/security` (the guidance) and `https://code.claude.com/docs/en/claude-security` (the scanner plugin). Re-read each maintenance-sweep turn; changes are filed as captures.
 
 ## What the guidance page says

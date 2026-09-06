@@ -20,6 +20,7 @@ a bare number is the failure the method's own rules forbid.
 
 import datetime
 import importlib.util
+import json
 import os
 import shutil
 import subprocess
@@ -193,8 +194,93 @@ def test_the_snapshot_folder_is_one_git_already_ignores():
           '".throughliner", "snapshots"' in source, "snapshot folder moved")
 
 
+def _drive(cwd, payload):
+    """Run the hook as the app does — a subprocess reading JSON on stdin."""
+    proc = subprocess.run([sys.executable, HOOK], cwd=cwd,
+                          input=json.dumps(payload), capture_output=True,
+                          text=True, encoding="utf-8")
+    return proc.returncode, proc.stdout
+
+
+def _log_lines(d):
+    path = os.path.join(d, ".throughliner", "pre-tool-use.log")
+    if not os.path.isfile(path):
+        return []
+    with open(path, encoding="utf-8") as handle:
+        return handle.read().splitlines()
+
+
+def test_every_decision_leaves_a_line_naming_its_branch():
+    """[research-writes-passed-lock-unexplained]: a write that passes with no
+    line is a hook that did not run. An allow and a deny each leave one line
+    carrying the tool, the decision, the deciding branch and the target."""
+    d = repo(commit=True)
+    # A planning session (no build working file): QUEUE.md is on the standing
+    # list and passes; README.md is not and is refused.
+    rc, out = _drive(d, {"cwd": d, "tool_name": "Edit", "session_id": "s1",
+                         "tool_input": {"file_path": os.path.join(d, "QUEUE.md")}})
+    rc2, out2 = _drive(d, {"cwd": d, "tool_name": "Edit", "session_id": "s1",
+                           "tool_input": {"file_path": os.path.join(d, "README.md")}})
+    lines = _log_lines(d)
+    check("the hook exits 0 on both calls", rc == 0 and rc2 == 0, f"{rc} {rc2}")
+    check("the allow left no deny output and the deny did",
+          out.strip() == "" and '"deny"' in out2, repr((out, out2)))
+    check("two decisions, two lines", len(lines) == 2, repr(lines))
+    if len(lines) == 2:
+        allow, deny = lines
+        check("the allow line names its branch and target",
+              "\tEdit\tallow\tplanning standing list\t" in allow
+              and allow.endswith("QUEUE.md"), allow)
+        check("the deny line names its branch and target",
+              "\tEdit\tdeny\tplanning standing list: not on it\t" in deny
+              and deny.endswith("README.md"), deny)
+        check("each line opens with a clock stamp",
+              all(len(l.split("\t")[0]) == 19 for l in lines), repr(lines))
+    # A shell command that no guard matches is an allow with the command as
+    # its target.
+    _drive(d, {"cwd": d, "tool_name": "Bash", "session_id": "s1",
+               "tool_input": {"command": "git status"}})
+    lines = _log_lines(d)
+    check("a shell allow names its branch and the command",
+          lines and "\tBash\tallow\tshell command: no guard matched\tgit status"
+          in lines[-1], repr(lines[-1:] if lines else lines))
+    shutil.rmtree(d, ignore_errors=True)
+
+
+def test_no_log_in_an_unadopted_folder():
+    """An unadopted folder must not gain a .throughliner/ folder from a hook
+    that fired in passing."""
+    d = tempfile.mkdtemp(prefix="decision-log-unadopted-")
+    _drive(d, {"cwd": d, "tool_name": "Bash", "session_id": "s1",
+               "tool_input": {"command": "git status"}})
+    check("no .throughliner/ folder appears in an unadopted folder",
+          not os.path.isdir(os.path.join(d, ".throughliner")))
+    shutil.rmtree(d, ignore_errors=True)
+
+
+def test_the_decision_log_is_pruned():
+    """The bound: the newest 500 lines, about a session's worth of calls."""
+    mod = load()
+    d = repo(commit=True)
+    mod._ctx.update({"cwd": d, "tool": "Edit", "target": "x"})
+    for i in range(mod._DECISION_LOG_LINES + 40):
+        mod._log_decision("allow", "branch %d" % i)
+    lines = _log_lines(d)
+    check("the log holds exactly the newest bound of lines",
+          len(lines) == mod._DECISION_LOG_LINES, str(len(lines)))
+    check("the oldest lines are the ones that went",
+          lines and lines[0].endswith("branch 40\tx")
+          and lines[-1].endswith("branch %d\tx" % (mod._DECISION_LOG_LINES + 39)),
+          repr((lines[:1], lines[-1:])))
+    mod._ctx.update({"cwd": "", "tool": "", "target": ""})
+    shutil.rmtree(d, ignore_errors=True)
+
+
 if __name__ == "__main__":
     print("test_pre_tool_use_snapshots")
+    test_every_decision_leaves_a_line_naming_its_branch()
+    test_no_log_in_an_unadopted_folder()
+    test_the_decision_log_is_pruned()
     test_untracked_document_is_snapshotted()
     test_tracked_document_is_not_snapshotted()
     test_a_non_method_document_is_not_snapshotted()

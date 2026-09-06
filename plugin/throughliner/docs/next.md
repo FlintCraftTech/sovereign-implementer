@@ -46,13 +46,6 @@ no-blocking-ask rules are all sound and are not reopened.
 user cannot capture anything. That is a real cost of the current shape rather than
 a wording problem, and it is answered by concurrency work rather than here.
 
-**Self-closing is refused, recorded so it is not re-proposed.** A run that ran
-/done on itself would commit with nobody present, and a commit message is one of
-the few things this method still shows before it happens — precisely because a
-commit is hard to unwind and its message lands in no file. Auto-closing either
-overrides that guard or invents a version of it that survives nobody being there.
-Neither is worth saving one command.
-
 ## What /next runs on
 
 **A run reads SPEC, then the queue's cleared region whole** — each item's full
@@ -115,8 +108,8 @@ whichever bound comes first ends the run. What the marker means and where it is
 written are in plan.md's decision step, which is the authoring site.
 
 The run includes any `[user]` items among the cleared work; Step 3 walks the user
-through each *without ending the run*. The marker is the only thing that bounds a
-run.
+through each *without ending the run*. A `[user]` item is not a bound: the run's
+two bounds are the cleared-to-run line and a `Runs alone` marker.
 
 ## Step 1: Pre-flight
 
@@ -210,10 +203,10 @@ user is not, and a run should not stop to explore.
 
 ### 3. Open waiting mail  [SILENT] when the mailbox is empty; [BRIEF] when it isn't
 
-Read anything waiting in this project's `INBOX/`, before the run is presented.
-That ordering is the point: mail can block work, so it is read while the run can
-still change rather than after scope is locked. Full mechanics —
-`${CLAUDE_PLUGIN_ROOT}/docs/feedback-and-inbox.md`.
+Triage anything waiting in this project's `INBOX/` as
+`${CLAUDE_PLUGIN_ROOT}/docs/feedback-and-inbox.md` states, before the run is
+presented. That ordering is the point: mail can block work, so it is read while
+the run can still change rather than after scope is locked.
 
 ```
 /next OPENS, FILES and DEFERS. It never processes.
@@ -221,33 +214,16 @@ still change rather than after scope is locked. Full mechanics —
     a message bearing on an     ->  name it at the present-the-run beat and
       item in the cleared           recommend dropping that item FROM THIS
       region                        RUN ONLY. Leave the queue untouched.
-    the message file            ->  moves to INBOX/archive/
 ```
 
-Processing — deciding an item's fate — stays /plan's, which is the boundary the
-whole method rests on. The reply draft is offered at the close, not here: a run
-is unattended in practice, and stopping it to approve text that leaves the
-machine would defeat that.
-
-Nothing in the scope-lock blocks this: `pre_tool_use` treats any project's
-`INBOX/` as always editable, so reading and archiving mail during a locked run
-cannot be denied.
+Deciding an item's fate stays /plan's; a reply, where one is owed, is drafted
+at the close.
 
 ### 3b. Cycles due-ness check  [SILENT] when no cycles doc exists; [BRIEF] whenever one does
 
-**The trigger is the session opening's cycles line**, which names the doc, each
-definition's slug and what its observable currently reads. Where that line is
-present, read `CYCLES.md` and compute each cycle's due-ness from the observable
-its definition names — filing ONE capture in Unprocessed under the cycle's slug
-where a turn is due and no open capture with that slug exists, and nothing
-otherwise — then name each cycle as due or not in one line, whether or not
-anything was filed. Where a cycle carries a chain, due-ness is per ritual: a
-ritual is due when its computed date on the cycles line has arrived and no
-completed turn of this cycle is recorded since the previous anchor, and the
-capture names that ritual in its heading, under the cycle's slug; a cycle with
-no chain is unchanged. It folds into the pre-flight's single narration like every
-other check here. Filing only: what to do with the capture stays planning work.
-A project with no cycles doc gets no line and pays nothing here.
+Run the cycles due-ness check as plan.md's Step 1 states it ("Cycles due-ness
+check"), filing only — what to do with the capture stays planning work. It
+folds into the pre-flight's single narration like every other check here.
 
 ### 4. Present the run and offer the off-ramp  [BRIEF, PROMPT]
 
@@ -537,8 +513,6 @@ line.
 ```
 python <plugin-root>/scripts/reorder_queue.py <QUEUE.md path> \
     --delete <slug> Processed
-# the plugin root is the grandparent of the running skill's base directory
-# (.../<plugin-root>/skills/<skill>) — derive it, never hardcode a path.
 ```
 
 Tick first, then remove. That order means an interruption between the two leaves
@@ -561,16 +535,9 @@ item strands in Processed and the next /next presents it again as if unbuilt.
   recorded is told to the user *after* the last step is done or they defer.
 - **One `[user]` item at a time**, each in its own message, led by its own live
   walk-through. Not a bulk-approval result set.
-- **Three things count as knowing an item is complete**, and nothing else: it was
-  walked to its end this session, the user said they did it, or its walkthrough
-  named an observable check and that check passed. An item whose blocker visibly
-  hasn't shipped is not complete. A failed check produces a plain statement of
-  what was found and leaves the item in place.
-- **The gap this leaves is deliberate: leave the item in place.** An item the user
-  completed on their own, with nothing observable to show for it, will sit in
-  Processed until they mention it — and mentioning it is already a supported path.
-  This is written down precisely so nobody later notices the hole and proposes an
-  ask to fill it.
+- **Completion is read as the always-loaded lifecycle states** —
+  skill-nonspecific-rules.md's "Walk a `[user]` item through whenever it is
+  reached" bullet; an item whose blocker visibly hasn't shipped is not complete.
 - **A completed `[user]` item has a defined close:** log it under its slug and
   remove it from Processed. Lives in **both** /done (the user runs /done right
   after finishing) and /plan (they completed it async and mention it).
@@ -679,9 +646,8 @@ deferral to honour and nothing to resume from.
 **Where the user volunteers that an item is done, take them at their word:** skip
 the walk-through and recommend /done to record it.
 
-**Where the item's walkthrough names an observable check, run it** — a file
-present or absent, a branch gone, a URL responding. A failed check is reported
-plainly as what was found, and the item stays in place.
+**Where the item's walkthrough names an observable check, run it**, and report
+a failed one as what was found, leaving the item in place.
 
 **Confirm the step can produce the observation the item names** — the light
 form: check that the step names something which yields the evidence, and no

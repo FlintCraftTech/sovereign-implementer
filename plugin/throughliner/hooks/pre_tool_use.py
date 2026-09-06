@@ -212,7 +212,61 @@ PATTERN_AS_DATA_NOTE = (
 
 # --- Helpers ---
 
-def _deny(reason: str) -> int:
+# --- The decision log ([research-writes-passed-lock-unexplained]) ---
+#
+# Every decision this hook makes — allow, deny or ask — appends one line to
+# `.throughliner/pre-tool-use.log` under the project root: clock time, the
+# tool, the decision, the branch that decided, and the path or command it
+# targeted. An allowed hook leaves no trace in the transcript, so a write
+# that passed with no line here is a hook that did not run, or ran and
+# exited without deciding — which is the case the log exists to make
+# visible. The folder is the project's ignored `.throughliner/`, which
+# already holds the snapshots. A failure to write never changes the decision.
+#
+# The file is pruned to its newest 500 lines on each append — about a
+# session's worth of tool calls, derived from the run-cost measurements'
+# 254–417 calls per run (workshop/resources/research/run-cost-measurements-
+# 2026-08-28.md).
+_DECISION_LOG_NAME = "pre-tool-use.log"
+_DECISION_LOG_LINES = 500
+_ctx = {"cwd": "", "tool": "", "target": ""}
+
+
+def _log_decision(decision: str, branch: str) -> None:
+    cwd = _ctx.get("cwd") or ""
+    if not cwd:
+        return
+    target = (_ctx.get("target") or "").replace("\r", " ").replace("\n", " ")
+    if len(target) > 200:
+        target = target[:200] + "…"
+    stamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    line = "%s\t%s\t%s\t%s\t%s\n" % (
+        stamp, _ctx.get("tool") or "", decision, branch, target)
+    folder = os.path.join(cwd, ".throughliner")
+    path = os.path.join(folder, _DECISION_LOG_NAME)
+    try:
+        os.makedirs(folder, exist_ok=True)
+        try:
+            with open(path, "r", encoding="utf-8", errors="replace") as f:
+                lines = f.read().splitlines(keepends=True)
+        except OSError:
+            lines = []
+        lines.append(line)
+        lines = lines[-_DECISION_LOG_LINES:]
+        with open(path, "w", encoding="utf-8", newline="") as f:
+            f.write("".join(lines))
+    except OSError:
+        pass
+
+
+def _allow(branch: str) -> int:
+    """An allow is a decision too, and it leaves a line like the others."""
+    _log_decision("allow", branch)
+    return 0
+
+
+def _deny(reason: str, branch: str = "") -> int:
+    _log_decision("deny", branch)
     output = {
         "hookSpecificOutput": {
             "hookEventName": "PreToolUse",
@@ -224,13 +278,14 @@ def _deny(reason: str) -> int:
     return 0
 
 
-def _ask(reason: str) -> int:
+def _ask(reason: str, branch: str = "") -> int:
     """Surface a permission prompt the user approves or declines.
 
     Unlike _deny, "ask" does not block — it hands the decision to the user
     with the reason shown. Used by the subagent cost gate so a subagent
     spawn is never silent, while the user keeps full choice.
     """
+    _log_decision("ask", branch)
     output = {
         "hookSpecificOutput": {
             "hookEventName": "PreToolUse",
@@ -1499,6 +1554,14 @@ def main() -> int:
     tool_name = data.get("tool_name", "")
     tool_input = data.get("tool_input") or {}
 
+    # The decision log writes only inside an adopted project — an unadopted
+    # folder must not gain a `.throughliner/` folder from a hook that fired
+    # in passing.
+    adopted_here = bool(cwd) and os.path.isfile(os.path.join(cwd, "SPEC.md"))
+    _ctx["cwd"] = cwd if adopted_here else ""
+    _ctx["tool"] = tool_name if isinstance(tool_name, str) else ""
+    _ctx["target"] = ""
+
     # --- Subagent (Agent / Task): cost ask-gate ---
     # A subagent run burns tokens fast and a single run can exhaust the
     # user's usage, so every spawn gets a permission prompt before it starts.
@@ -1519,7 +1582,8 @@ def main() -> int:
             "Subagents burn tokens fast — a single run can use up your usage "
             "for the session. Approve if this genuinely needs wide, "
             "open-ended exploration; decline to have Claude do the work "
-            "directly instead. Declining is a normal, safe choice."
+            "directly instead. Declining is a normal, safe choice.",
+            branch="subagent cost gate",
         )
 
     # --- Skill: the method's own commands are the user's to type ---
@@ -1545,13 +1609,15 @@ def main() -> int:
             ours = "throughliner" in prefix.lower() or "flintcraft" in prefix.lower()
             adopted = bool(cwd) and os.path.isfile(os.path.join(cwd, "SPEC.md"))
             if bare.lower() in METHOD_SKILLS and (ours or (not prefix and adopted)):
+                _ctx["target"] = requested
                 return _deny(
                     f"[Throughliner] The /{bare} command is yours to type — "
                     "Claude can't run it, and trying shows you a red error "
                     "instead of doing anything.\n\n"
                     "If you just typed it and it landed as ordinary chat text, "
                     "the command probably hadn't registered yet. Wait a few "
-                    f"seconds and type /{bare} again."
+                    f"seconds and type /{bare} again.",
+                    branch="method skill invocation",
                 )
 
     if not cwd:
@@ -1574,6 +1640,7 @@ def main() -> int:
         command = tool_input.get("command", "")
         if not isinstance(command, str):
             return 0
+        _ctx["target"] = command
 
         # Match each git-safety pattern per segment, never against the whole
         # compound command, so tokens from unrelated segments can't combine
@@ -1589,7 +1656,8 @@ def main() -> int:
                     "this one file has no history to restore from.\n\n"
                     "Use Edit to change a line in it. Nothing else needs to "
                     "touch the whole file."
-                    + PATTERN_AS_DATA_NOTE
+                    + PATTERN_AS_DATA_NOTE,
+                    branch="git safety: sent-register destruction",
                 )
 
             if RESET_HARD.search(segment):
@@ -1600,7 +1668,8 @@ def main() -> int:
                     "- `git stash` — saves changes for later.\n"
                     "- `git checkout -- <file>` — discards one file's changes.\n"
                     "- `git reset HEAD~1` — moves HEAD back, keeps working tree."
-                    + PATTERN_AS_DATA_NOTE
+                    + PATTERN_AS_DATA_NOTE,
+                    branch="git safety: reset --hard",
                 )
 
             if PUSH_FORCE.search(segment):
@@ -1609,7 +1678,8 @@ def main() -> int:
                     "overwrite remote commits.\n\n"
                     "Use `git push --force-with-lease` instead — it refuses to "
                     "push if the remote has commits you haven't fetched."
-                    + PATTERN_AS_DATA_NOTE
+                    + PATTERN_AS_DATA_NOTE,
+                    branch="git safety: push --force",
                 )
 
             if BLANKET_ADD.search(segment):
@@ -1618,7 +1688,8 @@ def main() -> int:
                     "`git add --all`, `git add .`) stage everything in the tree, "
                     "including files never meant for the commit.\n\n"
                     "Stage explicitly — name each path: `git add <path> <path>`."
-                    + PATTERN_AS_DATA_NOTE
+                    + PATTERN_AS_DATA_NOTE,
+                    branch="git safety: blanket add",
                 )
 
             if COMMIT_ALL.search(segment):
@@ -1628,7 +1699,8 @@ def main() -> int:
                     "meant for the commit.\n\n"
                     "Stage explicitly, then commit: `git add <path> <path>`, "
                     'then `git commit -m "<message>"`.'
-                    + PATTERN_AS_DATA_NOTE
+                    + PATTERN_AS_DATA_NOTE,
+                    branch="git safety: commit -a",
                 )
 
         # --- Structured shell writes to project files ---
@@ -1677,7 +1749,8 @@ def main() -> int:
                 "and still passes.\n\n"
                 "Note the honest limit of this check: it reads the command's "
                 "text, not its behaviour. A write buried inside a script FILE "
-                "this command merely invokes is not seen."
+                "this command merely invokes is not seen.",
+                branch="shell-write guard: structured write to a project file",
             )
 
         if has_computed_write_target(command):
@@ -1702,7 +1775,8 @@ def main() -> int:
                 "Why this is strict: a computed target slipped past an earlier "
                 "version of this check and silently corrupted QUEUE.md, and the "
                 "only difference from the version that was correctly blocked "
-                "was one variable assignment."
+                "was one variable assignment.",
+                branch="shell-write guard: computed target",
             )
 
         # The queue tool is the one sanctioned route by which a shell command
@@ -1713,7 +1787,7 @@ def main() -> int:
         if "reorder_queue" in command:
             _snapshot_before_write(cwd, os.path.join(cwd, "QUEUE.md"))
 
-        return 0
+        return _allow("shell command: no guard matched")
 
     # --- Edit/Write/MultiEdit: file-scope enforcement ---
     #
@@ -1730,6 +1804,7 @@ def main() -> int:
     filepath = tool_input.get("file_path", "")
     if not filepath:
         return 0
+    _ctx["target"] = filepath
 
     # Publish the editing-state signal: a write is about to happen, on this
     # file, now. Placed before the scope checks so the marker is up before the
@@ -1760,7 +1835,8 @@ def main() -> int:
             "fallback only when both kind names are taken. Write the new record "
             "under the free name above that matches this session's kind.\n\n"
             "If you meant to add to the existing record rather than replace it, "
-            "use Edit — appending to a record is always allowed."
+            "use Edit — appending to a record is always allowed.",
+            branch="overwrite guard: LOG entry",
         )
 
     # A Write over the outbound register destroys the only copy — the mailbox is
@@ -1777,7 +1853,8 @@ def main() -> int:
             "Use Edit instead: append the new line to the existing register, "
             "or change the line that needs changing. Replacing the whole file "
             "is what is refused. (This fires only against a register that "
-            "already exists — a Write creating one passes.)"
+            "already exists — a Write creating one passes.)",
+            branch="overwrite guard: sent register",
         )
 
     # Rule 1: the working file's Files: section governs editability. Tri-state:
@@ -1798,9 +1875,10 @@ def main() -> int:
                     "Files: section, so nothing is limiting which files it can "
                     "change. That may be exactly right — an audit lists no "
                     "files — but it is worth knowing rather than assuming.\n\n"
-                    "Proceed, or stop and give the build a file list first?"
+                    "Proceed, or stop and give the build a file list first?",
+                    branch="build scope: unscoped working file, asked once",
                 )
-            return 0
+            return _allow("build scope: unscoped working file")
 
         # A build does not edit QUEUE.md by hand. It reads the file — that is
         # where its instructions and their reasoning live — and the only queue
@@ -1834,7 +1912,8 @@ def main() -> int:
                 "a path. It moves, deletes and appends whole entries "
                 "byte-for-byte, addressed by slug.\n\n"
                 "If this is neither of those, it is work on the queue's own "
-                "contents, which is planning rather than building."
+                "contents, which is planning rather than building.",
+                branch="build scope: queue edited by hand",
             )
 
         # The session id must be passed: _is_method_doc resolves this session's
@@ -1842,32 +1921,22 @@ def main() -> int:
         # `_build-unknown.md` and never matches the real one — which denied a
         # scoped build every write to its own working file, including the
         # progress ticks and change notes the close reads.
-        if _is_method_doc(filepath, cwd, data.get("session_id", "")):
-            return 0
-
-        if _is_memory_dir(filepath):
-            return 0
-
-        if _is_research_dir(filepath, cwd):
-            return 0
-
-        if _is_retired_terms_file(filepath, cwd):
-            return 0
-
-        if _is_scratchpad_dir(filepath, cwd):
-            return 0
-
-        if _is_plans_dir(filepath, cwd):
-            return 0
-
-        if _is_tools_file(filepath, cwd):
-            return 0
-
-        if _is_inbox_dir(filepath):
-            return 0
-
-        if _is_close_phase_file(filepath, cwd, data.get("session_id", "")):
-            return 0
+        sid = data.get("session_id", "")
+        for branch, hit in (
+            ("build scope: method doc",
+             lambda: _is_method_doc(filepath, cwd, sid)),
+            ("build scope: memory dir", lambda: _is_memory_dir(filepath)),
+            ("research exemption", lambda: _is_research_dir(filepath, cwd)),
+            ("retired-terms file", lambda: _is_retired_terms_file(filepath, cwd)),
+            ("scratchpad", lambda: _is_scratchpad_dir(filepath, cwd)),
+            ("plans dir", lambda: _is_plans_dir(filepath, cwd)),
+            ("TOOLS.md", lambda: _is_tools_file(filepath, cwd)),
+            ("INBOX", lambda: _is_inbox_dir(filepath)),
+            ("close-phase file",
+             lambda: _is_close_phase_file(filepath, cwd, sid)),
+        ):
+            if hit():
+                return _allow(branch)
 
         if not build_files:
             return _deny(
@@ -1878,7 +1947,8 @@ def main() -> int:
                 "don't edit source files — route findings to Captures in "
                 "QUEUE.md instead. If a file genuinely needs editing, halt "
                 "and add it to the working file's Files: section with the "
-                "user's approval."
+                "user's approval.",
+                branch="build scope: empty Files list",
             )
 
         if not _is_build_file(filepath, cwd, build_files):
@@ -1908,8 +1978,11 @@ def main() -> int:
                 f"{diagnosis}\n\n"
                 "If this file genuinely needs editing, halt the build and, "
                 "with the user's approval, add it to the working file's Files: "
-                "section."
+                "section.",
+                branch="build scope: not in Files list",
             )
+
+        return _allow("build scope: in Files list")
 
     else:
         # /setup declares itself with a scratchpad marker, and a session
@@ -1920,27 +1993,31 @@ def main() -> int:
         # scaffold file) sits outside the standing list and was denied with no
         # prompt and no override.
         if _setup_marker_present(data.get("session_id", "")):
-            return 0
+            return _allow("setup marker")
 
         # Rule 4: no build working file, so this is a planning or freeform
         # session, and the scope-lock runs against the STANDING list instead of
         # a build's agreed one. Writes to that surface pass silently; everything
         # else is denied. See _is_plan_quiet_path for why this denies rather
         # than asks.
-        if not (
-            _is_plan_quiet_path(filepath, cwd)
-            or _is_memory_dir(filepath)
-            or _is_research_dir(filepath, cwd)
-            or _is_scratchpad_dir(filepath, cwd)
-            or _is_plans_dir(filepath, cwd)
-            or _is_tools_file(filepath, cwd)
-            or _is_inbox_dir(filepath)
-            or _is_ritual_declared_path(filepath, cwd)
-            or _is_build_file(
-                filepath, cwd,
-                _freeform_scope_files(cwd, data.get("session_id", "")),
-            )
+        sid = data.get("session_id", "")
+        for branch, hit in (
+            ("planning standing list", lambda: _is_plan_quiet_path(filepath, cwd)),
+            ("memory dir", lambda: _is_memory_dir(filepath)),
+            ("research exemption", lambda: _is_research_dir(filepath, cwd)),
+            ("scratchpad", lambda: _is_scratchpad_dir(filepath, cwd)),
+            ("plans dir", lambda: _is_plans_dir(filepath, cwd)),
+            ("TOOLS.md", lambda: _is_tools_file(filepath, cwd)),
+            ("INBOX", lambda: _is_inbox_dir(filepath)),
+            ("ritual Writes: field",
+             lambda: _is_ritual_declared_path(filepath, cwd)),
+            ("freeform scope file",
+             lambda: _is_build_file(filepath, cwd,
+                                    _freeform_scope_files(cwd, sid))),
         ):
+            if hit():
+                return _allow(branch)
+        if True:
             return _deny(
                 "[Throughliner] BLOCKED: planning sessions can only change a "
                 "fixed set of files, and this isn't one of them.\n\n"
@@ -1959,7 +2036,8 @@ def main() -> int:
                 "_freeform-<session-id>.md in the project root with a Files: "
                 "section naming this one path, say so in one line, and make "
                 "the edit — the user's repeated direction is what opens that "
-                "door, one path at a time."
+                "door, one path at a time.",
+                branch="planning standing list: not on it",
             )
 
     return 0

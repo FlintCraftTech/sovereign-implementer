@@ -33,7 +33,7 @@ code
 
 **How the reveal renders** follows the view-in-doc rule (skill-nonspecific-rules.md). The
 text is now doc-resident, so: a plain link to the edited file with the line named
-in the prose ("around line 40" — the app ignores a link's line anchor), falling
+in the prose ("around line 40"), falling
 back to an inline excerpt if the link won't resolve. Either
 way, only after the write is confirmed.
 
@@ -329,15 +329,14 @@ item that silently thrashes wastes the run with no one watching.
 signature of no progress on one item:
     the same error recurring
     an empty diff (an edit that changes nothing)
-    the same check failing the same way
-        ~3 times  ->  STOP. Don't keep trying.
+    an attempt fails the same way an earlier, DIFFERENT attempt
+        already failed  ->  STOP. Don't keep trying.
 ```
 
 Tell the user plainly what repeated — the exact error, or what wouldn't change —
 and hand them the decision via Approach not working.
 
-Judgment, not a counter: three is a rough trigger and the point is to surface a
-stuck item.
+Judgment, not a counter: the point is to surface a stuck item.
 
 ### Approach not working  [DISCUSS, PROMPT]
 

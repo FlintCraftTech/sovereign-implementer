@@ -1155,8 +1155,24 @@ def test_unreadable_not_before_says_so():
     shutil.rmtree(root, ignore_errors=True)
 
 
+def test_unblock_potential_singular():
+    """One citing entry reads "1 other entry cites it", not "1 other entries
+    cite it" ([lint-gone-notice-repeats-every-call])."""
+    d = project(unprocessed=(
+        "#### Cited once [alpha]\nRationale.\n\n"
+        "#### Cites alpha [beta]\nWaits on [alpha] in its prose.\n"))
+    items = digest.parse(os.path.join(d, "QUEUE.md"))
+    rung, why, item = digest.whats_next(items, d, os.path.join(d, "QUEUE.md"))
+    check("singular: the cited entry is picked",
+          rung == 3 and item is not None and item["slug"] == "alpha",
+          repr((rung, why)))
+    check("singular: one citer reads as one entry",
+          "1 other entry cites it" in why, repr(why))
+
+
 if __name__ == "__main__":
     print("test_queue_digest.py")
+    test_unblock_potential_singular()
     test_migration_written_block_on_a_cleared_item_is_reported()
     test_marker_text_in_prose_does_not_move_the_line()
     test_line_count_and_median_print()

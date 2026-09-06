@@ -1179,8 +1179,10 @@ def whats_next(items, root, queue_path, skip=(), picked=0, today=None,
     cited = [i for i in pool if i["slug"] and counts.get(i["slug"], 0) > 0]
     if cited:
         cited.sort(key=lambda i: (-counts[i["slug"]], i["first_line"]))
-        return 3, ("unblock potential — %d other entries cite it"
-                   % counts[cited[0]["slug"]]), cited[0]
+        n = counts[cited[0]["slug"]]
+        return 3, ("unblock potential — %d other entr%s cite%s it"
+                   % (n, "y" if n == 1 else "ies",
+                      "s" if n == 1 else "")), cited[0]
 
     med_lines, med_age, _source = medians_for(items, root, queue_path, medians)
 

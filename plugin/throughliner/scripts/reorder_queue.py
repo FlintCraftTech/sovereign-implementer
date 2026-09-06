@@ -36,7 +36,10 @@ Contract:
   --move <slug> <BEFORE|AFTER> <anchor-slug>  relative form of the same move:
              place the item immediately before/after another item in the same
              section, all other items keeping their relative order. Exists so a
-             two-item reorder never demands the section's full slug list.
+             two-item reorder never demands the section's full slug list. To
+             clear several held items, run one --move per item with
+             --marker-after naming that item, so each command clears only
+             what it names — the full slug list is never needed for that.
   --move-section <slug> <From> <To>  cross-section move: relocate one item's
              whole block byte-for-byte from one section to the other — the
              Unprocessed → Processed keep-move is /plan's most frequent
@@ -342,7 +345,10 @@ def refuse_unnamed_crossings(unnamed, marker_pref):
         "  Placing the marker after '%s' puts %s above the readiness line, so "
         "an unattended /next run could build %s.\n"
         "  Nothing was written. Name --marker-after as the LAST item that "
-        "should stay cleared, rather than the item you just placed."
+        "should stay cleared, rather than the item you just placed.\n"
+        "  To clear several items, run one --move per item with "
+        "--marker-after naming that item, so each command clears only "
+        "what it names."
         % (len(unnamed), "" if len(unnamed) == 1 else "s",
            ", ".join("[%s]" % s for s in unnamed), marker_pref,
            "it" if len(unnamed) == 1 else "them",

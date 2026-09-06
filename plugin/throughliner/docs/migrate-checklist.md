@@ -54,7 +54,6 @@ project to, so a project already past one skips it.
 1. read the existing QUEUE.md; identify each old section and item
 2. convert each item per the rules of each epoch section you are running
 3. DRAFT the whole converted queue and show it for approval before writing
-   # not a contradiction of write-first: see "Why this shows before it writes"
 4. after writing, the post_tool_use lint confirms the new queue is well-formed
 5. /setup writes the new epoch marker LAST, once the conversions have landed
 ```
@@ -74,9 +73,9 @@ each work item becomes:
     a #### heading                 its one-line description
     a [slug] at the END of it      kebab-case, for LOG traceability
     rationale prose beneath
-    an optional user-credit        "captured by you" — ONLY when the user
-                                   personally raised it. Otherwise unmarked:
-                                   AI is the default author, no AI label written.
+    an optional user-credit        "captured by you" — write the credit as the
+                                   rules state (skill-nonspecific-rules.md,
+                                   Captures, provenance)
     a red-flag marker              only if it carries a security/privacy risk:
                                    Red flag · State: cleared | uncleared
 ```
@@ -136,12 +135,9 @@ show it landed.** A run reads each cleared item whole from QUEUE.md, so an item
 that says none of that reaches the run with nothing to build from and halts it
 as underspecified.
 
-**Nothing is reformatted, and no delimiter is required.** An earlier version of
-this epoch asked for a `--- Build block ---` region, because a run then read a
-generated view assembled from those regions. That view is retired
-(2026-08-27) and the run reads the item's own text — so **an existing project's
-build blocks need no conversion at all**: they read as part of the item, exactly
-as prose does.
+**Nothing is reformatted, and no delimiter is required.** The run reads the
+item's own text, so **an existing project's build blocks need no conversion at
+all**: they read as part of the item, exactly as prose does.
 
 ```
 a cleared item's own prose already    ->  nothing to do. It already says it.

@@ -187,9 +187,8 @@ hash right after the commit, when the hash first exists):
 [Prose rationale — re-authored from the work's rationale in the build working file (or, for a
 planning session, what motivated these queue changes), expanded with what was
 learned along the way. Inline prose, no `Why:` label. Re-authoring is where
-reasoning gets re-attributed by accident: credit the user only for reasoning
-they gave in their own words, write mixed authorship as mixed, and frame
-Claude's reasoning as Claude's (skill-nonspecific-rules.md, rationale provenance).]
+reasoning gets re-attributed by accident (skill-nonspecific-rules.md, rationale
+provenance).]
 
 [per-flavor body fields]
 ````
@@ -357,8 +356,7 @@ hash or title search.
 **Captures filed after the commit.** When a capture comes up in the post-commit
 tail, the same move that appends it to QUEUE.md also updates this session's
 just-written entry — edit its "Routed to Captures:" line to include it, as a
-working-tree edit with no separate commit. It rides into the next session's
-commit, exactly as the hash backfill does.
+working-tree edit with no separate commit.
 
 ## Checks the closing session couldn't run
 
@@ -377,15 +375,9 @@ line** — an unrun check recorded only in a log entry never surfaces again.
 
 ## Triage any waiting mail  [SILENT] when the mailbox is empty; [BRIEF] when mail is triaged with nothing to send; [PROMPT] where a reply is drafted
 
-Read anything still sitting in this project's `INBOX/`, route it through the
-three-way triage, and move each file to `INBOX/archive/`. Full mechanics —
-`${CLAUDE_PLUGIN_ROOT}/docs/feedback-and-inbox.md`.
-
-**The close is the site because it is the one skill that always runs** — it
-catches mail a chat's openings missed, or that landed after them.
-
-**Filing, not processing.** Anything a message raises becomes a capture in
-Unprocessed; deciding its fate stays /plan's, like every other capture.
+Triage anything still sitting in this project's `INBOX/` as
+`${CLAUDE_PLUGIN_ROOT}/docs/feedback-and-inbox.md` states — filing, not
+processing: deciding what a message raises stays /plan's.
 
 **Where a reply is owed, draft it here** and show the exact wording before
 anything is sent. This is the moment that draft belongs to — a run is unattended
@@ -406,26 +398,16 @@ scanning the whole chat.
 
 **Where nothing has happened since that rescan — no work, no decisions, only the
 close being invoked — perform no second pass, and write one line into the record:
-"covered by the rescan just run."** The required line is what keeps a
-stood-down scan distinguishable from one that never happened. Conversation
+"covered by the rescan just run."** Conversation
 between the rescan and the close is still scanned under the window rule above,
 so this arm reaches only the case where the window is genuinely empty.
 
 **Cycles due-ness check first** [SILENT] when no cycles doc exists; [BRIEF]
-whenever one does. The session opening emits a cycles line naming each
-definition and what its observable reads, and that line is the trigger — but
-**read the project root for `CYCLES.md` here as well**, because a doc created
-this session carries no opening line and would otherwise be invisible to its
-own close. Where the doc exists, read it and compute each cycle's due-ness
-from the observable its definition names — filing ONE capture in Unprocessed
-under the cycle's slug where a turn is due and no open capture with that slug
-exists, and nothing otherwise — then say in one line which cycles are due and
-which are not, filed or not. Where a cycle carries a chain, due-ness is per
-ritual: a ritual is due when its computed date on the cycles line has arrived
-and no completed turn of this cycle is recorded since the previous anchor, and
-the capture names that ritual in its heading, under the cycle's slug; a cycle
-with no chain is unchanged. Filing only: routing stays planning work. A
-project with no cycles doc pays nothing here.
+whenever one does. Run the cycles due-ness check as plan.md's Step 1 states it
+("Cycles due-ness check"), filing only — routing stays planning work — with
+one limb of this site's own: **read the project root for `CYCLES.md` here as
+well**, because a doc created this session carries no opening line and would
+otherwise be invisible to its own close.
 
 Before committing, re-read that stretch of the chat and surface candidate
 captures — things the user thought out loud but never flagged.
@@ -657,8 +639,7 @@ wrote** — the close is the one moment the hash exists and the files are at
 hand, and it is one convention for tracked and untracked projects alike (an
 untracked log never appears in any commit, so nothing later can attribute it
 from git). Read the hash from the commit just made, replace each placeholder
-this session wrote, and stop there — a working-tree edit riding into the next
-close's commit, no amend, no two-commit flow. In a tracked project the
+this session wrote, and stop there. In a tracked project the
 session-start backfill remains as the safety net for a fill this step missed.
 
 ## Recommend next  [BRIEF, PROMPT]
@@ -787,10 +768,7 @@ outside a tail is what would reopen this.
 **After the close, if further work changes a file, offer once to append it to
 this session's LOG entry** [BRIEF, PROMPT]. The entry is written and committed by
 now, so anything done afterwards — a fix, a question answered, a piece of work
-run on request — is invisible in the record unless the entry is amended. **The
-amendment is not committed; it waits for the next close** — that is what the one
-commit per session rule above means in practice at this exact moment, which is
-the moment it was most often broken.
+run on request — is invisible in the record unless the entry is amended.
 
 ```
 append, never rewrite   ->  a marked tail section on the existing entry, so it

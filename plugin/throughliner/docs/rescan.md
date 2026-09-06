@@ -40,10 +40,6 @@ common and otherwise has to be asked for in prose every time. Mark it as a tail
 rather than blending it in, so what was recorded at the close stays visible as
 what the close recorded.
 
-**Committing nothing is what keeps this from being a second close under another
-name**, and it is also why nothing has to judge when the tail has ended: the skill
-can be run as many times as the tail has parts.
-
 Filing is capture-making and is open to every skill. Routing and building are
 /plan's and /next's, and this skill stays on the filing side of that line.
 
@@ -128,8 +124,8 @@ than rewrite, under a heading that says what it is:
 **Where this chat has no LOG entry yet**, there is nothing to append to: the work
 is recorded by the close when it runs, so say that and file only the captures.
 
-**Nothing is committed here.** The tail rides the next close's commit. Say so when
-reporting, so the user is not left thinking the record is saved. A second
+Say so when reporting that nothing is committed here, so the user is not left
+thinking the record is saved. A second
 `/done` typed in a chat that has already closed reaches this same tail rather
 than a second close — done.md's router carries that arm.
 

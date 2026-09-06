@@ -107,9 +107,8 @@ Rule gate: not needed — <why>
 Retired: `<term>` — <what it was>     # only when this session retired something
 ```
 
-Write the label plain, not bolded. A required artifact turns a silent omission
-into a visible one: "not needed because X" is a claim a later reader can
-disagree with, and a missing line is a gap anyone can see.
+Write the label plain, not bolded. "Not needed because X" is a claim a later
+reader can disagree with, and a missing line is a gap anyone can see.
 
 **The honest limit, and state it wherever this is described: nothing can tell an
 honest disposition from a dishonest one.** A planning-sited gate can refuse,

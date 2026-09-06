@@ -134,9 +134,6 @@ only the *decision* passes through you; the prose stays in the file.
 
 ```
 locate:  scripts/reorder_queue.py under the PLUGIN ROOT
-         # the plugin root is the grandparent of the running skill's base
-         # directory (.../<plugin-root>/skills/<skill>). Derive it from there
-         # so it resolves wherever the plugin is installed — never hardcode.
 
 invoke:  python <plugin-root>/scripts/reorder_queue.py <QUEUE.md path> \
              <Processed|Unprocessed> <slug1> <slug2> …
@@ -269,23 +266,11 @@ a finished item doesn't strand in the queue and get re-presented by the next
 /next. It runs as a close of its own, inside a planning close, and — for the
 removal — inside a build close.
 
-**Identify completed items from what the session can already see.**
-
-```
-walked through to its end in THIS session   ->  completed. Close it here.
-the user has said they did it               ->  completed. Close it here.
-anything else                               ->  leave it in Processed, silently
-```
-
-Where the item's walkthrough names an observable check — a file present or
-absent, a branch gone, a URL responding — **run it before recording completion**,
-rather than taking the report at face value. Checking the world is not asking the
-user. A failed check is reported as what was found, and the item stays in place.
-
-The gap this leaves is real and is meant to stay: an item the user completed on
-their own between sessions, with nothing observable to show for it, will sit in
-the queue until they mention it. **That is the fallback, not a hole to plug** —
-mentioning it is already a supported path.
+**Completion is read as the always-loaded `[user]` lifecycle states**
+(skill-nonspecific-rules.md, "Walk a `[user]` item through whenever it is
+reached"); anything else stays in Processed, silently. Where the item's
+walkthrough names an observable check, **run it before recording completion**,
+and report a failed one as what was found, leaving the item in place.
 
 ```
 1. take the completed item(s) from what the session can see  [SILENT]

@@ -375,6 +375,29 @@ def test_move_non_anchor_leaves_marker_alone():
           repr(order_of(new)))
 
 
+def test_unnamed_crossing_refusal_names_one_move_per_item():
+    """A refused clearing names the route that clears several held items
+    without retyping the section: one --move per item, each naming itself
+    as --marker-after ([marker-guard-escape-hatch-is-full-retype])."""
+    body = (
+        "#### First item [alpha]\nRationale for alpha.\n\n"
+        + MARKER + "\n\n"
+        "#### Second item [beta]\nHeld.\n\n"
+        "#### Third item [gamma]\nHeld.\n\n"
+        "#### Fourth item [delta]\nHeld.\n"
+    )
+    rc, err, new = run(build_queue(body), "Processed",
+                       "--move", "delta", "AFTER", "alpha",
+                       "--marker-after", "gamma")
+    check("crossing-refusal: refuses", rc != 0, err)
+    check("crossing-refusal: names the one-move-per-item route",
+          "one --move per item" in err and "clears only what it names" in err,
+          err)
+    check("crossing-refusal: nothing written",
+          order_of(new) == ["alpha", MARKER, "beta", "gamma", "delta"],
+          repr(order_of(new)))
+
+
 def test_move_explicit_marker_after_still_wins():
     """An explicit --marker-after is the caller asking for the marker to move,
     so the re-anchor branch must not override it."""
@@ -534,6 +557,7 @@ def main():
         test_move_marker_anchor_does_not_drag_the_marker,
         test_move_non_anchor_leaves_marker_alone,
         test_move_explicit_marker_after_still_wins,
+        test_unnamed_crossing_refusal_names_one_move_per_item,
         test_delete_first_item_when_marker_anchored_to_it,
         test_delete_block_containing_heading_like_lines,
         test_delete_from_unprocessed,

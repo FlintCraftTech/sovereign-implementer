@@ -12,7 +12,11 @@ of Unprocessed and nowhere else, so placement cannot go wrong by construction.
 Slice three adds `append_sent_line`, which composes one outbound-register line
 from its fields and appends it at the end of `INBOX/sent.md` — the one file
 with no history to restore from, where an edit anchored on whatever a session
-last read has landed a line out of order.
+last read has landed a line out of order. Slice five adds the queue tool's
+three moves — `queue_move`, `queue_move_section`, `queue_delete` — each checked
+at the door and each running the script's own move, so a planning session
+moves, keeps and deletes entries through calls whose arguments are validated
+before anything is written.
 
 **Every tool wraps a calculation or a write path existing code already
 performs.** Nothing here invents an answer or a second write mechanism: the
@@ -61,7 +65,7 @@ for _stream in (sys.stderr, sys.stdout, sys.stdin):
 
 PROTOCOL_VERSION = "2024-11-05"
 SERVER_NAME = "throughliner-state"
-SERVER_VERSION = "0.4.0"
+SERVER_VERSION = "0.5.0"
 
 # This file sits at <plugin-root>/mcp/server.py, so the plugin root is its
 # grandparent. Derived rather than hardcoded, per the working conventions.
@@ -256,6 +260,42 @@ def _installed_snapshot():
     return version, full
 
 
+VISIBILITY_INNER_RE = re.compile(r"inner repository \(`([^`]+?)/?`\)")
+
+
+def _inner_root(root):
+    """The product subfolder in a nested project, or None for a flat one.
+
+    Read from the project CLAUDE.md's Visibility line, which names the inner
+    in backticks; failing that, the one immediate subfolder holding a `.git`.
+    Two candidates and no Visibility line is ambiguous, and None is returned
+    rather than a guess.
+    """
+    claude = os.path.join(root, "CLAUDE.md")
+    try:
+        with open(claude, "r", encoding="utf-8") as f:
+            for line in f:
+                if not line.startswith("Visibility:"):
+                    continue
+                m = VISIBILITY_INNER_RE.search(line)
+                if m:
+                    cand = os.path.join(root, m.group(1))
+                    if os.path.isdir(os.path.join(cand, ".git")):
+                        return cand
+    except OSError:
+        pass
+    found = []
+    try:
+        for name in os.listdir(root):
+            p = os.path.join(root, name)
+            if (not name.startswith(".") and os.path.isdir(p)
+                    and os.path.isdir(os.path.join(p, ".git"))):
+                found.append(p)
+    except OSError:
+        return None
+    return found[0] if len(found) == 1 else None
+
+
 def tool_host_currency(_arguments):
     """Whether the installed host carries the source's current files."""
     root = project_root()
@@ -265,6 +305,13 @@ def tool_host_currency(_arguments):
                "server expects it (%s)." % PLUGIN_ROOT
 
     source = os.path.join(root, "plugin", "throughliner")
+    if not os.path.isdir(source):
+        # A nested project keeps the product one level down; the same lookup
+        # rule_signals.py's inner_root() performs, copied rather than imported
+        # since the server runs standalone from the plugin folder.
+        inner = _inner_root(root)
+        if inner is not None:
+            source = os.path.join(inner, "plugin", "throughliner")
     if not os.path.isdir(source):
         return "No plugin source at %s — this tool answers only in the " \
                "project that develops the plugin." % source
@@ -480,6 +527,13 @@ def tool_append_sent_line(arguments):
         if "\n" in value or "\r" in value:
             problems.append("%s contains a line break — a register line is "
                             "one line." % name)
+    if fields["message_id"] and not fields["message_id"].isdigit():
+        # A Discord message or topic id is a run of digits. Anything else
+        # would land inside the backticked id segment and could split the
+        # line's fields when the claims sweep reads it back.
+        problems.append("message_id %r is not a run of digits — a Discord "
+                        "message or topic id is digits only; leave it empty "
+                        "for a send that has none." % fields["message_id"])
     if not os.path.isdir(inbox):
         problems.append("this project has no INBOX/ folder — the mailbox is "
                         "not scaffolded, so there is no register to append to.")
@@ -683,6 +737,318 @@ def tool_hold_entry(arguments):
 
     return "%s the hold line on [%s] %s:\n%s%s" % (
         action, slug, where, new_line, moved)
+
+
+# --------------------------------------------------------------------------
+# Slice five: the queue tool's three moves, checked at the door
+# ([mcp-queue-move-tools]). Each wraps reorder_queue.py's own move — the
+# within-section --move (which lives in the script's main, so it runs as a
+# subprocess), --move-section and --delete (the script's functions, called
+# in-process) — so there is one implementation. The door checks refuse what
+# is checkably wrong before anything is written; the script's own refusals,
+# the unnamed-crossing one included, come back as the tool's answer.
+# --------------------------------------------------------------------------
+
+SECTIONS = ("Processed", "Unprocessed")
+POSITIONS = ("TOP", "BOTTOM", "BEFORE", "AFTER")
+MARKER_TEXT = "the `--- Cleared to run above this line ---` marker"
+
+
+def _section_state(mover, queue):
+    """Per section: (slugs in order, marker anchor or None, had_marker)."""
+    with open(queue, 'r', encoding='utf-8', newline='') as f:
+        lines = f.read().splitlines(keepends=True)
+    sections = mover.parse(lines)
+    state = {}
+    for name in SECTIONS:
+        if name not in sections:
+            continue
+        start, end = sections[name]
+        _pre, blocks, marker_after, had = mover.split_blocks(lines[start:end])
+        state[name] = ([s for s, _ in blocks], marker_after, had)
+    return state
+
+
+def _mover_ready():
+    """(mover, queue) or (None, refusal text)."""
+    root = project_root()
+    queue = _queue_path(root)
+    mover = _mover()
+    if mover is None:
+        return None, "Cannot write: reorder_queue.py is not where this " \
+                     "server expects it (%s)." % PLUGIN_ROOT
+    if not os.path.isfile(queue):
+        return None, "Cannot write: no QUEUE.md at %s." % queue
+    return mover, queue
+
+
+def _refused(problems):
+    return "Refused — nothing was written:\n" + \
+           "\n".join("- " + p for p in problems)
+
+
+def _crossing_problem(mover, before, before_anchor, after, after_anchor,
+                      named, marker_after):
+    """A door check the script itself does not make: where a move would put
+    ANY entry across the readiness line and the caller named no marker
+    placement, refuse and say which entries would cross, so the placement is
+    named on purpose rather than falling out of where the marker sat."""
+    if marker_after is not None:
+        return None
+    _unnamed, note = mover.crossing_note(before, before_anchor, after,
+                                         after_anchor, named=named)
+    crossed = [line.split("[", 1)[1].split("]", 1)[0]
+               for line in note.splitlines()
+               if "crossed the readiness line" in line]
+    if not crossed:
+        return None
+    return ("this move would put %s across %s — name marker_after "
+            "(TOP, BOTTOM, or the slug of the last entry that should stay "
+            "cleared) so the placement is deliberate."
+            % (", ".join("[%s]" % s for s in crossed), MARKER_TEXT))
+
+
+def _in_process(call):
+    """Run one of the script's functions under captured output, returning
+    (ok, text). The script's refusals exit via die(); a SystemExit is caught
+    and its text returned as a refusal rather than killing the server."""
+    captured = io.StringIO()
+    try:
+        with contextlib.redirect_stderr(captured), \
+                contextlib.redirect_stdout(captured):
+            call()
+    except SystemExit:
+        return False, captured.getvalue().strip()
+    return True, captured.getvalue().strip()
+
+
+def _position_args(arguments):
+    """(position, anchor, marker_after, problems) read from the arguments."""
+    problems = []
+    position = (arguments.get("position") or "BOTTOM").strip().upper()
+    anchor = (arguments.get("anchor") or "").strip().strip("[]") or None
+    marker_after = arguments.get("marker_after")
+    marker_after = marker_after.strip().strip("[]") if isinstance(
+        marker_after, str) and marker_after.strip() else None
+    if position not in POSITIONS:
+        problems.append("position must be one of TOP, BOTTOM, BEFORE or "
+                        "AFTER, not %r." % position)
+    if position in ("BEFORE", "AFTER") and anchor is None:
+        problems.append("position %s needs an anchor — the slug of the "
+                        "entry to place it %s." % (position, position.lower()))
+    if position in ("TOP", "BOTTOM") and anchor is not None:
+        problems.append("position %s takes no anchor." % position)
+    if marker_after is not None and marker_after.upper() in ("TOP", "BOTTOM"):
+        marker_after = marker_after.upper()
+    return position, anchor, marker_after, problems
+
+
+def _marker_problems(marker_after, section, slugs_after, had_marker):
+    problems = []
+    if marker_after is None:
+        return problems
+    if section != "Processed" or not had_marker:
+        problems.append("marker_after was given, but %s has no cleared-to-run "
+                        "marker — the marker lives in Processed." % section)
+    elif marker_after not in ("TOP", "BOTTOM") and marker_after not in slugs_after:
+        problems.append("marker_after names [%s], which would not be an entry "
+                        "in %s after the move." % (marker_after, section))
+    return problems
+
+
+def tool_queue_move(arguments):
+    """Move one entry within its section, with the readiness marker's
+    placement named where the move would put anything across it."""
+    mover, queue = _mover_ready()
+    if mover is None:
+        return queue
+    section = (arguments.get("section") or "").strip()
+    slug = (arguments.get("slug") or "").strip().strip("[]")
+    position, anchor, marker_after, problems = _position_args(arguments)
+
+    if section not in SECTIONS:
+        problems.append("section must be Processed or Unprocessed, not %r."
+                        % section)
+        return _refused(problems)
+    state = _section_state(mover, queue)
+    if section not in state:
+        return _refused(problems + ["section %s is not in the queue." % section])
+    have, marker_anchor, had_marker = state[section]
+    if not slug:
+        problems.append("slug is missing — the entry to move.")
+    elif slug not in have:
+        problems.append("slug [%s] names no entry in %s." % (slug, section))
+    if anchor is not None:
+        if anchor == slug:
+            problems.append("anchor names the moved entry itself.")
+        elif anchor not in have:
+            problems.append("anchor [%s] names no entry in %s."
+                            % (anchor, section))
+    problems += _marker_problems(marker_after, section, have, had_marker)
+    if problems:
+        return _refused(problems)
+
+    # The order the script will derive, so the crossing check sees the same
+    # move the script is about to make.
+    rest = [s for s in have if s != slug]
+    if position == "TOP":
+        desired = [slug] + rest
+    elif position == "BOTTOM":
+        desired = rest + [slug]
+    else:
+        idx = rest.index(anchor) + (1 if position == "AFTER" else 0)
+        desired = rest[:idx] + [slug] + rest[idx:]
+    if had_marker:
+        before_anchor = marker_anchor if marker_anchor else "TOP"
+        pref = marker_after if marker_after is not None else before_anchor
+        if marker_after is None and pref == slug:
+            # The script re-anchors a moved anchor so the marker keeps its
+            # position; mirror that here so the check reads the real outcome.
+            idx = have.index(slug)
+            preceding = have[:idx]
+            pref = preceding[-1] if preceding else "TOP"
+        problem = _crossing_problem(mover, have, before_anchor, desired, pref,
+                                    [slug], marker_after)
+        if problem:
+            return _refused([problem])
+
+    args = [queue, section, "--move", slug, position]
+    if anchor is not None:
+        args.append(anchor)
+    if marker_after is not None:
+        args += ["--marker-after", marker_after]
+    ok, report = _run_mover(args, os.path.dirname(queue))
+    if not ok:
+        return "Refused by the queue tool — nothing was written:\n" + report
+    return "Moved [%s] %s%s in %s.\n%s" % (
+        slug, position.lower(), " [%s]" % anchor if anchor else "", section,
+        report)
+
+
+def tool_queue_move_section(arguments):
+    """Move one entry between the two sections — the keep-move — with the
+    readiness marker placed in the same call where the move clears it."""
+    mover, queue = _mover_ready()
+    if mover is None:
+        return queue
+    slug = (arguments.get("slug") or "").strip().strip("[]")
+    sec_from = (arguments.get("from_section") or "").strip()
+    sec_to = (arguments.get("to_section") or "").strip()
+    position, anchor, marker_after, problems = _position_args(arguments)
+
+    for name in (sec_from, sec_to):
+        if name not in SECTIONS:
+            problems.append("from_section and to_section must each be "
+                            "Processed or Unprocessed, not %r." % name)
+    if problems:
+        return _refused(problems)
+    if sec_from == sec_to:
+        return _refused(["from_section and to_section are the same — use "
+                         "queue_move for a move within one section."])
+    state = _section_state(mover, queue)
+    for name in (sec_from, sec_to):
+        if name not in state:
+            return _refused(["section %s is not in the queue." % name])
+    f_have, _f_anchor, _f_had = state[sec_from]
+    t_have, t_anchor, t_had = state[sec_to]
+    if not slug:
+        problems.append("slug is missing — the entry to move.")
+    elif slug not in f_have:
+        problems.append("slug [%s] names no entry in %s." % (slug, sec_from))
+    elif slug in t_have:
+        problems.append("slug [%s] is already an entry in %s."
+                        % (slug, sec_to))
+    if anchor is not None and anchor not in t_have:
+        problems.append("anchor [%s] names no entry in %s — the anchor is "
+                        "an entry in the destination section."
+                        % (anchor, sec_to))
+    if problems:
+        return _refused(problems)
+    if position == "TOP":
+        idx = 0
+    elif position == "BOTTOM":
+        idx = len(t_have)
+    else:
+        idx = t_have.index(anchor) + (1 if position == "AFTER" else 0)
+    t_after = t_have[:idx] + [slug] + t_have[idx:]
+    problems += _marker_problems(marker_after, sec_to, t_after, t_had)
+    if problems:
+        return _refused(problems)
+    if t_had:
+        before_anchor = t_anchor if t_anchor else "TOP"
+        pref = marker_after if marker_after is not None else before_anchor
+        problem = _crossing_problem(mover, t_have, before_anchor, t_after,
+                                    pref, [slug], marker_after)
+        if problem:
+            return _refused([problem])
+
+    ok, report = _in_process(lambda: mover.move_section(
+        queue, slug, sec_from, sec_to, position, anchor, marker_after))
+    if not ok:
+        return "Refused by the queue tool — nothing was written:\n" + report
+    return "Moved [%s] from %s to %s (%s%s).\n%s" % (
+        slug, sec_from, sec_to, position.lower(),
+        " [%s]" % anchor if anchor else "", report)
+
+
+def tool_queue_delete(arguments):
+    """Remove one entry's whole block, addressed by slug."""
+    mover, queue = _mover_ready()
+    if mover is None:
+        return queue
+    slug = (arguments.get("slug") or "").strip().strip("[]")
+    section = (arguments.get("section") or "").strip()
+    problems = []
+    if section not in SECTIONS:
+        problems.append("section must be Processed or Unprocessed, not %r."
+                        % section)
+        return _refused(problems)
+    state = _section_state(mover, queue)
+    if section not in state:
+        return _refused(["section %s is not in the queue." % section])
+    have, _anchor, _had = state[section]
+    if not slug:
+        problems.append("slug is missing — the entry to delete.")
+    elif have.count(slug) == 0:
+        problems.append("slug [%s] names no entry in %s." % (slug, section))
+    elif have.count(slug) > 1:
+        problems.append("slug [%s] matches %d entries in %s — two entries "
+                        "sharing a slug is itself a fault; fix that first."
+                        % (slug, have.count(slug), section))
+    if problems:
+        return _refused(problems)
+
+    ok, report = _in_process(lambda: mover.delete_item(queue, slug, section))
+    if not ok:
+        return "Refused by the queue tool — nothing was written:\n" + report
+    return "Deleted [%s] from %s.\n%s" % (slug, section, report)
+
+
+_MOVE_PROPERTIES = {
+    "position": {
+        "type": "string",
+        "enum": ["TOP", "BOTTOM", "BEFORE", "AFTER"],
+        "description":
+            "Where the entry lands: TOP or BOTTOM of the section, or "
+            "BEFORE/AFTER the entry named in anchor. Defaults to BOTTOM.",
+    },
+    "anchor": {
+        "type": "string",
+        "description":
+            "With BEFORE or AFTER: the slug of the entry to place it next "
+            "to, in the destination section.",
+    },
+    "marker_after": {
+        "type": "string",
+        "description":
+            "Where the cleared-to-run marker lands afterwards (Processed "
+            "only): TOP, BOTTOM, or the slug of the LAST entry that should "
+            "stay cleared. Required whenever the move would put any entry "
+            "across the marker. To clear several held entries, make one "
+            "move per entry naming that entry here, so each call clears "
+            "only what it names.",
+    },
+}
 
 
 TOOLS = [
@@ -895,6 +1261,95 @@ TOOLS = [
             },
         },
         "handler": tool_hold_entry,
+    },
+    {
+        "name": "queue_move",
+        "description":
+            "Move one queue entry within its section — to the top or "
+            "bottom, or before/after another entry — through the queue "
+            "tool's own move, so every block is carried byte-for-byte. "
+            "Refuses at the door a slug or anchor that is not an entry in "
+            "that section, a position outside the four words, and a move "
+            "that would put any entry across the cleared-to-run marker "
+            "with no marker_after named; the queue tool's own refusal of "
+            "an unnamed clearing comes back as the answer.",
+        "inputSchema": {
+            "type": "object",
+            "required": ["section", "slug"],
+            "properties": dict({
+                "section": {
+                    "type": "string",
+                    "enum": ["Processed", "Unprocessed"],
+                    "description": "The section the entry sits in.",
+                },
+                "slug": {
+                    "type": "string",
+                    "description": "The entry to move.",
+                },
+            }, **_MOVE_PROPERTIES),
+        },
+        "handler": tool_queue_move,
+    },
+    {
+        "name": "queue_move_section",
+        "description":
+            "Move one entry from one section to the other — the keep-move "
+            "from Unprocessed into Processed, or the reverse — through the "
+            "queue tool's own cross-section move. Lands at the BOTTOM of "
+            "the destination unless position says otherwise; in Processed "
+            "the bottom is BELOW the cleared-to-run marker, so a kept entry "
+            "that is cleared needs position and marker_after in the same "
+            "call. Refuses at the door a slug not in the source section, a "
+            "slug already in the destination, an anchor not in the "
+            "destination, a bad position word, and a move that would put "
+            "any entry across the marker with no marker_after named.",
+        "inputSchema": {
+            "type": "object",
+            "required": ["slug", "from_section", "to_section"],
+            "properties": dict({
+                "slug": {
+                    "type": "string",
+                    "description": "The entry to move.",
+                },
+                "from_section": {
+                    "type": "string",
+                    "enum": ["Processed", "Unprocessed"],
+                    "description": "The section it leaves.",
+                },
+                "to_section": {
+                    "type": "string",
+                    "enum": ["Processed", "Unprocessed"],
+                    "description": "The section it joins.",
+                },
+            }, **_MOVE_PROPERTIES),
+        },
+        "handler": tool_queue_move_section,
+    },
+    {
+        "name": "queue_delete",
+        "description":
+            "Remove one entry's whole block from the queue, addressed by "
+            "slug, through the queue tool's own delete — which re-anchors "
+            "the cleared-to-run marker where the deleted entry was its "
+            "anchor and reports any other entries still citing the slug. "
+            "Refuses at the door a slug that is not an entry in the named "
+            "section, or one that matches more than one entry.",
+        "inputSchema": {
+            "type": "object",
+            "required": ["slug", "section"],
+            "properties": {
+                "slug": {
+                    "type": "string",
+                    "description": "The entry to delete.",
+                },
+                "section": {
+                    "type": "string",
+                    "enum": ["Processed", "Unprocessed"],
+                    "description": "The section the entry sits in.",
+                },
+            },
+        },
+        "handler": tool_queue_delete,
     },
 ]
 

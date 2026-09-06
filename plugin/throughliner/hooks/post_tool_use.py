@@ -991,6 +991,45 @@ def _split_warnings(warnings: list, head_content: str):
     return new, old
 
 
+_LINT_STATE_NAME = "queue-lint-last.json"
+
+
+def _read_lint_state(cwd: str):
+    """The warning bodies the previous lint run found, or None.
+
+    A cleared flag's "gone" notice reads this rather than the commit: against
+    the commit a flag cleared this session stays "gone" after every tool call
+    until the close commits, and one notice printed dozens of times in a
+    session. Missing or unreadable means no gone notices this run — never an
+    error, since the lint is advisory.
+    """
+    path = os.path.join(cwd, ".throughliner", _LINT_STATE_NAME)
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+    except (OSError, ValueError):
+        return None
+    if not isinstance(data, list):
+        return None
+    return {b for b in data if isinstance(b, str)}
+
+
+def _write_lint_state(cwd: str, warnings: list) -> None:
+    """Record this run's warning bodies for the next run's gone direction.
+
+    The folder is the project's ignored `.throughliner/`, which already holds
+    the hook's snapshots. A failure to write changes nothing the lint reports.
+    """
+    folder = os.path.join(cwd, ".throughliner")
+    try:
+        os.makedirs(folder, exist_ok=True)
+        with open(os.path.join(folder, _LINT_STATE_NAME), "w",
+                  encoding="utf-8") as f:
+            json.dump(sorted({_warning_body(w) for w in warnings}), f)
+    except (OSError, TypeError, ValueError):
+        pass
+
+
 def _cleared_warnings(warnings: list, head_content: str) -> list:
     """Flags the last commit carried that the working tree no longer does.
 
@@ -1180,6 +1219,10 @@ def _lint_queue(queue_path: str, with_growth: bool = True) -> int:
 
     sections = []
     warnings = lint(content)
+    # The gone direction's baseline is the previous lint RUN, not the commit;
+    # read before this run's bodies overwrite it.
+    last_run = _read_lint_state(cwd)
+    _write_lint_state(cwd, warnings)
     if baseline_kind is None:
         # No committed copy and no snapshot: a report with no baseline is not
         # a comparison, so it is one plain line — never everything-as-new,
@@ -1222,11 +1265,19 @@ def _lint_queue(queue_path: str, with_growth: bool = True) -> int:
         # count creep from 20 to 27 with the wording never changing once. A
         # pre-existing flag was invisible in exactly the way an absent one is.
         #
-        # Computed against the baseline every time — the committed file, or
-        # the newest pre-change snapshot where the queue is untracked — so
-        # nothing is stored and no state file can go stale. The full listing
-        # stays available by running the lint script directly.
+        # The NEW direction is computed against the commit (or the newest
+        # pre-change snapshot where the queue is untracked) every time. The
+        # GONE direction reads a second baseline: the bodies the previous lint
+        # run found, kept in `.throughliner/queue-lint-last.json`. Against the
+        # commit alone, a flag cleared this session stayed "gone" until the
+        # close committed, and one notice printed after every tool call for a
+        # whole planning session. A notice now prints only where the body was
+        # present at the previous run and is absent now — once. No state file
+        # means no gone notices this run. The full listing stays available by
+        # running the lint script directly.
         for cleared in _cleared_warnings(warnings, baseline_content):
+            if last_run is None or _warning_body(cleared) not in last_run:
+                continue
             sections.append(
                 "[Throughliner] QUEUE.md structure lint (advisory): a flag "
                 "present in the previous version is gone from the working "

@@ -47,6 +47,15 @@ removed. Three named mechanisms:
 Also apply a **staleness test**: is this still true? A confidently wrong rule is
 worse than a missing one.
 
+**Criterion over count.** Where a limit carries a bare number with no
+derivation, first ask what condition the number was standing in for, and write
+that condition as the rule. Keep a number only where no condition exists, and
+then with its derivation written beside it. Two instances, 2026-09-06:
+next-build.md's going-in-circles trigger, "~3 times" → an attempt failing the
+same way an earlier, different attempt already failed; CYCLES.md's rezip cache
+prune, "the three most recent" → the build being installed and the most recent
+stable-labelled build.
+
 ## Resolving a near-duplicate flag
 
 The signal raises flags; it never decides. Two rules may legitimately say

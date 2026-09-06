@@ -335,8 +335,7 @@ readable edit's post-write reveal ->  a plain link to the file, with the line
                                    ->  an inline excerpt if the link won't resolve
 ```
 
-**Link the file plainly and name the line in the prose**, since the desktop app
-opens `.md` in its own viewer and silently ignores a link's anchor.
+**Link the file plainly and name the line in the prose.**
 
 **How inline text is formed, whichever rule sent it there:**
 
@@ -459,14 +458,14 @@ unannounced, and on flat projects exactly as it always has.
 
 Work on the project folder the chat was opened in and no other, taking that
 folder as given rather than scanning outward for a different project or asking
-the user which one to work on. A user may keep several independent SI projects
-nested under one parent — that's the supported shape.
+the user which one to work on. A user may keep several independent Throughliner
+projects nested under one parent — that's the supported shape.
 
 ```
 opened folder has no SPEC.md          ->  unadopted; offer /setup FOR THIS FOLDER
-opened folder contains nested SI      ->  say so plainly, so the user can open
-projects (session_start surfaces it)      the child directly. Work stays on the
-                                          opened folder either way.
+opened folder contains nested         ->  say so plainly, so the user can open
+Throughliner projects                     the child directly. Work stays on the
+(session_start surfaces it)               opened folder either way.
 ```
 
 ## Response-shape tags
@@ -924,11 +923,9 @@ real and equally bad; neither warning may be louder than the other. (How a
   this on your say-so; otherwise here is your step — keeping the decision in
   front of the user.
 
-  **And the test is a check, not a judgment: before tagging `[user]`, ask what
-  would answer this — name the tool that would do the work, and confirm it is
-  absent or unauthenticated.** Where no tool plausibly exists, that is itself
-  the answer. It runs thorough at /plan's decision step and light at /next's
-  pre-hand-off; each doc carries its own weight.
+  **Before tagging `[user]`, run the CLI-tool check (Research and evidence
+  filing, below) — thorough at /plan's decision step, light at /next's
+  pre-hand-off.**
 - **File every piece of genuine user work as a `[user]` item**, so it lives in
   the queue rather than in the conversation, which ends and takes it with it.
   When "can Claude do this at all?" returns **no**, file it. A thing in the
@@ -1138,6 +1135,9 @@ to the session scratchpad with the editing tools, then
 ```
 python <plugin-root>/scripts/reorder_queue.py <QUEUE.md path> \
     --append Unprocessed --body <scratchpad path>
+# <plugin-root> is the grandparent of the running skill's base directory
+# (.../<plugin-root>/skills/<skill>) — derive it at run time, never hardcode
+# a path
 ```
 
 **Subordinate to the ideation loop above** — this is what runs once the loop
@@ -1510,7 +1510,9 @@ the discriminator:  which thing is misbehaving?
 
 **A send or post goes out only after the user has seen the exact text and
 given an explicit yes** — feedback reports, GitHub issues, and outbound INBOX
-messages alike. Inbound INBOX mail is surfaced by session_start and routed
+messages alike — and the yes is written on every step that sends, wherever that
+step lives: a skill doc, a cycle or ritual definition, a walkthrough. Inbound
+INBOX mail is surfaced by session_start and routed
 through the three-way triage, then archived.
 
 **When an inbound message asks a question, a reply is owed: draft it unprompted

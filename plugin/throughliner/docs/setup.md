@@ -47,10 +47,8 @@ it would fail partway, file by file, leaving the setup half-finished. So:
 Then stop there — no scaffolding, no continue-anyway question, no workaround.
 
 **A planning session is different — it is not refused.** There is no build file
-there, and /setup's own marker (Step 0.5 below) is what lets its writes through:
-without it, a session with no build file is read as planning, and every write
-outside that session's usual few files is refused outright — no prompt, no
-override. What /setup owes that situation is a description rather than a
+there, and /setup's own marker (Step 0.5 below) is what lets its writes
+through. What /setup owes that situation is a description rather than a
 refusal, because the failure to avoid is silence, not permission. Say what is
 about to happen and let the user choose:
 
@@ -170,7 +168,7 @@ can refer back to.
 
 ## Case B: migration framing
 
-When the content is a migration, /setup maps it into SI's docs. The mapping is
+When the content is a migration, /setup maps it into Throughliner's docs. The mapping is
 your judgment, not a fixed table; these guardrails keep it from importing the
 source's shape wholesale.
 
@@ -178,7 +176,7 @@ source's shape wholesale.
   is for: product truth — what the app is, who it's for, how it works, why it
   exists. **It is not a UX spec or an implementation manual.** Map the source
   into that frame, with SPEC's purpose deciding the shape rather than the source.
-- **Check role-fit before renaming.** A source doc and the SI
+- **Check role-fit before renaming.** A source doc and the Throughliner
   doc it seems to map to may not cover the same ground: the old one might be
   broader (a UX doc walking every screen) or narrower. If the roles don't match,
   say so plainly and let the user decide how to split or combine rather than
@@ -189,7 +187,7 @@ source's shape wholesale.
   exhaustive detail SPEC is meant to leave out. Rewrite or drop any purpose, intro,
   or self-description sentence that re-asserts the source's role, so SPEC describes
   **the product**, not the old doc.
-- **SI docs live at the project root.** No path setting, no doc-location config. If
+- **Throughliner's docs live at the project root.** No path setting, no doc-location config. If
   the source used a path block or pointed its docs elsewhere, that doesn't carry
   over.
 
@@ -271,7 +269,7 @@ becoming the private outer with the checkout's contents moved down into the
 product subfolder (the **wrap**). On a yes, plan the conversion with the user
 file by file, opening the plan by reading `git remote` to choose the arm; on
 anything else, drop it — the flat shape keeps working exactly as before, and
-the offer returns once more only at the moment the project goes public.
+the offer returns once more as the public-repository offer's first provision.
 
 ```
 split  (no remote)   ->  create the product subfolder and its repository; move
@@ -593,9 +591,9 @@ session reads when weighing a git operation, so a nested scaffold that leaves
 it blank leaves "which repository am I in" unanswered.
 
 **A folder that is already a flat repository is never restructured here.** The
-conversion is an offer — at the migration path, and again at the moment the
-project goes public, which is when a flat layout starts to matter — and
-declining leaves the flat shape working exactly as before. **A conversion that
+conversion is an offer — at the migration path, and again as the
+public-repository offer's first provision — and declining leaves the flat shape
+working exactly as before. **A conversion that
 is accepted writes the same Visibility line the scaffold writes**, replacing
 whatever the flat answer was.
 
@@ -700,11 +698,8 @@ user chooses tracked     ->  state plainly what results: these documents are
 CLAUDE.md**, in the slot the template carries for it, so every later session
 reads it — not only the setup session's record.
 
-**A public repository is set up only when the user asks**, never volunteered,
-and the licence question travels with that offer rather than sitting in the
-interview. **The offer may set up the repository and may never represent the
-contents as screened** — not publishing these documents is the only complete
-protection.
+**A public repository is set up only when the user asks** — the offer itself is
+"The public-repository offer — one subject, five provisions", below.
 
 **Cloud-sync folder, said once**  [SILENT] when no name matches; [BRIEF] when
 one does. Read the project's absolute path for these folder names,
@@ -793,17 +788,6 @@ about the documents being checked, clean, or safe to publish. Any wording
 implying they have been checked contradicts a shipped rule, and it is the
 sentence most likely to slip in here.
 
-**Two things are deliberately NOT asked, recorded so they are not re-proposed.**
-A standalone licence question in the interview — moved onto this offer, because
-most no-code developers cannot answer it while still describing what their project is, which
-turns a question into a small failure with "I don't know" as the honest reply. And
-the idea that open source implies open logging — dropped entirely, because raising
-it at all nudges a user toward publishing their planning documents, which is the
-exact direction the scrub gate's stated limit exists to avoid nudging. Both costs
-were named and accepted: a user who never asks for a public repository never
-considers licensing, and a user who publishes may never think about whether their
-logs belong in it.
-
 ## Step 3: Interview (adaptive discovery)  [SEQUENCE, PROMPT]
 
 The interview is an **adaptive discovery, not a fixed script.** Its job is to reach
@@ -875,10 +859,7 @@ what they said, which reads as a commitment they agreed to.
 Scope decisions belong in /plan, which is where this item gets processed. If
 examples would clarify scope, ask a follow-up rather than smuggling them in.
 
-**There is no settings question at all, here or anywhere.** The last one —
-whether INBOX messages were committed — was dropped in favour of ignoring
-`INBOX/` on both paths, because the safe outcome must not depend on a question
-being asked. Discovery ends where it ends; there is no settings round after it.
+Discovery ends where it ends; there is no settings round after it.
 
 The editor and working-mode questions that used to sit here are **gone**,
 replaced by one default: point at the doc, with a plain-English summary inline

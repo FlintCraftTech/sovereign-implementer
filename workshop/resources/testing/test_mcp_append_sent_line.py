@@ -156,6 +156,11 @@ for label, args, needle in [
     ("a missing required field is refused", {k: v for k, v in GOOD.items() if k != "claim"}, "claim is missing"),
     ("an intent outside the two is refused", dict(GOOD, intent="for reference"), "intent must be exactly"),
     ("a line break inside a field is refused", dict(GOOD, claim="two\nlines"), "line break"),
+    # [sweep-security-append-sent-line-message-id-unchecked]: an id carrying a
+    # backtick and a spaced dash would land inside the backticked id segment
+    # and could split the line's fields when the claims sweep reads it back.
+    ("a message id that is not a run of digits is refused",
+     dict(GOOD, message_id="1544101479659475000` — for completion"), "not a run of digits"),
 ]:
     d = project(register_text="# Sent\n")
     answer = call(d, args)
