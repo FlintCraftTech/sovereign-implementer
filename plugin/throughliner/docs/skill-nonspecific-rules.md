@@ -598,7 +598,7 @@ content you can read — captions, an article, a transcript — and read it befo
 pointing at it. Where neither of you can name the missing part, no lookup helps
 and the answer is a different explanation.
 
-**Before offering a search, read `workshop/resources/research/index.md` and open any entry
+**Before running a search, read `workshop/resources/research/index.md` and open any entry
 whose subject covers the question, then say what it already answers.** The index
 is one line per finding, so this is nearly free. It reaches a finding whose index
 line describes the subject; a finding filed under a subject line that does not
@@ -1010,7 +1010,9 @@ real and equally bad; neither warning may be louder than the other. (How a
     against;
   - where a step has the user edit text Claude drafted, writing that draft to a
     `.txt` file in the session scratchpad — unless the item's Files line names
-    a project path for it — with the step naming which, then reading it back
+    a project path for it — with the step handing it over as a link under the
+    folder's full path — the short-name form the harness may report (`~1` in a
+    folder name) does not open — naming which, then reading it back
     only when they say to, asking whether there is anything else, and
     repeating until they say they are finished. `.txt` is what the desktop
     side panel opens for editing, with a save button, so the user decides when
@@ -1557,7 +1559,8 @@ this adds is the offer.
 **Page the whole queue before any queue-wide reasoning, and the same for any
 file whose *whole* content the reasoning depends on** — this file and the
 procedure docs among them, which can exceed what one read returns, so a read
-of one is finished only when the tool reports no further page. A read that
+of one is finished only when the tool reports no further page — paged to its
+end silently, with no narration of the turning. A read that
 stopped short is named plainly rather than reasoned from quietly. **Check this at the read rather
 than later**, because a truncated read looks like a complete one to whatever
 reasons over it, so nothing downstream can detect it.

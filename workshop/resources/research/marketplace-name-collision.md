@@ -31,3 +31,12 @@ while still reporting success.
 
 **Re-check trigger:** if #44042 ships a fix (a warning or coexistence), the
 standing rule can be softened to "read the prompt".
+
+**Renaming the local marketplace was weighed 2026-09-05 and refused** (the
+deleted capture [local-marketplace-rename-ends-collision]). The local and
+published marketplaces share one committed `marketplace.json`, so there is no
+local-only name to change: renaming it renames the install namespace
+`throughliner@flintcraft` and breaks every consumer's pin. A second local-only
+marketplace folder pointing outside its own root would rest on an undocumented
+path rule, for the single benefit of a check that is already routed to another
+computer ([desktop-add-marketplace-verified]).

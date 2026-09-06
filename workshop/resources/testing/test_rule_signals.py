@@ -207,6 +207,37 @@ def test_nested_project_reads_both_histories():
     shutil.rmtree(outer, ignore_errors=True)
 
 
+def test_dispositions_window_follows_index_order():
+    """A same-day build record sorts BEFORE the planning record by filename
+    (`-build.md` < `.md`) but sits above it in the index, and it is in the
+    window ([dispositions-window-misses-same-day-records])."""
+    root = tempfile.mkdtemp(prefix="rule-signals-window-")
+    log = os.path.join(root, "LOG")
+    os.makedirs(log)
+    with open(os.path.join(log, "2026-09-05-item.md"), "w", encoding="utf-8") as f:
+        f.write("# abc1234 — plan — the item\n\nPlanning.\n\n"
+                "**Work processed:** kept.\n\nRule gate: run — admitted.\n")
+    with open(os.path.join(log, "2026-09-05-item-build.md"), "w",
+              encoding="utf-8") as f:
+        f.write("# def5678 — the item built\n\nBuilt.\n\n"
+                "**Files touched:** `a.md`\n\nRule gate: run — refused the extra clause.\n")
+    with open(os.path.join(log, "2026-09-04-older.md"), "w", encoding="utf-8") as f:
+        f.write("# 0123abc — an older build\n\nRule gate: run — admitted earlier.\n")
+    with open(os.path.join(log, "index.md"), "w", encoding="utf-8") as f:
+        f.write("# LOG Index\n\n"
+                "- def5678 — the item built → 2026-09-05-item-build.md\n"
+                "- abc1234 — plan — the item → 2026-09-05-item.md\n"
+                "- 0123abc — an older build → 2026-09-04-older.md\n")
+    found, note = signals.dispositions(root, window=True)
+    entries = [d["entry"] for d in found]
+    check("the same-day build record is inside the window",
+          entries == ["2026-09-05-item-build.md"], repr((entries, note)))
+    check("its refusal is read", any(d["refusal"] for d in found), repr(found))
+    check("the older record below the boundary is outside the window",
+          "2026-09-04-older.md" not in entries, repr(entries))
+    shutil.rmtree(root, ignore_errors=True)
+
+
 def test_flat_project_has_no_inner():
     root = tempfile.mkdtemp(prefix="rule-signals-flat-")
     os.makedirs(os.path.join(root, "LOG"))
@@ -221,6 +252,7 @@ if __name__ == "__main__":
     print("test_rule_signals")
     test_nested_project_reads_both_histories()
     test_flat_project_has_no_inner()
+    test_dispositions_window_follows_index_order()
     test_placeholder_entry_suppresses_the_freshest_commit()
     test_backfilled_entry_restores_normal_behaviour()
     test_placeholder_only_counts_in_a_heading()

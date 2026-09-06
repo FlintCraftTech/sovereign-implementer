@@ -67,7 +67,13 @@ def read(d, rel):
 
 
 # --- 1. a [COMMIT_HASH] heading is filled from the fixture commit -------------
+# A baseline commit first: a record whose only match is the ROOT commit is
+# read as imported and left unfilled (case 6), the stated cost of
+# [backfill-attributes-pre-wrap-records-to-outer-commit].
 d = repo()
+write(d, "LOG/index.md", "# LOG index\n")
+git(d, "add", "LOG")
+git(d, "commit", "-q", "-m", "baseline")
 write(d, "LOG/2026-01-01-thing.md",
       "# [COMMIT_HASH] — Fixture entry about the thing\n\nBody.\n")
 git(d, "add", "LOG")
@@ -123,6 +129,47 @@ check("prose discussing the token is not",
       not hook._hash_is_misplaced("The [HASH] token goes in the heading."))
 check("a backticked token is prose",
       not hook._hash_is_misplaced("**Commit:** `[HASH]`"))
+
+# --- 5. a record's index line carries a hash git would disagree with: the
+#        index wins ([backfill-attributes-pre-wrap-records-to-outer-commit]) --
+d = repo()
+write(d, "LOG/index.md", "# LOG index\n")
+git(d, "add", "LOG")
+git(d, "commit", "-q", "-m", "baseline")
+write(d, "LOG/2026-01-03-indexed.md",
+      "# [HASH] — An entry whose index line already knows its hash\n\nBody.\n")
+write(d, "LOG/index.md",
+      "# LOG index\n\n- deadbee — An entry whose index line already knows its "
+      "hash → 2026-01-03-indexed.md\n")
+git(d, "add", "LOG")
+git(d, "commit", "-q", "-m", "a later commit git would attribute it to")
+git_says = git(d, "log", "-1", "--pretty=%h").stdout.strip()
+report = hook.backfill_log_hashes(d)
+after = read(d, "LOG/2026-01-03-indexed.md")
+check("the record is filled from its index line, not from git",
+      after.startswith("# deadbee — An entry"), repr(after))
+check("git's own answer was a different commit, so the index genuinely won",
+      git_says != "deadbee" and git_says not in after, repr((git_says, after)))
+shutil.rmtree(d, ignore_errors=True)
+
+# --- 6. a record whose only git match is the ROOT commit stays unfilled and
+#        is reported as an import -----------------------------------------------
+d = repo()
+write(d, "LOG/2026-01-04-imported.md",
+      "# PENDING — A record that arrived with the repository\n\nBody.\n")
+write(d, "LOG/index.md", "# LOG index\n\n- PENDING — A record that arrived "
+      "with the repository → 2026-01-04-imported.md\n")
+git(d, "add", "LOG")
+git(d, "commit", "-q", "-m", "import everything")
+report = hook.backfill_log_hashes(d)
+after = read(d, "LOG/2026-01-04-imported.md")
+check("a record first seen in the root commit keeps its placeholder",
+      after.startswith("# PENDING — A record"), repr(after))
+check("the report names it as predating the repository's history",
+      "2026-01-04-imported.md" in report and "predate" in report, repr(report))
+check("the index file's own placeholder keeps the git route and is filled",
+      "- PENDING —" not in read(d, "LOG/index.md"), repr(read(d, "LOG/index.md")))
+shutil.rmtree(d, ignore_errors=True)
 
 print()
 if failures:

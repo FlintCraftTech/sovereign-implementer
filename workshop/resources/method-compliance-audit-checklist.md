@@ -82,6 +82,8 @@ Read corpus-wide, the gate asks things it can't ask one rule at a time:
 - **Distribution.** Which always-loaded rules are reference material that could be fetched on demand — and, the reverse error, which fetched material is a standing behavioural rule a session would never know to look for?
 - **Rationale placement.** Which operative statements still carry their why inline, and where should it go — the shipped FAQ if a consumer would want it, the deciding LOG entry if it's an authoring decision? When moving one, check the clause isn't *stating* a rule while arguing for it.
 - **Consistency.** Is a rule held to its own standard across docs? Hardened in one doc but cited loosely in another is a finding even when each instance reads fine alone.
+- **False subordination.** A nested unit that is a complete sentence is a freestanding rule wearing a bullet, and is read against the gate as one — admission, eviction, distribution and wording — rather than passing as part of its parent.
+- **Exceptions, retroactively.** For each existing exception, restate the rule so that it does not need one; an exception that restates away without losing content is a finding.
 
 **Eviction does not happen in this run.** The sweep names what should go and why; the removal is separate work, filed to Captures like every other finding — see the dispositions note above for why the concern behind the older, opposite instruction is answered by the queue rather than by letting an audit edit.
 
@@ -137,7 +139,11 @@ One lens, two steps.
 
 ## Lens 8 — duplication
 
-Covers what the mechanical near-duplicate matcher cannot see: **two passages doing one job at the same level.**
+Covers what the mechanical near-duplicate matcher cannot see: **content stated at more than one site when one site owns it.**
+
+**First, name the owner.** For each mechanism the turn meets — a rule, a check, a field, a limit — name its owning site: the one place its content is stated. Then read every other mention against that owner. A non-owner site carrying the mechanism's content is a finding; a non-owner site pointing at the owner is not. `method-map.md` maps documents, not mechanisms, so the owner is named per finding rather than read from a register, and the finding says which site it named as owner and why.
+
+Eight relationships produce restatement. Each carries its test.
 
 **Across levels.** For each rule in the always-loaded files, ask which lower-level doc owns the same ground — the parent-axis method the 2026-08-22 style-dedup audits used — and file a capture where both state the rule rather than one stating and the other pointing.
 
@@ -145,7 +151,19 @@ Covers what the mechanical near-duplicate matcher cannot see: **two passages doi
 
 **Across siblings.** Where the same rule appears in two or more sibling documents, or a finding or report proposes it for another sibling, the finding proposes one rule at the lowest common parent, conditioned on what the copies differ by, and names every copy it repeals. The where-each-site-fires sentence is what separates this from the parallel-by-design case: copies guarding different moments that no single session reaches are two plugs, not one rule. The instance: the rests-on requirement lived in plan.md's decision step and in next.md, and a report proposed it for SPEC sentences as a third sibling; the always-loaded claim-about-the-world rule was the common parent, and one conditioned rule there replaced the copies.
 
-**Stated limit:** the lens compares rules naming the same mechanism. A duplication paraphrased past shared vocabulary stays unread — the same residual the contradictions lens states.
+**A pointer that restates.** A cross-reference sentence that carries the rule's content beside the pointer — "see X, which says that a capture is appended to the bottom of Unprocessed" — has stated the rule a second time under cover of pointing. The test: delete everything after the pointer's target and read what remains; where the sentence still points, what was deleted was a restatement.
+
+**Prose beside a typed block or specimen.** A sentence saying what an adjacent block, table or specimen already shows — the block lists three states and the sentence says there are three states, named so. The test: cover the block and read the prose, then cover the prose and read the block; where either alone carries the content, the other is the restatement, and the block is the owner.
+
+**Host versus shipped.** A rule in this project's CLAUDE.md that restates a rule the shipped docs carry, rather than pointing at the shipped rule and stating only the host-side difference. The test: does the CLAUDE.md passage say anything a consumer's session would not already read from the shipped file? Where the answer is only the host difference, the rest is a restatement.
+
+**A limit restated under a "say it wherever this is described" instruction.** A caveat or coverage limit stated at every mention of its mechanism because the owning site instructs that it be — "state the limit whenever this comes up". Each mention is a restatement, and the finding names the instruction that multiplies it, so planning decides whether the multiplication is designed (the limit must travel with every description of the mechanism) or is copies to be replaced by pointers to one owner. The lens does not decide that; it names the instruction.
+
+**A drifted pointer.** A cross-reference whose target no longer says what the pointer claims — the target was reworded, moved or repealed and the pointer was not. Not a restatement but a defect found by the same read: the owner-map step opens every pointer's target, and this is what it finds when the target has moved. The test: open the target and read it against the pointer's claim about it.
+
+**Stated limit:** the lens compares sites naming the same mechanism. A restatement paraphrased past shared vocabulary stays unread — the same residual the contradictions lens states.
+
+**How a found restatement is taken out** is in [`rule-maintenance.md`](rule-maintenance.md) — codification, consolidation and recasting, and how a near-duplicate flag is resolved. This lens finds; that file removes.
 
 ## Lens 9 — turns
 

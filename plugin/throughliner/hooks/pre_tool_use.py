@@ -594,11 +594,29 @@ def _is_research_dir(filepath: str, cwd: str) -> bool:
     scope-lock must not block it, so this folder is always editable, mirroring
     the method-docs and memory exemptions. Matched relative to the project
     root, so it holds wherever the project lives.
+
+    A nested project keeps its workshop in the product subfolder — an
+    immediate child of the project root holding its own `.git` — so the same
+    folder under such a child is the project's research folder too. The child
+    is recognised by the `.git` on disk, never by a configured name.
     """
     norm = _normalise(filepath)
     research_dir = _normalise(
         os.path.join(cwd, "workshop", "resources", "research"))
-    return norm.startswith(research_dir + os.sep) or norm == research_dir
+    if norm.startswith(research_dir + os.sep) or norm == research_dir:
+        return True
+    if not _is_inside(filepath, cwd):
+        return False
+    rel = os.path.relpath(os.path.normpath(filepath), os.path.normpath(cwd))
+    parts = rel.replace("\\", "/").split("/")
+    if len(parts) < 4 or parts[0] in ("", ".", ".."):
+        return False
+    child = os.path.join(cwd, parts[0])
+    if not os.path.exists(os.path.join(child, ".git")):
+        return False
+    nested_dir = _normalise(
+        os.path.join(child, "workshop", "resources", "research"))
+    return norm.startswith(nested_dir + os.sep) or norm == nested_dir
 
 
 def _is_retired_terms_file(filepath: str, cwd: str) -> bool:

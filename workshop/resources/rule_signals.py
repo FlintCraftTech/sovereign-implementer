@@ -1236,6 +1236,40 @@ def _latest_planning_entry(log_dir, names):
     return boundary
 
 
+INDEX_POINTER_RE = re.compile(r"(?:→|->)\s*(?P<file>[^\s→]+\.md)\s*$")
+
+
+def _index_order(log_dir):
+    """Record filenames in the log index's order, newest first.
+
+    `LOG/index.md` holds the current month and `LOG/index-YYYY-MM.md` each
+    completed month, every one newest-first and written in close order — so
+    the current file first, then the month files newest month first, is the
+    whole archive in close order. A record the index does not list is absent
+    from the result, and the caller falls back to filename order for it.
+    """
+    try:
+        names = os.listdir(log_dir)
+    except OSError:
+        return []
+    months = sorted((n for n in names if re.match(r"^index-\d{4}-\d{2}\.md$", n)),
+                    reverse=True)
+    files = (["index.md"] if "index.md" in names else []) + months
+    order = []
+    for name in files:
+        try:
+            with open(os.path.join(log_dir, name), "r", encoding="utf-8") as f:
+                for line in f:
+                    if not line.startswith("- "):
+                        continue
+                    m = INDEX_POINTER_RE.search(line.rstrip())
+                    if m and m.group("file") not in order:
+                        order.append(m.group("file"))
+        except OSError:
+            continue
+    return order
+
+
 def dispositions(root, window=True):
     """Every `Rule gate:` line on record, newest LOG entry first.
 
@@ -1253,6 +1287,15 @@ def dispositions(root, window=True):
     history. Where no planning entry exists, the window cannot be established —
     the caller says so and names the flag, rather than silently printing
     nothing, which would read as "no refusals".
+
+    **The window is bounded by the log index's order, not by filename order.**
+    The index is newest-first and written in close order — the same read the
+    planning opening's log check makes — so "since the last planning session"
+    is every record whose index line sits above the latest planning record's.
+    Filename order put a build run closing on the same day as its planning
+    session OUTSIDE the window, because `-build.md` sorts before a bare `.md`:
+    twenty-two dispositions went unlisted at one opening. A record the index
+    does not list falls back to the filename comparison, and the note says so.
 
     **The guard, stated wherever this prints.** It reports what a disposition
     *claims*. It cannot say whether a refusal was correct, and it cannot see a
@@ -1273,7 +1316,42 @@ def dispositions(root, window=True):
                     "could not be established — showing full history "
                     "(--dispositions-all prints this deliberately)")
         else:
-            scope = [n for n in names if n >= boundary]
+            order = _index_order(log_dir)
+            # The boundary itself is read off the index too: the newest
+            # index-listed record that is a planning record. `_latest_planning_entry`
+            # sorts by filename, where the legacy combined logs (`log.md`,
+            # `log-v*.md`) sort after every dated record and carry planning
+            # fields — so it returned `log.md` here, windowing the listing to
+            # that one file, which is the other half of why the listing read
+            # "0 on record" at the 2026-09-05 opening.
+            for name in order:
+                if name not in names:
+                    continue
+                try:
+                    with open(os.path.join(log_dir, name), "r",
+                              encoding="utf-8") as f:
+                        text = f.read()
+                except OSError:
+                    continue
+                if PLANNING_ENTRY_RE.search(name) or PLANNING_BODY_RE.search(text):
+                    boundary = name
+                    break
+            if boundary in order:
+                above = set(order[:order.index(boundary)])
+                # Only dated per-entry records can be missing from the index
+                # by accident; the month index files and the legacy combined
+                # logs are not per-entry records and are never listed.
+                unlisted = [n for n in names if n not in order and n >= boundary
+                            and re.match(r"^\d{4}-\d{2}-\d{2}-", n)]
+                scope = [n for n in names if n in above] + unlisted
+                if unlisted:
+                    note = ("%d record(s) absent from the log index were "
+                            "windowed by filename order instead: %s"
+                            % (len(unlisted), ", ".join(unlisted)))
+            else:
+                scope = [n for n in names if n >= boundary]
+                note = ("the latest planning record is not in the log index, "
+                        "so the window fell back to filename order")
 
     found = []
     for name in scope:

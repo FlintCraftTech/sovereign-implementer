@@ -161,6 +161,41 @@ def main():
         check("a manifest change beyond the version still reports",
               reported != [], "nothing was reported")
 
+        # The two roots apart ([release-ritual-commands-target-outer-repo]):
+        # a nested project's git history is the inner and its records are the
+        # outer's, so `--log-root` points the LOG/ reads elsewhere while every
+        # git read stays on the repository.
+        with tempfile.TemporaryDirectory() as outer:
+            os.makedirs(os.path.join(outer, "LOG"))
+            with open(os.path.join(outer, "LOG", "2026-01-01-reworded.md"),
+                      "w", encoding="utf-8") as handle:
+                handle.write(
+                    "# %s — The run's pre-flight is reworded\n\n"
+                    "Written from the outer.\n\n"
+                    "**Files touched:** `plugin/throughliner/docs/next.md`\n"
+                    % marks["shipped"][:7])
+            with open(os.path.join(outer, "LOG", "2026-01-01-reworded-plan.md"),
+                      "w", encoding="utf-8") as handle:
+                handle.write(
+                    "# abc1234 — plan — the pre-flight reword\n\n"
+                    "Decided because the word misled.\n\n"
+                    "**Work processed:** kept.\n")
+            apart = "\n".join(changelog.build(repo, marks["base"],
+                                              marks["shipped"], outer))
+            check("--log-root finds the record in the other folder",
+                  "Written from the outer" in apart, apart)
+            check("--log-root finds the deciding record in the other folder",
+                  "Decided because the word misled" in apart, apart)
+            check("--log-root does not read the repository's own LOG/",
+                  "The pre-flight said the run was unattended" not in apart,
+                  apart)
+
+        # The default is unchanged: no log root means the repository's own.
+        default = "\n".join(changelog.build(repo, marks["base"],
+                                            marks["shipped"]))
+        check("without --log-root the repository's own records are read",
+              "The pre-flight said the run was unattended" in default, default)
+
     print()
     if _failures:
         print("FAILED: %d" % len(_failures))

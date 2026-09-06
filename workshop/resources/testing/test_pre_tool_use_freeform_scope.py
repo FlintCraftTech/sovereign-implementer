@@ -142,6 +142,32 @@ def main():
         repr(denied),
     )
 
+    # 6. The research exemption in a NESTED project: the workshop sits under
+    # the product subfolder, an immediate child of the root holding its own
+    # .git ([scope-lock-research-exemption-flat-path-only]). The same path
+    # without the child .git is an ordinary subfolder and stays denied.
+    d5 = make_project(scope_files=None)
+    nested = os.path.join(d5, "product", "workshop", "resources", "research")
+    os.makedirs(nested)
+    research_file = os.path.join(nested, "x.md")
+    check(
+        "research folder under a child WITHOUT .git is denied",
+        decision(drive_edit(d5, research_file)) == "deny",
+        repr(drive_edit(d5, research_file)),
+    )
+    os.makedirs(os.path.join(d5, "product", ".git"))
+    check(
+        "research folder under a child holding .git is allowed",
+        decision(drive_edit(d5, research_file)) == "allow",
+        repr(drive_edit(d5, research_file)),
+    )
+    sibling = os.path.join(d5, "product", "workshop", "resources", "notes.md")
+    check(
+        "a non-research path under the same child is still denied",
+        decision(drive_edit(d5, sibling)) == "deny",
+        repr(drive_edit(d5, sibling)),
+    )
+
     if _failures:
         print(f"\n{len(_failures)} FAILURE(S)")
         return 1

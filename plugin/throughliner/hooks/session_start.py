@@ -169,6 +169,58 @@ def _oldest_commit_for(cwd, entry_title):
     return hashes[-1] if hashes else ""
 
 
+def _hash_from_index(log_dir, record_name):
+    """The hash the index files record for `record_name`, or "".
+
+    An index line is `- <hash> — <summary> → <filename>`, written by the same
+    close that wrote the record. Where it already holds a real hash, that is
+    the answer for the record's own placeholder — read first, before git is
+    asked, because git's oldest-commit test cannot tell a record's own close
+    from the commit that later imported a whole folder of records.
+    """
+    try:
+        names = sorted(os.listdir(log_dir))
+    except OSError:
+        return ""
+    pattern = re.compile(
+        r"^-\s+(?P<hash>[0-9a-f]{7,40})\s+[—–-]\s+.*(?:→|->)\s*"
+        + re.escape(record_name) + r"\s*$")
+    for name in names:
+        if not (name.startswith("index") and name.endswith(".md")):
+            continue
+        try:
+            with open(os.path.join(log_dir, name), "r", encoding="utf-8") as f:
+                for line in f:
+                    match = pattern.match(line.rstrip("\r\n"))
+                    if match:
+                        return match.group("hash")
+        except (OSError, UnicodeDecodeError):
+            continue
+    return ""
+
+
+def _is_root_commit(cwd, commit):
+    """True where `commit` has no parent — the repository's first commit.
+
+    A record found first in the root commit was imported with the repository
+    rather than written by a close inside it: a wrap, a clone or a folder move
+    adds every existing record in one commit, and the oldest-commit test then
+    attributes all of them to it. Such a record keeps its placeholder and is
+    reported as an import.
+    """
+    try:
+        result = subprocess.run(
+            ["git", "rev-parse", "--verify", "--quiet", commit + "^"],
+            cwd=cwd,
+            capture_output=True,
+            text=True,
+            timeout=15,
+        )
+    except (OSError, subprocess.SubprocessError):
+        return False
+    return result.returncode != 0
+
+
 def _file_is_committed(cwd, relpath):
     """True if `relpath` has at least one commit in git history.
 
@@ -267,6 +319,10 @@ def backfill_log_hashes(cwd):
     # from the one above and reported as one: there the backfill may be
     # failing, here the entry is malformed and no backfill can ever read it.
     malformed_position = []
+    # Records whose only git match is the repository's root commit — imported
+    # with the repository rather than written inside it. Left unfilled and
+    # named, so the hash is read from the index or filled by hand.
+    imported = []
     for name in names:
         if not name.endswith(".md"):
             continue
@@ -296,7 +352,17 @@ def backfill_log_hashes(cwd):
             entry_title = line[match.end():].strip()
             if not entry_title:
                 continue
-            commit = _oldest_commit_for(cwd, entry_title)
+            # A record file's placeholder: the index line written by the same
+            # close is the answer where it carries a real hash. Index files keep
+            # the git route — there is nothing above them to read.
+            commit = "" if is_index_file else _hash_from_index(log_dir, name)
+            if not commit:
+                commit = _oldest_commit_for(cwd, entry_title)
+                if (commit and not is_index_file
+                        and _is_root_commit(cwd, commit)):
+                    if name not in imported:
+                        imported.append(name)
+                    continue
             if not commit:
                 # An unresolved placeholder is normal for the current session's
                 # own entry (not committed yet). But if this entry file is
@@ -334,6 +400,15 @@ def backfill_log_hashes(cwd):
             "placeholder is not at the start of a heading or an index line, so "
             "nothing can ever fill it. Move it into the heading, per the entry "
             "template."
+        )
+    if imported:
+        anomaly += (
+            f" Note: {len(imported)} entry file(s) predate this repository's "
+            f"history ({', '.join(imported)}) — their only git match is the "
+            "repository's first commit, which imported them rather than wrote "
+            "them, so the placeholder is left in place. Read the hash from the "
+            "record's index line, or fill it by hand from the repository the "
+            "session actually ran in."
         )
     if not filled:
         if anomaly:

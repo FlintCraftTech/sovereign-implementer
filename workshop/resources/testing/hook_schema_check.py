@@ -116,11 +116,66 @@ def _is_json(text):
 
 # --- SessionStart -------------------------------------------------------------
 
+def _installed_markers():
+    """The version and format epoch the hook under test expects a project to
+    carry, read from the source rather than remembered."""
+    with open(os.path.join(PLUGIN_ROOT, ".claude-plugin", "plugin.json"),
+              encoding="utf-8") as f:
+        version = json.load(f).get("version", "")
+    epoch = ""
+    with open(os.path.join(HOOKS, "session_start.py"), encoding="utf-8") as f:
+        for line in f:
+            if line.startswith("FORMAT_EPOCH ="):
+                epoch = line.split("=", 1)[1].strip()
+                break
+    return version, epoch
+
+
+def _adopted_project():
+    """A temp project the hook reads as adopted and current.
+
+    The adopted-path cases used to drive the hook against the folder this
+    suite sits in. Since the wrap of 2026-09-04 that folder is the inner
+    repository, which holds no SPEC.md or QUEUE.md, so the hook took its
+    unadopted path and the "project state within the first 2KB" check failed
+    at every rezip. A fixture the suite builds itself is adopted whatever
+    layout the project keeps: SPEC.md, a QUEUE.md with both sections and the
+    cleared-to-run marker, a LOG/ with its index, the two marker files carrying
+    the installed values, under git with one commit.
+    """
+    d = tempfile.mkdtemp(prefix="hookcheck-adopted-")
+    version, epoch = _installed_markers()
+    with open(os.path.join(d, "SPEC.md"), "w", encoding="utf-8") as f:
+        f.write("# SPEC\n\nA fixture project.\n")
+    with open(os.path.join(d, "QUEUE.md"), "w", encoding="utf-8") as f:
+        f.write("# QUEUE\n\n## Processed\n\n"
+                "--- Cleared to run above this line ---\n\n"
+                "## Unprocessed\n")
+    os.makedirs(os.path.join(d, "LOG"))
+    with open(os.path.join(d, "LOG", "index.md"), "w", encoding="utf-8") as f:
+        f.write("# LOG index\n")
+    with open(os.path.join(d, ".throughliner-version"), "w",
+              encoding="utf-8") as f:
+        f.write(version + "\n")
+    with open(os.path.join(d, ".throughliner-format-epoch"), "w",
+              encoding="utf-8") as f:
+        f.write(epoch + "\n")
+    for args in (["init", "-q"],
+                 ["config", "user.email", "suite@example.invalid"],
+                 ["config", "user.name", "suite"],
+                 ["add", "-A"],
+                 ["commit", "-q", "-m", "fixture"]):
+        subprocess.run(["git"] + args, cwd=d, capture_output=True,
+                       text=True, encoding="utf-8")
+    return d
+
+
 def test_session_start_adopted():
-    """This project is adopted, so the hook takes its main path."""
+    """An adopted project, so the hook takes its main path."""
+    d = _adopted_project()
     rc, out, err = drive("session_start.py",
-                         {"hook_event_name": "SessionStart", "cwd": ROOT,
-                          "source": "startup"})
+                         {"hook_event_name": "SessionStart", "cwd": d,
+                          "source": "startup"}, cwd=d)
     check("SessionStart (adopted): exits 0", rc == 0, err[:500])
     hso = assert_envelope("SessionStart (adopted)", out, "SessionStart",
                           ["additionalContext"])
@@ -147,9 +202,10 @@ def test_session_start_survives_a_sparse_payload():
     The harness supplies optional fields inconsistently, so the hook has to cope
     with a payload stripped to the minimum rather than assuming a full one.
     """
+    d = _adopted_project()
     rc, out, err = drive("session_start.py",
-                         {"hook_event_name": "SessionStart", "cwd": ROOT,
-                          "source": "startup"})
+                         {"hook_event_name": "SessionStart", "cwd": d,
+                          "source": "startup"}, cwd=d)
     check("SessionStart (sparse payload): still exits 0 with valid output",
           rc == 0 and _is_json(out), err[:500])
 
@@ -188,10 +244,14 @@ def test_session_start_payload_fits_under_the_cap():
     does not exist. Manufacturing a figure without it is the same failure with
     extra steps. A number nobody has to defend beats a defensible-sounding
     invention, so the size is printed and a human reads it.
+
+    Measured on a minimal adopted fixture since 2026-09-06, so the printed
+    size is a floor for the payload rather than this project's own figure.
     """
+    d = _adopted_project()
     rc, out, err = drive("session_start.py",
-                         {"hook_event_name": "SessionStart", "cwd": ROOT,
-                          "source": "startup"})
+                         {"hook_event_name": "SessionStart", "cwd": d,
+                          "source": "startup"}, cwd=d)
     if not _is_json(out):
         check("SessionStart: payload size checkable", False, err[:300])
         return
@@ -212,9 +272,10 @@ def test_session_start_points_at_the_rules_rather_than_pasting_them():
     to work. So the check is on the mechanism, not just the size: the directive
     must be present, and the file's actual contents must NOT be.
     """
+    d = _adopted_project()
     rc, out, err = drive("session_start.py",
-                         {"hook_event_name": "SessionStart", "cwd": ROOT,
-                          "source": "startup"})
+                         {"hook_event_name": "SessionStart", "cwd": d,
+                          "source": "startup"}, cwd=d)
     if not _is_json(out):
         check("SessionStart: rules directive checkable", False, err[:300])
         return
@@ -255,9 +316,10 @@ def test_session_start_state_lines_lead_the_payload():
     than the live defence it once was. It stays because it is what makes adding
     a line safe.
     """
+    d = _adopted_project()
     rc, out, err = drive("session_start.py",
-                         {"hook_event_name": "SessionStart", "cwd": ROOT,
-                          "source": "startup"})
+                         {"hook_event_name": "SessionStart", "cwd": d,
+                          "source": "startup"}, cwd=d)
     if not _is_json(out):
         check("SessionStart: ordering checkable", False, err[:300])
         return

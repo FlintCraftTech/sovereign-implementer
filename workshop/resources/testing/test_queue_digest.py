@@ -23,6 +23,7 @@ retired. Assert on lookups.
 import importlib.util
 import os
 import shutil
+import subprocess
 import sys
 import tempfile
 
@@ -94,6 +95,50 @@ def project(processed="", unprocessed="", log_entries=()):
 def run(root):
     items = digest.parse(os.path.join(root, "QUEUE.md"))
     return items, digest.render(items, root, os.path.join(root, "QUEUE.md"))
+
+
+def git(cwd, *args):
+    return subprocess.run(["git"] + list(args), cwd=cwd, capture_output=True,
+                          text=True, encoding="utf-8")
+
+
+def git_project():
+    """A temp project that IS a git repository, with two commits to QUEUE.md.
+
+    The three cases needing real commit dates used to read this project's own
+    QUEUE.md at the suite's computed root. Since the wrap of 2026-09-04 the
+    queue lives one level above the folder the suite computes, so the open
+    failed and the suite aborted before its remaining cases ran. A fixture of
+    its own keeps the suite independent of where the project keeps its queue.
+
+    First commit: two entries. Second commit: a third entry plus a held item
+    written already held, so first-seen dates differ across commits and the
+    held-since field has exactly one commit to attribute to.
+    """
+    d = tempfile.mkdtemp(prefix="digest-git-")
+    git(d, "init", "-q")
+    git(d, "config", "user.email", "suite@example.invalid")
+    git(d, "config", "user.name", "suite")
+    path = os.path.join(d, "QUEUE.md")
+
+    def write(processed):
+        with open(path, "w", encoding="utf-8") as f:
+            f.write("# QUEUE\n\nIntro prose.\n\n## Processed\n\n" + processed
+                    + "\n" + MARKER + "\n\n## Unprocessed\n\n")
+
+    write("#### First item [alpha]\nRationale.\n" + BLOCK
+          + "\n#### Second item [beta]\nRationale.\n" + BLOCK)
+    git(d, "add", "QUEUE.md")
+    git(d, "commit", "-q", "-m", "two entries",
+        "--date", "2026-01-01T12:00:00")
+    write("#### First item [alpha]\nRationale.\n" + BLOCK
+          + "\n#### Second item [beta]\nRationale.\n" + BLOCK
+          + "\n#### Third item [gamma]\nRationale.\n" + BLOCK
+          + "\n#### A held item [delta]\nRationale.\nBlocked by: [alpha]\n")
+    git(d, "add", "QUEUE.md")
+    git(d, "commit", "-q", "-m", "a third entry and a held item",
+        "--date", "2026-02-01T12:00:00")
+    return d
 
 
 # --- a migration-written build block is surfaced until planning checks it -----
@@ -659,22 +704,36 @@ def test_no_git_degrades_quietly():
     shutil.rmtree(root, ignore_errors=True)
 
 
-def test_age_prints_in_this_repository():
-    """The real project is a git repo with a committed QUEUE.md, so dates land.
+def test_age_prints_in_a_git_repository():
+    """A git repo with a committed QUEUE.md yields a first-seen date per slug.
 
-    Skipped rather than failed where that isn't true — a checkout without
-    history is a legitimate state, and the degrade case above is what pins the
-    behaviour that matters.
+    Run against a fixture repository of its own (see `git_project`), never
+    against this project's queue. Skipped rather than failed where git itself
+    is unavailable — a machine without git is a legitimate state, and the
+    degrade case above is what pins the behaviour that matters.
     """
-    dates = digest.first_seen(ROOT, os.path.join(ROOT, "QUEUE.md"))
+    root = git_project()
+    dates = digest.first_seen(root, os.path.join(root, "QUEUE.md"))
     if not dates:
-        print("  skip first-seen dates (no git history for QUEUE.md here)")
+        print("  skip first-seen dates (git unavailable on this machine)")
+        shutil.rmtree(root, ignore_errors=True)
         return
     check(
         "every date is an ISO day",
         all(len(d) == 10 and d[4] == "-" for d in dates.values()),
         str(list(dates.items())[:3]),
     )
+    check(
+        "every committed slug has a date",
+        set(dates) == {"alpha", "beta", "gamma", "delta"},
+        str(sorted(dates)),
+    )
+    check(
+        "a slug added in the second commit carries the later date",
+        dates["alpha"] < dates["gamma"],
+        "%s vs %s" % (dates["alpha"], dates["gamma"]),
+    )
+    shutil.rmtree(root, ignore_errors=True)
 
 
 def test_runs_alone_reports_what_is_ahead_of_it():
@@ -934,20 +993,23 @@ def test_median_age_is_computed_not_judged():
     cannot read a field the digest does not print — working the median date out
     by hand is the judgment the ladder exists to remove.
 
-    Run against the real repository, because a median age needs real commit
-    dates. Skipped rather than failed where there is no history, exactly as the
+    Run against a fixture repository, because a median age needs real commit
+    dates. Skipped rather than failed where git is unavailable, exactly as the
     first-seen test above is.
     """
-    dates = digest.first_seen(ROOT, os.path.join(ROOT, "QUEUE.md"))
+    root = git_project()
+    dates = digest.first_seen(root, os.path.join(root, "QUEUE.md"))
     if not dates:
-        print("  skip median age (no git history for QUEUE.md here)")
+        print("  skip median age (git unavailable on this machine)")
+        shutil.rmtree(root, ignore_errors=True)
         return
-    queue = os.path.join(ROOT, "QUEUE.md")
-    out = digest.render(digest.parse(queue), ROOT, queue)
+    queue = os.path.join(root, "QUEUE.md")
+    out = digest.render(digest.parse(queue), root, queue)
     text = "\n".join(out) if isinstance(out, list) else out
     check("the section median age prints", "median first seen:" in text, text[:400])
     check("at least one entry is marked at/above median age",
           "(at/above median age)" in text, text[:400])
+    shutil.rmtree(root, ignore_errors=True)
 
 
 def test_median_age_absent_without_dates():
@@ -1000,10 +1062,12 @@ def test_held_since_attributes_within_one_commit():
     when the two arrived together — the ordinary case, since an item is
     normally written already held.
     """
+    root = git_project()
     held = {}
-    dates = digest.first_seen(ROOT, os.path.join(ROOT, "QUEUE.md"), held)
+    dates = digest.first_seen(root, os.path.join(root, "QUEUE.md"), held)
     if not dates:
-        print("  skip held-since (no git history for QUEUE.md here)")
+        print("  skip held-since (git unavailable on this machine)")
+        shutil.rmtree(root, ignore_errors=True)
         return
     check(
         "every held-since date is an ISO day",
@@ -1015,6 +1079,17 @@ def test_held_since_attributes_within_one_commit():
         set(held) <= set(dates),
         str(set(held) - set(dates)),
     )
+    check(
+        "the item written already held is attributed to its own commit",
+        held.get("delta") == dates.get("delta"),
+        "held %r, first seen %r" % (held.get("delta"), dates.get("delta")),
+    )
+    check(
+        "an item never held gets no held-since date",
+        "alpha" not in held,
+        str(held),
+    )
+    shutil.rmtree(root, ignore_errors=True)
 
 
 def test_not_before_prints_with_its_state():
@@ -1108,7 +1183,7 @@ if __name__ == "__main__":
     test_capture_naming_another_capture_is_not_flagged()
     test_no_build_block_report_survives()
     test_no_git_degrades_quietly()
-    test_age_prints_in_this_repository()
+    test_age_prints_in_a_git_repository()
     test_runs_alone_reports_what_is_ahead_of_it()
     test_no_runs_alone_work_says_none()
     test_whats_next_answers_only_the_pick()

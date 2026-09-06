@@ -128,13 +128,17 @@ def epoch_move(project_root, commit):
     return added[-1] if added else None
 
 
-def log_entries_for(project_root, commit):
+def log_entries_for(project_root, commit, log_root=None):
     """Session records whose heading carries this commit's hash.
 
     Git abbreviates a hash to whatever length is unambiguous, and the records
     are stamped with the abbreviated form, so the match is on a prefix.
+
+    `log_root` is where `LOG/` lives when it is not beside the git history —
+    a nested project keeps the records in its outer repository and the product
+    in the inner. Defaults to `project_root`, which is the flat case.
     """
-    log_path = os.path.join(project_root, LOG_DIR)
+    log_path = os.path.join(log_root or project_root, LOG_DIR)
     if not os.path.isdir(log_path):
         return []
 
@@ -258,7 +262,7 @@ def slug_of(name):
     return SLUG_SUFFIX.sub("", base)
 
 
-def deciding_record(project_root, entry_file):
+def deciding_record(project_root, entry_file, log_root=None):
     """The planning record for this entry's item, or None.
 
     The reason a change was made is written where it was decided — the
@@ -266,9 +270,12 @@ def deciding_record(project_root, entry_file):
     the doing. The match is by slug, which is the same retrieval idea the
     development project's own rules write down (search the index for the
     rule's words); here the slug is mechanical where the words are not.
+
+    `log_root` as in `log_entries_for`: where `LOG/` lives when it is not
+    beside the git history.
     """
     slug = slug_of(entry_file)
-    log_path = os.path.join(project_root, LOG_DIR)
+    log_path = os.path.join(log_root or project_root, LOG_DIR)
     candidates = []
     try:
         names = sorted(os.listdir(log_path))
@@ -293,14 +300,19 @@ def deciding_record(project_root, entry_file):
     return {"file": name, "summary": summary_of(text)}
 
 
-def build(project_root, since, until):
-    """The changelog as a list of lines. Empty where nothing shipped."""
+def build(project_root, since, until, log_root=None):
+    """The changelog as a list of lines. Empty where nothing shipped.
+
+    Every git read stays on `project_root`; the two `LOG/` reads go to
+    `log_root` where one is given, else `project_root`.
+    """
     lines = []
     for commit, subject in shipped_commits(project_root, since, until):
         paths, basenames = shipped_names(project_root, commit)
         if version_bump_only(project_root, commit, paths):
             continue
-        entries = [entry for entry in log_entries_for(project_root, commit)
+        entries = [entry for entry in log_entries_for(project_root, commit,
+                                                      log_root)
                    if entry_is_shipped(entry, paths, basenames)]
         epoch = epoch_move(project_root, commit)
 
@@ -335,7 +347,7 @@ def build(project_root, since, until):
             if summary:
                 lines.append("")
                 lines.append(summary)
-            deciding = deciding_record(project_root, entry["file"])
+            deciding = deciding_record(project_root, entry["file"], log_root)
             if deciding and deciding["summary"]:
                 lines.append("")
                 lines.append("**Why it was made** (from the record of the "
@@ -382,6 +394,11 @@ def main(argv=None):
              "several releases. Takes a tag, a commit, or a bare version "
              "number (1.19.0 is tried as v1.19.0 too).")
     parser.add_argument("--out", help="write to this path instead of stdout")
+    parser.add_argument(
+        "--log-root", dest="log_root", metavar="PATH",
+        help="the folder holding LOG/, where it is not the project root — a "
+             "nested project keeps its records in the outer repository and "
+             "the product in the inner (default: the project root)")
     args = parser.parse_args(argv)
 
     since = args.since
@@ -399,7 +416,7 @@ def main(argv=None):
     if not since:
         parser.error("one of --from or --catch-up is required")
 
-    lines = build(args.project_root, since, args.until)
+    lines = build(args.project_root, since, args.until, args.log_root)
     args.since = since
 
     if not lines:
