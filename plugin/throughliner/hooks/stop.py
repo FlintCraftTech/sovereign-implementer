@@ -122,12 +122,14 @@ def _sentence_span(message, start, end):
     return left, right
 
 
-def _strip_quoted(message):
+def _strip_quoted(message, spans=False):
     """The message with blockquoted lines and fenced code blocks blanked.
 
     A capture report is never inside a blockquote or a code fence; a quoted
     draft, a specimen or a pasted post always is. Lines are replaced with
-    empty strings rather than removed, so nothing else shifts.
+    empty strings rather than removed, so nothing else shifts. With `spans`
+    set, inline code and quotation-marked spans are blanked too — the time-word
+    scan uses that form, since a quoted phrase is someone else's words.
     """
     out = []
     in_fence = False
@@ -140,8 +142,40 @@ def _strip_quoted(message):
         if in_fence or stripped.startswith(">"):
             out.append("\n" if line.endswith("\n") else "")
             continue
-        out.append(line)
+        out.append(_QUOTED_SPAN.sub(" ", line) if spans else line)
     return "".join(out)
+
+
+# --- Relative time words with no source ([unfounded-time-words-stopped-once]) ---
+#
+# A COPY of pre_tool_use.py's TIME_WORD_PATTERN and _QUOTED_SPAN: the hooks run
+# standalone from a copied plugin cache and cannot import a shared module.
+# Change one, change both. pre_tool_use.py scans text written into a record,
+# the queue or SPEC; this scans the finished reply. Each distinct phrase blocks
+# once per session, then passes, through the same marker mechanism as the
+# filing-claim check. The limit, stated: a bare wrong clock time or a wrong
+# date is not a phrase and is not reached.
+TIME_WORD_PATTERN = re.compile(
+    r"\b(?:"
+    r"(?:\d+|a|an|one|two|three|four|five|few|a few|couple of|several)"
+    r"\s+(?:minutes?|hours?|days?|weeks?|months?)\s+ago"
+    r"|just now|moments ago|earlier today|this morning|this afternoon"
+    r"|this evening|tonight|yesterday|today|tomorrow|last week|next week"
+    r"|last night"
+    r")\b",
+    re.IGNORECASE,
+)
+_QUOTED_SPAN = re.compile(r"`[^`\n]*`|\"[^\"\n]*\"|“[^”\n]*”")
+
+
+def _unfounded_time_words(message):
+    """Distinct time phrases in the reply outside quoted text, lowercased."""
+    found = []
+    for match in TIME_WORD_PATTERN.finditer(_strip_quoted(message, spans=True)):
+        phrase = " ".join(match.group(0).lower().split())
+        if phrase not in found:
+            found.append(phrase)
+    return found
 
 
 def _claimed_slugs(message):
@@ -300,6 +334,27 @@ def main():
     # must not block.
     queue_slugs = _slugs_in_queue(queue_path)
     if queue_slugs is None:
+        sys.exit(0)
+
+    # Second claim class: a relative time word with no source. Blocks once per
+    # distinct phrase per session; a phrase already blocked passes silently,
+    # since the reply is then expected to carry its source in the sentence.
+    fresh = [
+        p for p in _unfounded_time_words(message)
+        if not _already_blocked(cwd, session_id, "time-" + p.replace(" ", "-"))
+    ]
+    if fresh:
+        listed = ", ".join('"%s"' % p for p in fresh)
+        print(json.dumps({
+            "decision": "block",
+            "reason": (
+                "Your last message says when something happened with no "
+                f"source: {listed}. Read the clock or the record and put the "
+                "source in the sentence, or drop the word — a wrong time in "
+                "chat proliferates into the records. This phrase is stopped "
+                "once; it passes on the next reply."
+            ),
+        }))
         sys.exit(0)
 
     claimed = _claimed_slugs(message)

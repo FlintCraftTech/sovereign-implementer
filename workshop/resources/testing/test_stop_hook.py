@@ -286,8 +286,51 @@ def test_claim_inside_a_fence_does_not_block():
     shutil.rmtree(root, ignore_errors=True)
 
 
+# --------------------------------------------------------------------------
+# Relative time words with no source ([unfounded-time-words-stopped-once]).
+# --------------------------------------------------------------------------
+
+def time_blocked(out):
+    return "with no source" in out
+
+
+def test_bare_time_word_blocks_once_with_the_phrase_named():
+    root = project()
+    code, out = run(root, "That is what we settled an hour ago.")
+    check("a bare 'an hour ago' blocks", time_blocked(out), out)
+    check("the reason names the phrase", "an hour ago" in out, out)
+    code, out = run(root, "Still what we settled an hour ago.")
+    check("the same phrase does not block a second time",
+          not time_blocked(out), out)
+    shutil.rmtree(root, ignore_errors=True)
+
+
+def test_time_word_inside_a_quotation_passes():
+    root = project()
+    code, out = run(root, "Your words were \"do it like an hour ago\" and I "
+                          "have read them back.")
+    check("a phrase inside quotation marks passes", not time_blocked(out), out)
+    code, out = run(root, "> we settled this yesterday\n\nThat is the quote.")
+    check("a phrase inside a blockquote passes", not time_blocked(out), out)
+    code, out = run(root, "The rule names `this morning` as a specimen.")
+    check("a phrase inside inline code passes", not time_blocked(out), out)
+    shutil.rmtree(root, ignore_errors=True)
+
+
+def test_day_words_and_elapsed_forms_block():
+    root = project()
+    for phrase in ("yesterday", "tomorrow", "last week", "3 minutes ago",
+                   "just now", "tonight"):
+        code, out = run(root, f"I did that {phrase}.")
+        check(f"'{phrase}' blocks", time_blocked(out), out)
+    shutil.rmtree(root, ignore_errors=True)
+
+
 if __name__ == "__main__":
     print("test_stop_hook")
+    test_bare_time_word_blocks_once_with_the_phrase_named()
+    test_time_word_inside_a_quotation_passes()
+    test_day_words_and_elapsed_forms_block()
     test_claim_inside_a_blockquote_does_not_block()
     test_claim_inside_a_fence_does_not_block()
     test_cited_shipped_slug_does_not_block()

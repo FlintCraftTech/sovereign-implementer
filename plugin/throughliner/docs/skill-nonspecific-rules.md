@@ -208,7 +208,9 @@ The work cycle. Every piece of work travels the same loop.
   with no build running, the mechanics are these:** on the user's next word,
   write `_freeform-<session-id>.md` in the project root with a `Files:`
   section naming that one path, say so in one line, make the edit, and let
-  the close record it as handmade work. The consent is the user's repeated
+  the close record it as handmade work — the door opens only after the safety
+  check has refused that path earlier in the same session, which it reads from
+  its own log. The consent is the user's repeated
   direction recorded as one path in a file, which is a different thing from
   Claude asking and being waved through — the denial itself is unchanged. A
   deliverable the user asked for is not a temporary file: under the same door

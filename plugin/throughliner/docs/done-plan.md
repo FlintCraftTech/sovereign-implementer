@@ -33,11 +33,25 @@ instead (done-build.md) — it reads what was built against SPEC and reports a
 contradiction rather than editing SPEC to match. Audits land no product changes,
 so an audit close has neither.
 
-**Did this session's work change what SPEC says?** Apply the spec-entry trigger
-test **in plan.md's own wording** — quote it from there rather than keeping a copy
-here, so the two can't drift apart. Read against what this session landed.
+**Read what the session changed, not what it remembers — two reads, stated as
+commands:**
 
-If it fires, **stop the close before committing.** Surface the drift in plain
+```
+git diff HEAD -- SPEC.md     # every SPEC sentence written or changed this session
+git diff HEAD -- QUEUE.md    # every item kept or reshaped this session
+```
+
+For every SPEC sentence the first diff shows written or changed, read the queue
+item it was written for **as that item now stands**, and where the two have come
+apart, correct the sentence. For every kept item the second diff shows, read its
+final text for a product-truth change that has no sentence, applying the
+spec-entry trigger test **in plan.md's own wording** — quote it from there rather
+than keeping a copy here, so the two can't drift apart — and write the sentence
+under the drift branch below. Where SPEC.md or QUEUE.md is gitignored, the diff
+falls to the copy the safety check keeps in the project's snapshot folder, read
+against the file as it stands.
+
+If either read finds drift, **stop the close before committing.** Surface the drift in plain
 words, naming which SPEC sentence the session made wrong, get approval to fix it,
 then edit SPEC and commit it **in this same commit** rather than filing it as a
 capture for a later session.
@@ -47,9 +61,11 @@ in-session. Editing SPEC to match a decision the user already made this session 
 RECORDING, not re-planning. That covers all three shapes alike.
 
 **The gate checks that every decision this session made had its SPEC sentence
-written at the decision step.** That is where product truth is written — with
-the user in the room, ahead of the build — so by the time the close runs, the
-sentence either exists or was missed, and this is what catches the miss.
+written at the decision step, and that the sentence still matches the item at
+the close.** That is where product truth is written — with the user in the room,
+ahead of the build — so by the time the close runs, the sentence either exists
+or was missed, or was written correctly and made wrong when the same session
+later reshaped its item; the two diffs are what catch both.
 
 **A SPEC sentence describing decided-but-unbuilt behaviour is the designed lead,
 not drift.** SPEC is read at build time, which is what requires it to lead: the
@@ -74,7 +90,12 @@ user that these are theirs and meant to be saved. **Read them as expected work
 rather than a broken repo, and leave them intact.** Where a scope file
 (`_freeform-<session-id>.md`) is present at the close with no queue item behind
 it, read it as the record of what the user directed through the scope-lock's
-door, and name those paths in the entry.
+door, and name those paths in the entry. **Read the door's uses from the safety
+check's own log rather than from the scope file alone:** `.throughliner/pre-tool-use.log`
+holds one line per decision, and every line whose branch reads `freeform scope
+file` and whose last column is this session's id is a path the door admitted.
+Name each such path in the entry under handmade work, one line per path; where
+the log holds none, say nothing.
 
 **2. Decide LOG granularity by judgment.**
 

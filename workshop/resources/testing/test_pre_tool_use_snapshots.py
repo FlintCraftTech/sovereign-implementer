@@ -228,12 +228,14 @@ def test_every_decision_leaves_a_line_naming_its_branch():
     check("two decisions, two lines", len(lines) == 2, repr(lines))
     if len(lines) == 2:
         allow, deny = lines
-        check("the allow line names its branch and target",
+        # Six columns since [sweep-security-users-door-is-self-declared]:
+        # the session id closes each line, after the target.
+        check("the allow line names its branch, target and session",
               "\tEdit\tallow\tplanning standing list\t" in allow
-              and allow.endswith("QUEUE.md"), allow)
-        check("the deny line names its branch and target",
+              and allow.endswith("QUEUE.md\ts1"), allow)
+        check("the deny line names its branch, target and session",
               "\tEdit\tdeny\tplanning standing list: not on it\t" in deny
-              and deny.endswith("README.md"), deny)
+              and deny.endswith("README.md\ts1"), deny)
         check("each line opens with a clock stamp",
               all(len(l.split("\t")[0]) == 19 for l in lines), repr(lines))
     # A shell command that no guard matches is an allow with the command as
@@ -269,8 +271,8 @@ def test_the_decision_log_is_pruned():
     check("the log holds exactly the newest bound of lines",
           len(lines) == mod._DECISION_LOG_LINES, str(len(lines)))
     check("the oldest lines are the ones that went",
-          lines and lines[0].endswith("branch 40\tx")
-          and lines[-1].endswith("branch %d\tx" % (mod._DECISION_LOG_LINES + 39)),
+          lines and lines[0].endswith("branch 40\tx\tunknown")
+          and lines[-1].endswith("branch %d\tx\tunknown" % (mod._DECISION_LOG_LINES + 39)),
           repr((lines[:1], lines[-1:])))
     mod._ctx.update({"cwd": "", "tool": "", "target": ""})
     shutil.rmtree(d, ignore_errors=True)

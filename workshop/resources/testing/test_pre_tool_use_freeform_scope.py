@@ -80,13 +80,48 @@ def decision(result):
 def main():
     print("freeform scope file:")
 
-    # 1. A path the scope file lists is allowed.
+    # 1. A path the scope file lists is allowed — but only after a logged
+    # refusal of that same path in this session
+    # ([sweep-security-users-door-is-self-declared]). The first attempt with
+    # the scope file present and no earlier refusal is refused, and the
+    # refusal names the door's condition; that refusal is then the one the
+    # second attempt reads from the log.
     d = make_project(scope_files=["plugin/docs/some-doc.md"])
     target = os.path.join(d, "plugin", "docs", "some-doc.md")
+    cold = drive_edit(d, target)
     check(
-        "listed path allowed",
+        "listed path with NO prior refusal is refused",
+        decision(cold) == "deny"
+        and "door opens only" in cold.get("permissionDecisionReason", ""),
+        repr(cold),
+    )
+    log_path = os.path.join(d, ".throughliner", "pre-tool-use.log")
+    with open(log_path, encoding="utf-8") as f:
+        log_text = f.read()
+    check(
+        "that refusal is logged with the door branch and the session id",
+        "freeform scope file: no prior refusal" in log_text
+        and ("\t" + SESSION + "\n") in log_text,
+        log_text,
+    )
+    check(
+        "listed path allowed after the logged refusal",
         decision(drive_edit(d, target)) == "allow",
         repr(drive_edit(d, target)),
+    )
+
+    # 1b. A refusal logged under a DIFFERENT session id does not open the door.
+    d1 = make_project(scope_files=["plugin/docs/some-doc.md"])
+    target1 = os.path.join(d1, "plugin", "docs", "some-doc.md")
+    os.makedirs(os.path.join(d1, ".throughliner"))
+    with open(os.path.join(d1, ".throughliner", "pre-tool-use.log"), "w",
+              encoding="utf-8") as f:
+        f.write("2026-09-06 21:00:00\tEdit\tdeny\tplanning standing list: "
+                "not on it\t" + target1 + "\tother-session\n")
+    check(
+        "another session's refusal does not open the door",
+        decision(drive_edit(d1, target1)) == "deny",
+        repr(drive_edit(d1, target1)),
     )
 
     # 2. A path the scope file does not list is still denied.
@@ -123,13 +158,23 @@ def main():
     # 5. The user's door ([post-close-lock-blocks-user-work]): a scope file
     # with a Files: list and NO queue item behind it extends the list — the
     # hook reads the file and consults no queue. The project here has no
-    # QUEUE.md at all, which is the strongest form of "no queue item".
-    d3 = make_project(scope_files=["CLAUDE.md"])
+    # QUEUE.md at all, which is the strongest form of "no queue item". The
+    # refusal comes first, as in case 1: the path is refused with no scope
+    # file, the scope file is then written, and the write passes.
+    d3 = make_project(scope_files=None)
     assert not os.path.exists(os.path.join(d3, "QUEUE.md"))
+    claude_md = os.path.join(d3, "CLAUDE.md")
     check(
-        "scope file with no queue item still extends the list (the user's door)",
-        decision(drive_edit(d3, os.path.join(d3, "CLAUDE.md"))) == "allow",
-        repr(drive_edit(d3, os.path.join(d3, "CLAUDE.md"))),
+        "the door's precondition: the path is refused first",
+        decision(drive_edit(d3, claude_md)) == "deny",
+    )
+    with open(os.path.join(d3, f"_freeform-{SESSION}.md"), "w",
+              encoding="utf-8") as f:
+        f.write("# Freeform scope\n\nFiles:\n- CLAUDE.md\n")
+    check(
+        "scope file with no queue item extends the list after the refusal (the user's door)",
+        decision(drive_edit(d3, claude_md)) == "allow",
+        repr(drive_edit(d3, claude_md)),
     )
 
     # 5b. The no-build denial names the door.

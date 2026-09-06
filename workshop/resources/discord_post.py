@@ -64,6 +64,7 @@ import base64
 import json
 import mimetypes
 import os
+import re
 import sys
 import time
 import urllib.error
@@ -522,6 +523,45 @@ def create_forum_topic(token, channel, title, body_path, attach=None):
                    body={"name": title, "message": {"content": text}})
 
 
+# A copy of rule_signals.py's inner_root (and the server's _inner_root) — the
+# same shape in a third place rather than an import, so this script keeps
+# running from the outer with nothing on the path.
+VISIBILITY_INNER_RE = re.compile(r"inner repository \(`([^`]+?)/?`\)")
+
+
+def inner_root(root):
+    """The product subfolder in a nested project, or None for a flat one.
+
+    Read from the project CLAUDE.md's Visibility line, which names the inner
+    in backticks; failing that, the one immediate subfolder holding a `.git`.
+    Two candidates and no Visibility line is ambiguous, and None is returned
+    rather than a guess.
+    """
+    claude = os.path.join(root, "CLAUDE.md")
+    try:
+        with open(claude, "r", encoding="utf-8") as f:
+            for line in f:
+                if not line.startswith("Visibility:"):
+                    continue
+                m = VISIBILITY_INNER_RE.search(line)
+                if m:
+                    cand = os.path.join(root, m.group(1))
+                    if os.path.isdir(os.path.join(cand, ".git")):
+                        return cand
+    except OSError:
+        pass
+    found = []
+    try:
+        for name in os.listdir(root):
+            p = os.path.join(root, name)
+            if (not name.startswith(".") and os.path.isdir(p)
+                    and os.path.isdir(os.path.join(p, ".git"))):
+                found.append(p)
+    except OSError:
+        return None
+    return found[0] if len(found) == 1 else None
+
+
 def archived_plugin_zip(project_root, version=None):
     """The zip of a build from plugin/rezip-archive/, for a test-rezips entry.
 
@@ -533,12 +573,22 @@ def archived_plugin_zip(project_root, version=None):
     With no version given, the newest entry is used. The readme beside each zip
     carries that build's label, version and Commit: line, and is what the
     channel post says.
+
+    The archive is looked for under the inner repository first, where a nested
+    project keeps it, and at the flat path second, so a flat project is
+    unchanged and the script works from the folder the app opens.
     """
-    archive_dir = os.path.join(project_root, "plugin", "rezip-archive")
-    if not os.path.isdir(archive_dir):
+    tried = []
+    inner = inner_root(project_root)
+    if inner:
+        tried.append(os.path.join(inner, "plugin", "rezip-archive"))
+    tried.append(os.path.join(project_root, "plugin", "rezip-archive"))
+    archive_dir = next((p for p in tried if os.path.isdir(p)), None)
+    if archive_dir is None:
         raise DiscordError(
             "No rezip archive at %s. It is written by the rezip ritual's "
-            "archive step — run a rezip before posting an entry." % archive_dir)
+            "archive step — run a rezip before posting an entry."
+            % " or ".join(tried))
 
     zips = sorted(name for name in os.listdir(archive_dir)
                   if name.endswith(".zip"))

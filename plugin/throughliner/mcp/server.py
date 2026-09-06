@@ -65,7 +65,7 @@ for _stream in (sys.stderr, sys.stdout, sys.stdin):
 
 PROTOCOL_VERSION = "2024-11-05"
 SERVER_NAME = "throughliner-state"
-SERVER_VERSION = "0.5.0"
+SERVER_VERSION = "0.6.0"
 
 # This file sits at <plugin-root>/mcp/server.py, so the plugin root is its
 # grandparent. Derived rather than hardcoded, per the working conventions.
@@ -1051,6 +1051,202 @@ _MOVE_PROPERTIES = {
 }
 
 
+# --------------------------------------------------------------------------
+# Slice six: the build run's per-item close as one checked call
+# ([mcp-build-tick-tool]). The tick, the slug-bound depth and rule-gate lines,
+# the index candidate and the changes entry go into the session's build
+# working file in the exact shapes next.md's specimen shows, and the item
+# leaves Processed through reorder_queue.py's own delete in the same call.
+# --------------------------------------------------------------------------
+
+WORKING_FILE_SECTIONS = ("Index entry candidates", "Run-level", "Files",
+                         "Progress", "Changes")
+_SECTION_HEADER_RE = re.compile(
+    r"^(%s):\s*$" % "|".join(re.escape(s) for s in WORKING_FILE_SECTIONS))
+_ARTICLE_LEAD_RE = re.compile(r"^\s*(?:-\s*)?(?:a|an|the)\b", re.IGNORECASE)
+
+
+def _build_working_file(root, session_id):
+    """The session's `_build-<session-id>.md`, or the one such file present.
+
+    The server is not told the session id by the harness, so a caller may
+    pass it; without one, exactly one working file in the project root is
+    taken as this session's, and none or several is a refusal — a tick
+    written into another session's file would record work that session
+    never did.
+    """
+    if session_id:
+        safe = re.sub(r"[^A-Za-z0-9._-]", "_", session_id)
+        path = os.path.join(root, "_build-%s.md" % safe)
+        return (path, None) if os.path.isfile(path) else \
+            (None, "no build working file at %s." % path)
+    found = sorted(name for name in os.listdir(root)
+                   if name.startswith("_build-") and name.endswith(".md"))
+    if not found:
+        return None, "no build working file (_build-<session-id>.md) in %s." \
+            % root
+    if len(found) > 1:
+        return None, "%d build working files in %s (%s) — pass session_id " \
+            "to say which is this session's." % (len(found), root,
+                                                 ", ".join(found))
+    return os.path.join(root, found[0]), None
+
+
+def _working_file_sections(lines):
+    """Map each section name to (header index, index after its last non-blank
+    line) — the point new lines are inserted at."""
+    headers = [(i, m.group(1)) for i, line in enumerate(lines)
+               for m in [_SECTION_HEADER_RE.match(line.rstrip("\r\n"))] if m]
+    spans = {}
+    for pos, (i, name) in enumerate(headers):
+        end = headers[pos + 1][0] if pos + 1 < len(headers) else len(lines)
+        last = i
+        for j in range(i + 1, end):
+            if lines[j].strip():
+                last = j
+        spans[name] = (i, last + 1)
+    return spans
+
+
+def tool_build_tick(arguments):
+    """One checked call for a build item's completion: tick, depth, rule gate,
+    index candidate and changes lines into the working file, then the item
+    out of Processed."""
+    root = project_root()
+    queue = _queue_path(root)
+    digest = _digest()
+    if _mover() is None or digest is None:
+        return "Cannot write: reorder_queue.py or queue_digest.py is not " \
+               "where this server expects it (%s)." % PLUGIN_ROOT
+    if not os.path.isfile(queue):
+        return "Cannot write: no QUEUE.md at %s." % queue
+
+    slug = (arguments.get("slug") or "").strip().strip("[]")
+    verdict = (arguments.get("verdict") or "").strip().lower()
+    reason = (arguments.get("reason") or "").strip()
+    depth = (arguments.get("depth") or "").strip().lower()
+    trigger = (arguments.get("trigger") or "").strip()
+    rule_gate = (arguments.get("rule_gate") or "").strip()
+    candidate = (arguments.get("index_candidate") or "").strip()
+    changes = (arguments.get("changes") or "").strip("\r\n")
+    session_id = (arguments.get("session_id") or "").strip()
+
+    problems = []
+    if not slug:
+        problems.append("slug is missing — the item being ticked.")
+    if verdict not in ("confirmed", "unconfirmed"):
+        problems.append("verdict must be `confirmed` or `unconfirmed` — "
+                        "choosing between the two tick forms is not optional.")
+    if verdict == "unconfirmed" and not reason:
+        problems.append("an unconfirmed tick names what still needs running "
+                        "— reason is missing.")
+    if depth not in ("short", "full"):
+        problems.append("depth must be `short` or `full`.")
+    if depth == "full" and not trigger:
+        problems.append("a full depth names its trigger — reasoning "
+                        "contested, or alternative seriously weighed.")
+    if not candidate:
+        problems.append("index_candidate is missing — the artifact touched "
+                        "and the nature of the change.")
+    elif _ARTICLE_LEAD_RE.match(candidate):
+        problems.append("index_candidate opens with A/An/The — lead with the "
+                        "artifact touched, since the index is scanned by its "
+                        "opening words.")
+    if not changes.strip():
+        problems.append("changes is missing — the files this item touched, "
+                        "one line each.")
+
+    path, why = _build_working_file(root, session_id)
+    if path is None:
+        problems.append(why)
+
+    items = digest.parse(queue)
+    matches = [i for i in items if i["slug"] == slug
+               and i["section"] == "Processed"]
+    if slug and not matches:
+        problems.append("slug %r is not a work item in Processed." % slug)
+    elif len(matches) > 1:
+        problems.append("slug %r matches %d Processed items — fix that first."
+                        % (slug, len(matches)))
+    item = matches[0] if len(matches) == 1 else None
+    if item is not None:
+        # The digest lowercases prose, so the read is case-insensitive.
+        carries_gate = any(line.strip().lower().startswith("rule gate:")
+                           for line in item["prose"])
+        if carries_gate and not rule_gate:
+            problems.append("the queue item carries a `Rule gate:` line, so "
+                            "rule_gate is required — copy its disposition "
+                            "across unchanged.")
+        if rule_gate and not carries_gate:
+            problems.append("the queue item carries no `Rule gate:` line, so "
+                            "a disposition cannot be written here — the "
+                            "gate's site is planning.")
+        if rule_gate and not re.match(r"^(run|not needed)\b", rule_gate,
+                                      re.IGNORECASE):
+            problems.append("rule_gate opens `run — <what>` or "
+                            "`not needed — <why>`.")
+
+    text = None
+    if path is not None:
+        with open(path, "r", encoding="utf-8", newline="") as f:
+            text = f.read()
+        # The specimen writes the slug bare on the Run and Entries lines;
+        # bracketed is accepted too.
+        if slug and not re.search(r"(?<![a-z0-9-])%s(?![a-z0-9-])"
+                                  % re.escape(slug), text):
+            problems.append("[%s] is not in the working file's item list "
+                            "(%s)." % (slug, os.path.basename(path)))
+        if slug and re.search(r"^Depth:\s*%s\s" % re.escape(slug), text,
+                              re.MULTILINE):
+            problems.append("[%s] is already ticked in the working file."
+                            % slug)
+        lines = text.splitlines(keepends=True)
+        spans = _working_file_sections(lines)
+        for name in ("Index entry candidates", "Progress", "Changes"):
+            if name not in spans:
+                problems.append("the working file has no `%s:` section." % name)
+    if problems:
+        return "Refused — nothing was written:\n" + \
+               "\n".join("- " + p for p in problems)
+
+    eol = "\r\n" if "\r\n" in text else "\n"
+    description = item["heading"]
+    tick = "- [x] %s — done, %s" % (
+        description, "confirmed" if verdict == "confirmed"
+        else "UNCONFIRMED: %s" % reason)
+    depth_line = "Depth: %s — %s" % (slug, depth if depth == "short"
+                                     else "full, %s" % trigger)
+    progress = [tick, depth_line]
+    if rule_gate:
+        progress.append("Rule gate: %s — %s" % (slug, rule_gate))
+    candidate_line = candidate if candidate.startswith("-") else "- " + candidate
+    change_lines = [l.rstrip("\r\n") for l in changes.splitlines()]
+    change_lines = [l if l.lstrip().startswith("-") else "- " + l
+                    for l in change_lines if l.strip()]
+
+    # Insert bottom-up so earlier indices stay valid.
+    inserts = [
+        (spans["Changes"][1], change_lines),
+        (spans["Progress"][1], progress),
+        (spans["Index entry candidates"][1], [candidate_line]),
+    ]
+    for at, new in sorted(inserts, key=lambda p: p[0], reverse=True):
+        lines[at:at] = [l + eol for l in new]
+    new_text = "".join(lines)
+    with open(path, "w", encoding="utf-8", newline="") as f:
+        f.write(new_text)
+
+    ok, report = _run_mover([queue, "--delete", slug, "Processed"], root)
+    written = "Wrote to %s:\n%s" % (
+        os.path.basename(path),
+        "\n".join(progress + [candidate_line] + change_lines))
+    if not ok:
+        return ("%s\nBut the queue tool refused the removal of [%s] from "
+                "Processed, so the item still sits in the queue:\n%s"
+                % (written, slug, report))
+    return "%s\nRemoved [%s] from Processed.\n%s" % (written, slug, report)
+
+
 TOOLS = [
     {
         "name": "queue_checkpoint_counts",
@@ -1350,6 +1546,76 @@ TOOLS = [
             },
         },
         "handler": tool_queue_delete,
+    },
+    {
+        "name": "build_tick",
+        "description":
+            "Close one build item in one checked call: writes the tick line "
+            "(`- [x] <description> — done, confirmed` or `— done, "
+            "UNCONFIRMED: <reason>`), the slug-bound `Depth:` line, the "
+            "slug-bound `Rule gate:` line where the queue item carries one, "
+            "the index-entry candidate and the `Changes:` entry into this "
+            "session's build working file in the exact shapes next.md's "
+            "specimen shows, then removes the item from Processed through "
+            "the queue tool's own delete. Refuses at the door a slug not in "
+            "the working file's item list or already ticked, a missing "
+            "verdict, an unconfirmed tick with no reason, a full depth with "
+            "no trigger, a rule-gate line the item does not carry (or a "
+            "missing one it does), and an index candidate led by A/An/The.",
+        "inputSchema": {
+            "type": "object",
+            "required": ["slug", "verdict", "depth", "index_candidate",
+                         "changes"],
+            "properties": {
+                "slug": {"type": "string",
+                         "description": "The item being ticked."},
+                "verdict": {
+                    "type": "string", "enum": ["confirmed", "unconfirmed"],
+                    "description": "confirmed where something ran and "
+                                   "passed; unconfirmed otherwise.",
+                },
+                "reason": {
+                    "type": "string",
+                    "description": "Required when unconfirmed: what still "
+                                   "needs running.",
+                },
+                "depth": {
+                    "type": "string", "enum": ["short", "full"],
+                    "description": "The record's depth for this item.",
+                },
+                "trigger": {
+                    "type": "string",
+                    "description": "Required when full: `reasoning "
+                                   "contested` or `alternative seriously "
+                                   "weighed`.",
+                },
+                "rule_gate": {
+                    "type": "string",
+                    "description": "The item's disposition copied "
+                                   "unchanged: `run — <what>` or `not "
+                                   "needed — <why>`. Required where the "
+                                   "queue item carries a Rule gate: line; "
+                                   "refused where it does not.",
+                },
+                "index_candidate": {
+                    "type": "string",
+                    "description": "The artifact touched and the nature of "
+                                   "the change, not led by A/An/The.",
+                },
+                "changes": {
+                    "type": "string",
+                    "description": "The files this item touched, one "
+                                   "`- path: what changed` line each.",
+                },
+                "session_id": {
+                    "type": "string",
+                    "description": "This session's id, naming its "
+                                   "_build-<session-id>.md; optional where "
+                                   "exactly one working file exists.",
+                },
+            },
+        },
+        "handler": tool_build_tick,
     },
 ]
 

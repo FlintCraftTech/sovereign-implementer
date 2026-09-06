@@ -229,7 +229,7 @@ PATTERN_AS_DATA_NOTE = (
 # 2026-08-28.md).
 _DECISION_LOG_NAME = "pre-tool-use.log"
 _DECISION_LOG_LINES = 500
-_ctx = {"cwd": "", "tool": "", "target": ""}
+_ctx = {"cwd": "", "tool": "", "target": "", "sid": ""}
 
 
 def _log_decision(decision: str, branch: str) -> None:
@@ -240,8 +240,12 @@ def _log_decision(decision: str, branch: str) -> None:
     if len(target) > 200:
         target = target[:200] + "…"
     stamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    line = "%s\t%s\t%s\t%s\t%s\n" % (
-        stamp, _ctx.get("tool") or "", decision, branch, target)
+    # Sixth column: the session id. The user's door reads it back to find a
+    # refusal of the same path in the SAME session, so the column is what
+    # makes that match possible ([sweep-security-users-door-is-self-declared]).
+    line = "%s\t%s\t%s\t%s\t%s\t%s\n" % (
+        stamp, _ctx.get("tool") or "", decision, branch, target,
+        safe_session_id(_ctx.get("sid") or ""))
     folder = os.path.join(cwd, ".throughliner")
     path = os.path.join(folder, _DECISION_LOG_NAME)
     try:
@@ -1279,6 +1283,35 @@ def _freeform_scope_files(cwd: str, session_id: str) -> list[str]:
     return _parse_build_files(path) or []
 
 
+def _door_refused_earlier(filepath: str, cwd: str, session_id: str) -> bool:
+    """True where this session's decision log holds a deny of this same path.
+
+    The user's door — a scope file in a no-build session — opens only after
+    the safety check has itself refused that path earlier in the same session
+    ([sweep-security-users-door-is-self-declared]). The hook cannot tell a
+    scope file written on the user's word from one a session wrote to get past
+    a refusal, so this ties the door to the one thing it can read: its own
+    log. Matched on the session id column and the path, normalised; lines
+    from before the column existed carry no id and never match.
+    """
+    path = os.path.join(cwd, ".throughliner", _DECISION_LOG_NAME)
+    if not os.path.isfile(path):
+        return False
+    sid = safe_session_id(session_id)
+    want = _normalise(filepath)
+    try:
+        with open(path, "r", encoding="utf-8", errors="replace") as f:
+            for raw in f:
+                parts = raw.rstrip("\r\n").split("\t")
+                if len(parts) < 6 or parts[2] != "deny" or parts[5] != sid:
+                    continue
+                if _normalise(parts[4]) == want:
+                    return True
+    except OSError:
+        return False
+    return False
+
+
 SETUP_MARKER_NAME = ".throughliner-setup-active"
 CLOSE_MARKER_NAME = ".throughliner-close-active"
 
@@ -1380,6 +1413,92 @@ def _is_close_phase_file(filepath: str, cwd: str, session_id: str) -> bool:
     rel = os.path.relpath(os.path.normpath(filepath), os.path.normpath(cwd))
     rel = os.path.normcase(rel).replace("\\", "/")
     return rel in tuple(os.path.normcase(n) for n in CLOSE_PHASE_FILES)
+
+
+# --- Relative time words with no source ([unfounded-time-words-stopped-once]) ---
+#
+# The always-loaded rule says every statement of when something happened is
+# read from a clock, a timestamp or the record, never recalled. It failed
+# repeatedly in practice, and a wrong time written into a record reads exactly
+# like a right one for as long as it stands. So the phrase set below is caught
+# mechanically in text written to a session record, the queue or SPEC: refused
+# once per distinct phrase per session, then allowed, so a phrase that carries
+# its source in the sentence costs one feedback turn and no more.
+#
+# THE ONE LIST. stop.py carries its own copy of this pattern and scans the
+# finished reply with it — the hooks run standalone from a copied plugin cache
+# and cannot import a shared module (CLAUDE.md's scripting constraints). Change
+# one, change both.
+#
+# The limit, stated: a phrase matcher does not reach a bare wrong clock time
+# ("at 19:10") or a wrong date; those stay with the rule.
+TIME_WORD_PATTERN = re.compile(
+    r"\b(?:"
+    r"(?:\d+|a|an|one|two|three|four|five|few|a few|couple of|several)"
+    r"\s+(?:minutes?|hours?|days?|weeks?|months?)\s+ago"
+    r"|just now|moments ago|earlier today|this morning|this afternoon"
+    r"|this evening|tonight|yesterday|today|tomorrow|last week|next week"
+    r"|last night"
+    r")\b",
+    re.IGNORECASE,
+)
+
+# Spans a time word may legitimately sit inside: inline code, double or curly
+# quotation marks, a blockquoted line, a fenced block. Quoted text is someone
+# else's words or a specimen, and a specimen of the phrase is how this very
+# rule is written down.
+_QUOTED_SPAN = re.compile(r"`[^`\n]*`|\"[^\"\n]*\"|“[^”\n]*”")
+
+
+def _strip_quoted_text(text: str) -> str:
+    """The text with fenced blocks, blockquoted lines and quoted spans blanked."""
+    out = []
+    in_fence = False
+    for line in text.splitlines(keepends=True):
+        stripped = line.lstrip()
+        if stripped.startswith("```"):
+            in_fence = not in_fence
+            out.append("\n" if line.endswith("\n") else "")
+            continue
+        if in_fence or stripped.startswith(">"):
+            out.append("\n" if line.endswith("\n") else "")
+            continue
+        out.append(_QUOTED_SPAN.sub(" ", line))
+    return "".join(out)
+
+
+def _unfounded_time_words(text: str) -> list[str]:
+    """Distinct time phrases in `text` outside quoted spans, lowercased."""
+    found = []
+    for match in TIME_WORD_PATTERN.finditer(_strip_quoted_text(text)):
+        phrase = " ".join(match.group(0).lower().split())
+        if phrase not in found:
+            found.append(phrase)
+    return found
+
+
+def _is_time_word_guarded_path(filepath: str, cwd: str) -> bool:
+    """LOG/ entries, QUEUE.md and SPEC.md — the records a wrong time skews."""
+    if not cwd:
+        return False
+    norm = _normalise(filepath)
+    if norm in (_normalise(os.path.join(cwd, "QUEUE.md")),
+                _normalise(os.path.join(cwd, "SPEC.md"))):
+        return True
+    log_dir = _normalise(os.path.join(cwd, "LOG"))
+    return norm.startswith(log_dir + os.sep)
+
+
+def _written_text(tool_name: str, tool_input: dict) -> str:
+    """The text a Write, Edit or MultiEdit is about to put into the file."""
+    if tool_name == "Write":
+        return tool_input.get("content") or ""
+    if tool_name == "Edit":
+        return tool_input.get("new_string") or ""
+    if tool_name == "MultiEdit":
+        return "\n".join((e or {}).get("new_string") or ""
+                         for e in (tool_input.get("edits") or []))
+    return ""
 
 
 def _fire_once(cwd: str, session_id: str, marker_name: str) -> bool:
@@ -1561,6 +1680,7 @@ def main() -> int:
     _ctx["cwd"] = cwd if adopted_here else ""
     _ctx["tool"] = tool_name if isinstance(tool_name, str) else ""
     _ctx["target"] = ""
+    _ctx["sid"] = data.get("session_id", "") or ""
 
     # --- Subagent (Agent / Task): cost ask-gate ---
     # A subagent run burns tokens fast and a single run can exhaust the
@@ -1857,6 +1977,27 @@ def main() -> int:
             branch="overwrite guard: sent register",
         )
 
+    # A relative time word with no source, written into a record, the queue or
+    # SPEC. Refused once per distinct phrase per session, then allowed.
+    if _is_time_word_guarded_path(filepath, cwd):
+        sid = data.get("session_id", "")
+        fresh = [
+            p for p in _unfounded_time_words(_written_text(tool_name, tool_input))
+            if _fire_once(cwd, sid, "time-word-" + re.sub(r"[^a-z0-9]+", "-", p))
+        ]
+        if fresh:
+            listed = ", ".join('"%s"' % p for p in fresh)
+            return _deny(
+                "[Throughliner] BLOCKED once: this text says when something "
+                f"happened with no source — {listed}.\n\n"
+                "Read the clock or the record and put the source in the "
+                "sentence (\"at 21:40, read from the clock\", \"per the "
+                "2026-09-06 record\"), or drop the word. A wrong time written "
+                "into a record reads exactly like a right one for as long as "
+                "it stands. The same phrase passes on the next attempt.",
+                branch="time word",
+            )
+
     # Rule 1: the working file's Files: section governs editability. Tri-state:
     # no section = skip enforcement, present but empty = method docs only,
     # entries listed = enforce the list.
@@ -1922,7 +2063,17 @@ def main() -> int:
         # scoped build every write to its own working file, including the
         # progress ticks and change notes the close reads.
         sid = data.get("session_id", "")
+        # The Files list is checked further down; a listed path is allowed
+        # there. What follows here is the ordered chain of standing
+        # exemptions, and the ritual `Writes:` field sits at its head: a path
+        # a cycles-doc definition declares is permitted whenever the project
+        # is open, in a build session as much as a planning one
+        # ([ritual-writes-refused-in-build-sessions]).
+        if _is_build_file(filepath, cwd, build_files or []):
+            return _allow("build scope: in Files list")
         for branch, hit in (
+            ("ritual Writes: field",
+             lambda: _is_ritual_declared_path(filepath, cwd)),
             ("build scope: method doc",
              lambda: _is_method_doc(filepath, cwd, sid)),
             ("build scope: memory dir", lambda: _is_memory_dir(filepath)),
@@ -2011,12 +2162,20 @@ def main() -> int:
             ("INBOX", lambda: _is_inbox_dir(filepath)),
             ("ritual Writes: field",
              lambda: _is_ritual_declared_path(filepath, cwd)),
-            ("freeform scope file",
-             lambda: _is_build_file(filepath, cwd,
-                                    _freeform_scope_files(cwd, sid))),
         ):
             if hit():
                 return _allow(branch)
+        # The user's door: a scope file names the path. It admits the write
+        # only where this session's log already holds a refusal of that same
+        # path — a door that opens cold is a one-write convention, not a lock.
+        door_line = ""
+        if _is_build_file(filepath, cwd, _freeform_scope_files(cwd, sid)):
+            if _door_refused_earlier(filepath, cwd, sid):
+                return _allow("freeform scope file")
+            door_line = (
+                "\n\nA scope file names this path, but the door opens only "
+                "after the safety check has refused the path earlier in this "
+                "same session — this refusal is that one.")
         if True:
             return _deny(
                 "[Throughliner] BLOCKED: planning sessions can only change a "
@@ -2036,8 +2195,9 @@ def main() -> int:
                 "_freeform-<session-id>.md in the project root with a Files: "
                 "section naming this one path, say so in one line, and make "
                 "the edit — the user's repeated direction is what opens that "
-                "door, one path at a time.",
-                branch="planning standing list: not on it",
+                "door, one path at a time." + door_line,
+                branch=("freeform scope file: no prior refusal" if door_line
+                        else "planning standing list: not on it"),
             )
 
     return 0

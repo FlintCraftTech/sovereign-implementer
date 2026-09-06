@@ -515,6 +515,11 @@ python <plugin-root>/scripts/reorder_queue.py <QUEUE.md path> \
     --delete <slug> Processed
 ```
 
+Where the project's state server is registered, make the four writes and the
+removal with its `build_tick` tool, which writes the lines in the shapes above,
+refuses a missing verdict, a full depth with no trigger or a gate line the item
+does not carry, and removes the item in the same call.
+
 Tick first, then remove. That order means an interruption between the two leaves
 the item in both files, which a resume can see and settle — the reverse order
 would leave it in neither.
